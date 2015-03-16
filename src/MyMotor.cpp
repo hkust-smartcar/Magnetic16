@@ -59,6 +59,7 @@ int32_t MyMotor::MyEncoder::getEncoderReading(void)
 {
 
 	getEncoderCount();
+	m_lastCount = m_myEncoder.GetCount();
 	return m_lastCount;
 }
 
@@ -84,7 +85,7 @@ MyMotor::MyMotor(MyConfig &config, MyVar &vars, MyLoop &loop)
 //#elif LIBSC_MOTOR0_ALTERMOTOR
 //	m_motor(getAlterMotorConfig(config.MyMotorId)),
 //#endif
-	m_speedController(&config.MyMotorSpeedControlRef, &config.MyMotorSpeedControlKp, &config.MyMotorSpeedControlKi, &config.MyMotorSpeedControlKd),
+	m_speedController(&config.MyMotorSpeedControlRef, &config.MyMotorSpeedControlKp, &config.MyMotorSpeedControlKi, &config.MyMotorSpeedControlKd, MIN_MOTOR_POWER, MAX_MOTOR_POWER),
 	m_lastProcessSpeedControlTime(0),
 	m_encoder(config, vars),
 	m_speed(0),
@@ -116,7 +117,7 @@ void MyMotor::speedControlRoutine(void)
 {
 	if (m_motorInstance->m_isStarted)
 	{
-		m_motorInstance->setSpeed((int16_t)m_motorInstance->m_speedController.updatePID((float)m_motorInstance->m_encoder.getEncoderReading(), Timer::TimeDiff(System::Time(), m_motorInstance->m_lastProcessSpeedControlTime)));
+		m_motorInstance->setSpeed((int16_t)m_motorInstance->m_speedController.updatePID((float)m_motorInstance->m_encoder.getEncoderReading()));
 		m_motorInstance->m_lastProcessSpeedControlTime = System::Time();
 	}
 	else

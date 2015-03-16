@@ -30,25 +30,25 @@ public:
 	// Put All Configuration Here
 
 	// MyMotorPID
-	float			MyMotorSpeedControlRef = 20.0f;
-	float			MyMotorSpeedControlKp = 2.0f;
+	float			MyMotorSpeedControlRef = 100.0f;
+	float			MyMotorSpeedControlKp = 0.005f;
 	float			MyMotorSpeedControlKi = 0.0f;
-	float			MyMotorSpeedControlKd = 0.001f;
+	float			MyMotorSpeedControlKd = 0.000f;
 
 	// MyServoTurningPID
 	float			MyServoTurningRef = 0.0f;
-	float			MyServoTurningKp = 2650.0f;
+	float			MyServoTurningKp = 1.0f;
 	float			MyServoTurningKi = 0.0f;
 	float			MyServoTurningKd = 0.0f;
 
 	// MyMagSen
-	uint8_t			MyMagSenPairCount = 2;
+	uint8_t			MyMagSenPairCount = 3;
 	uint8_t			MyMagSenPairId0 = 0;
 	uint8_t			MyMagSenPairId1 = 2;
 	uint8_t			MyMagSenPairId2 = 4;
 
-	float			MyMagSenFilterQ = 0.00001f;
-	float			MyMagSenFilterR = 1.75f;
+	float			MyMagSenFilterQ = 0.0015f;
+	float			MyMagSenFilterR = 0.9f;
 
 	float			MyMagSenDistanceWhenMaxDiff = 10.0f;
 	float			MyMagMaxSenReadingDiff = 1.4f;

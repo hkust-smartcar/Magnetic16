@@ -38,9 +38,6 @@ using namespace std;
 #define outRangeOf(v, ov, r) ((v - ov < -r || v - ov > r)? v : 0)
 #define abs(v) ((v > 0)? v : -v)
 
-#define MIN_MOTOR_POWER	0
-#define MAX_MOTOR_POWER	1000
-
 #define CMD_FORWARD		0
 #define CMD_BACKWARD	1
 #define CMD_LEFT		2

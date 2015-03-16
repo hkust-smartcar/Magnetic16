@@ -13,8 +13,8 @@
 #include <libsc/k60/system.h>
 #include <libsc/k60/trs_d05.h>
 #include <libbase/k60/adc.h>
-#include <libutil/kalman_filter.h>
 
+#include "MyKalmanFilter.h"
 #include "MyServo.h"
 #include "PIDhandler.h"
 #include "MyConfig.h"
@@ -24,7 +24,6 @@
 
 using namespace libsc::k60;
 using namespace libbase::k60;
-using namespace libutil;
 using namespace std;
 
 MyServo *m_servoInstance;
@@ -47,12 +46,12 @@ inline Pin::Name GetPin(const uint8_t id)
 		// no break
 #ifdef LIBSC_USE_MAGSEN
 	case 0:
-		return LIBSC_MAGSEN0;
+		return LIBSC_MAGSEN4;
 #endif
 
 #if LIBSC_USE_MAGSEN > 1
 	case 1:
-		return LIBSC_MAGSEN1;
+		return LIBSC_MAGSEN5;
 #endif
 
 #if LIBSC_USE_MAGSEN > 2
@@ -67,12 +66,12 @@ inline Pin::Name GetPin(const uint8_t id)
 
 #if LIBSC_USE_MAGSEN > 4
 	case 4:
-		return LIBSC_MAGSEN4;
+		return LIBSC_MAGSEN0;
 #endif
 
 #if LIBSC_USE_MAGSEN > 5
 	case 5:
-		return LIBSC_MAGSEN5;
+		return LIBSC_MAGSEN1;
 #endif
 	}
 }
@@ -98,31 +97,35 @@ vector<Adc> getAdcPair(const uint8_t id)
 	return newPair;
 }
 
-vector<KalmanFilter> MyServo::MyMagSenPair::getFilters(MyConfig &config)
+vector<MyKalmanFilter> MyServo::MyMagSenPair::getFilters(MyConfig &config)
 {
-	vector<KalmanFilter> newFilters;
+	vector<MyKalmanFilter> newFilters;
 
-	newFilters.push_back(KalmanFilter(config.MyMagSenFilterQ, config.MyMagSenFilterR, m_MagSens[0].GetResultF(), 1.0f));
-	newFilters.push_back(KalmanFilter(config.MyMagSenFilterQ, config.MyMagSenFilterR, m_MagSens[1].GetResultF(), 1.0f));
+//	newFilters.push_back(KalmanFilter(config.MyMagSenFilterQ, config.MyMagSenFilterR, m_MagSens[0].GetResultF(), 1.0f));
+//	newFilters.push_back(KalmanFilter(config.MyMagSenFilterQ, config.MyMagSenFilterR, m_MagSens[1].GetResultF(), 1.0f));
+
+
+	newFilters.push_back(MyKalmanFilter(&config.MyMagSenFilterQ, &config.MyMagSenFilterR, 0.5f, 0.5f));
+	newFilters.push_back(MyKalmanFilter(&config.MyMagSenFilterQ, &config.MyMagSenFilterR, 0.5f, 0.5f));
 
 	return newFilters;
 }
 
 void MyServo::MyMagSenPair::processReading(void)
 {
-	m_MagSenFilteredLeft = m_MagSenFilters[0].Filter( m_MagSens[0].GetResultF());
+	m_MagSenFilteredLeft = m_MagSenFilters[0].Filter(m_MagSens[0].GetResultF());
 	m_MagSenFilteredRight = m_MagSenFilters[1].Filter(m_MagSens[1].GetResultF());
 	m_MagSenOffsetPrediction = (m_MagSenFilteredLeft - m_MagSenFilteredRight) / *MaxSenReadingDiff * *DistanceWhenMaxDiff;
 }
 
 float MyServo::MyMagSenPair::getMagSenDiff(void)
 {
-	return m_MagSenLeft - m_MagSenRight;
+	return m_MagSenFilteredLeft - m_MagSenFilteredRight;
 }
 
 float MyServo::MyMagSenPair::getMagSenSum(void)
 {
-	return m_MagSenLeft + m_MagSenRight;
+	return m_MagSenFilteredLeft + m_MagSenFilteredRight;
 }
 
 float *MyServo::MyMagSenPair::getFilteredLeftReading(void)
@@ -143,8 +146,6 @@ float *MyServo::MyMagSenPair::getDistanceFromWire(void)
 MyServo::MyMagSenPair::MyMagSenPair(const uint8_t id, MyConfig &config)
 :
 	m_MagSens(getAdcPair(id)),
-	m_MagSenLeft(0.0f),
-	m_MagSenRight(0.0f),
 	m_MagSenFilteredLeft(0.0f),
 	m_MagSenFilteredRight(0.0f),
 	DistanceWhenMaxDiff(&config.MyMagSenDistanceWhenMaxDiff),
@@ -174,10 +175,10 @@ MyServo::MyServo(MyConfig &config, MyVar &vars, MyLoop &loop)
 	diffResultLR(0.0f),
 	sumResultLR(0.0f),
 	m_isStarted(false),
-	usedMagSen(config.MyMagSenPairCount),
+	usedMagSenPairs(config.MyMagSenPairCount),
 //#endif
 	m_servo(getServoConfig(config.MyServoId)),
-	m_TurningController(&config.MyServoTurningRef, &config.MyServoTurningKp, &config.MyServoTurningKi, &config.MyServoTurningKd),
+	m_TurningController(&config.MyServoTurningRef, &config.MyServoTurningKp, &config.MyServoTurningKi, &config.MyServoTurningKd, MIN_SERVO_TURNING_DEGREE, MAX_SERVO_TURNING_DEGREE),
 	m_lastProcessTurningControlTime(System::Time()),
 	m_lastTurningAngle(0),
 	m_lastTurningBeforeLowSignal(LastTurningDirection::FORWARD),
@@ -198,6 +199,9 @@ MyServo::MyServo(MyConfig &config, MyVar &vars, MyLoop &loop)
 	vars.diffResultLR = &diffResultLR;
 	vars.sumResultLR = &sumResultLR;
 	vars.isMotorStarted = &m_isStarted;
+	vars.lastTurningAngle = &m_lastTurningAngle;
+	vars.magSenFilterQ = &config.MyMagSenFilterQ;
+	vars.magSenFilterR = &config.MyMagSenFilterR;
 	loop.addFunctionToLoop(&turningControlRoutine, LOOP_IMMEDIATELY, LOOP_EVERYTIME);
 }
 
@@ -230,7 +234,7 @@ void MyServo::turnRight(const uint16_t degree_x10)
 
 void MyServo::turn(const int16_t degree_x10)
 {
-	m_servo.SetDegree(MID_SERVO_DEGREE + inRange(-MAX_SERVO_TURNING_DEGREE, outRangeOf(degree_x10, m_lastTurningAngle, 10), MAX_SERVO_TURNING_DEGREE));
+	m_servo.SetDegree(MID_SERVO_DEGREE + outRangeOf(inRange(-MAX_SERVO_TURNING_DEGREE, degree_x10, MAX_SERVO_TURNING_DEGREE), 0, 10));
 	dropDownLastAngle();
 }
 
@@ -252,26 +256,26 @@ void MyServo::updateLastTurningAngle(void)
 
 void MyServo::turningControlRoutine(void)
 {
-	if (m_servoInstance->usedMagSen >= 2)
+	if (m_servoInstance->usedMagSenPairs >= 1)
 	{
 		m_servoInstance->m_MagSenSD.processReading();
 		m_servoInstance->diffResultSD = m_servoInstance->m_MagSenSD.getMagSenDiff();
 		m_servoInstance->sumResultSD = m_servoInstance->m_MagSenSD.getMagSenSum();
 	}
-	if (m_servoInstance->usedMagSen >= 4)
+	if (m_servoInstance->usedMagSenPairs >= 2)
 	{
 		m_servoInstance->m_MagSenFD.processReading();
 		m_servoInstance->diffResultFD = m_servoInstance->m_MagSenFD.getMagSenDiff();
 		m_servoInstance->sumResultFD = m_servoInstance->m_MagSenSD.getMagSenSum();
 	}
-	if (m_servoInstance->usedMagSen >= 6)
+	if (m_servoInstance->usedMagSenPairs >= 3)
 	{
 		m_servoInstance->m_MagSenLR.processReading();
 		m_servoInstance->diffResultLR = m_servoInstance->m_MagSenLR.getMagSenDiff();
 		m_servoInstance->sumResultLR = m_servoInstance->m_MagSenSD.getMagSenSum();
 	}
-	m_servoInstance->turn((int16_t)m_servoInstance->m_TurningController.updatePID(m_servoInstance->diffResultSD / m_servoInstance->sumResultSD, Timer::TimeDiff(System::Time(), (Timer::TimerInt)m_servoInstance->m_lastProcessTurningControlTime)));
-	m_servoInstance->m_lastProcessTurningControlTime = System::Time();
+	//m_servoInstance->turn((int16_t)m_servoInstance->m_TurningController.updatePID(m_servoInstance->diffResultSD / m_servoInstance->sumResultSD));
+	m_servoInstance->turn((int16_t)(m_servoInstance->diffResultSD * 1000));
 }
 
 MyServo::LastTurningDirection MyServo::getLastCarState(void)

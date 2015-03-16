@@ -74,11 +74,13 @@ public:
 		static TypeId *m_instance;
 	};
 
+	typedef std::function<void(const std::vector<Byte>&)> OnReceiveListener;
+
 	explicit MyVarManager(void);
 	~MyVarManager(void);
 
 	void Init(void);
-	void Init(const JyMcuBt106::OnReceiveListener &oriListener);
+	void Init(const OnReceiveListener &oriListener);
 	void UnInit(void);
 
 	template<typename ObjType>
@@ -107,7 +109,7 @@ private:
 
 	JyMcuBt106						m_uart;
 
-	JyMcuBt106::OnReceiveListener	m_origin_listener;
+	OnReceiveListener	m_origin_listener;
 
 	std::vector<ObjMng>				sharedObjMng;
 	std::vector<ObjMng>				watchedObjMng;

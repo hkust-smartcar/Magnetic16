@@ -5,86 +5,67 @@
  *      Author: Peter
  */
 
-#include "PIDhandler.h"
 #include <cstring>
+
+#include <libsc/k60/system.h>
+
+#include "PIDhandler.h"
+#include "MySmartCar.h"
 
 using namespace libsc::k60;
 
-PIDhandler::PIDhandler(float *ref, float kp, float ki, float kd)
+PIDhandler::PIDhandler(float *ref, float *kp, float *ki, float *kd, const float min, const float max)
 :
 	reference(ref),
 	Kp(kp),
 	Ki(ki),
 	Kd(kd),
 	eSum(0),
-	lastError(0)
+	lastError(0),
+	epsilon(*reference * EPSILON_RATIO),
+	lastTimeUpdate(0),
+	min(min),
+	max(max)
 {
 	System::Init();
-}
-
-PIDhandler::PIDhandler(float ref, float kp, float ki, float kd)
-:
-	reference(new float(ref)),
-	Kp(kp),
-	Ki(ki),
-	Kd(kd),
-	eSum(0),
-	epsilon(10),
-	output(0),
-	v(10)
-	lastError(0)
-{
-	System::Init();
-}
-
-void PIDhandler::setKp(float kp)
-{
-	Kp = MAX(0, kp);
-}
-void PIDhandler::setKi(float ki)
-{
-	Ki = MAX(0, ki);
-}
-void PIDhandler::setKd(float kd)
-{
-	Kd = MAX(0, kd);
+	reset();
 }
 
 float PIDhandler::getKp(void)
 {
-	return Kp;
+	return *Kp;
 }
 
 float PIDhandler::getKi(void)
 {
-	return Ki;
+	return *Ki;
 }
 
 float PIDhandler::getKd(void)
 {
-	return Kd;
+	return *Kd;
 }
 
-void PIDhandler::reset()
+void PIDhandler::reset(void)
 {
 	eSum = 0;
+	lastTimeUpdate = System::Time();
 }
 
-float PIDhandler::updatePID(float val, uint32_t dt)
+float PIDhandler::updatePID(float val)
 {
 	float error = *reference - val;
+	uint32_t dt = Timer::TimeDiff(System::Time(), lastTimeUpdate);
 	float dE = (error - lastError) / dt;
-	if (abs(error)>epsilon){
+	lastError = error;
+
+	if (abs(lastError) >= epsilon)
 		eSum += error*dt;
-	}
-	if (abs(error)>=v){
-		output = abs(Kp * error) + Ki * esum + Kd * de;
-	}
-	else{
-		output = Kp * error + Ki * esum + Kd * de;
-	}
-	if (output>reference)
-		output = reference;
-	return (float)(output);
+
+	output += *Kp * lastError + *Ki * eSum + *Kd * dE;
+
+	lastTimeUpdate = System::Time();
+
+	return inRange(min, output, max);
 
 }

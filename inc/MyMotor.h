@@ -21,10 +21,13 @@
 #include "MyLoop.h"
 #include "PIDhandler.h"
 
-//#ifdef LIBSC_USE_MOTOR
-
 using namespace libsc::k60;
 using namespace libbase::k60;
+
+//#ifdef LIBSC_USE_MOTOR
+
+#define MIN_MOTOR_POWER	0
+#define MAX_MOTOR_POWER	500
 
 class MyMotor
 {

@@ -159,7 +159,7 @@ void MyVarManager::Init(void)
 	}
 }
 
-void MyVarManager::Init(const JyMcuBt106::OnReceiveListener &oriListener)
+void MyVarManager::Init(const OnReceiveListener &oriListener)
 {
 	if (!isStarted)
 	{

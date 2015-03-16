@@ -22,21 +22,20 @@ public:
 	// MyMagSen
 	float				*MagSenSDLeft;
 	float				*MagSenSDRight;
-
 	float				*MagSenFDLeft;
 	float				*MagSenFDRight;
-
 	float				*MagSenLRLeft;
 	float				*MagSenLRRight;
 
 	float 				*diffResultSD;
 	float 				*sumResultSD;
-
 	float 				*diffResultFD;
 	float 				*sumResultFD;
-
 	float 				*diffResultLR;
 	float 				*sumResultLR;
+
+	float				*magSenFilterQ;
+	float				*magSenFilterR;
 
 	// MyServo
 

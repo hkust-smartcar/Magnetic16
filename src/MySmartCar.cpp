@@ -51,7 +51,7 @@ Button::Config MySmartCar::getButtonConfig(const uint8_t id)
 	config.is_active_low = false;
 	config.is_use_pull_resistor = false;
 	config.listener = &onButtonPress;
-	config.listener_trigger = Button::Config::Trigger::kBoth;
+	config.listener_trigger = Button::Config::Trigger::kDown;
 	return config;
 }
 

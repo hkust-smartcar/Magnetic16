@@ -13,9 +13,9 @@
 #include <libsc/config.h>
 #include <libsc/k60/trs_d05.h>
 #include <libbase/k60/adc.h>
-#include <libutil/kalman_filter.h>
 #include <libsc/k60/system.h>
 
+#include "MyKalmanFilter.h"
 #include "PIDhandler.h"
 #include "MyConfig.h"
 #include "MyVar.h"
@@ -23,7 +23,6 @@
 
 using namespace libsc::k60;
 using namespace libbase::k60;
-using namespace libutil;
 using namespace std;
 
 //#ifdef LIBSC_USE_SERVO
@@ -31,6 +30,17 @@ using namespace std;
 #define MID_SERVO_DEGREE 			900
 #define MIN_SERVO_TURNING_DEGREE 	0
 #define MAX_SERVO_TURNING_DEGREE	800
+
+// cross road ->
+//			  |
+//
+//SD L->1or>1 R<normal
+//FD L>normal R>SDLor>1
+
+// cross road ^
+//			  |__
+//
+//oppsite to above
 
 class MyServo
 {
@@ -70,8 +80,6 @@ public:
 
 	private:
 
-		float					m_MagSenLeft;
-		float					m_MagSenRight;
 		float					m_MagSenFilteredLeft;
 		float					m_MagSenFilteredRight;
 		float					m_MagSenOffsetPrediction;
@@ -79,10 +87,10 @@ public:
 		float					*DistanceWhenMaxDiff;
 		float					*MaxSenReadingDiff;
 
-		vector<KalmanFilter> 	m_MagSenFilters;
+		vector<MyKalmanFilter> 	m_MagSenFilters;
 		vector<Adc>				m_MagSens;
 
-		vector<KalmanFilter> getFilters(MyConfig &config);
+		vector<MyKalmanFilter> getFilters(MyConfig &config);
 
 	};
 
@@ -131,7 +139,7 @@ private:
 
 	bool				m_isStarted;
 
-	Byte				usedMagSen;
+	Byte				usedMagSenPairs;
 //#endif
 
 

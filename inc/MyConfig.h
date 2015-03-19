@@ -30,7 +30,7 @@ public:
 	// Put All Configuration Here
 
 	// MyMotorPID
-	float			MyMotorSpeedControlRef = 100.0f;
+	float			MyMotorSpeedControlRef = 300.0f;
 	float			MyMotorSpeedControlKp = 0.005f;
 	float			MyMotorSpeedControlKi = 0.0f;
 	float			MyMotorSpeedControlKd = 0.000f;
@@ -55,9 +55,12 @@ public:
 
 	// MyServo
 	uint8_t			MyServoId = 0;
-	float			MyServoFactorSD = 1.0f;
-	float			MyServoFactorFD = 0.0f;
-	float			MyServoFactorLR = 0.0f;
+	float			MyServoDefaultMaxSDValue = 0.0f;
+	float			MyServoDefaultMinSDValue = 0.0f;
+	float			MyServoDefaultMaxFDValue = 0.0f;
+	float			MyServoDefaultMinFDValue = 0.0f;
+	float			MyServoDefaultMaxLRValue = 0.0f;
+	float			MyServoDefaultMinLRValue = 0.0f;
 
 	// MyMotor
 	uint8_t			MyMotorId = 0;
@@ -65,6 +68,23 @@ public:
 
 	// MyEncoder
 	uint8_t			MyEncoderId = 0;
+
+	// MyBatteryMeter
+
+	float			MyBatteryMeterVoltageRatio = 0.32984f;
+	float			MyBatteryMeterUpdateEvery = 0.02f;
+	float			MyBatteryMeterVoltageMax = 8.0f;
+	float			MyBatteryMeterVoltageMin = 7.2f;
+
+	uint16_t		MyBatteryMeterHighColor = 0x063F;
+	uint16_t		MyBatteryMeterNormalColor = 0x07E0;
+	uint16_t		MyBatteryMeterLowColor = 0xF800;
+
+	// MyLcd
+	uint16_t		MyLcdBackgroundColor = 0x0000;
+	uint16_t		MyLcdTextColor = 0xFFFF;
+	bool			MyLcdIsRevert = true;
+	uint8_t			MyLcdFps = 60;
 
 	// MySmartCar
 	SmartCarPowerMode

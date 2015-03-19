@@ -5,23 +5,7 @@
  *      Author: Peter
  */
 
-#include <map>
-#include <array>
-#include <cstring>
-#include <cstdio>
-#include <queue>
-#include <cstdlib>
-#include <cmath>
-#include <vector>
-
-#include <libsc/k60/battery_meter.h>
 #include <libbase/k60/mcg.h>
-#include <libsc/k60/system.h>
-#include <libutil/remote_var_manager.h>
-#include <libbase/k60/rand_generator.h>
-#include <libsc/k60/lcd_console.h>
-#include <libutil/kalman_filter.h>
-#include <libbase/k60/gpio.h>
 
 #include "MySmartCar.h"
 #include "PIDhandler.h"
@@ -48,7 +32,6 @@ namespace libbase
 
 using namespace libsc::k60;
 using namespace libbase::k60;
-using namespace libutil;
 using namespace std;
 
 MyConfig globalConfig;
@@ -102,13 +85,24 @@ int main()
 	myCar.myVarMng.addWatchedVar(globalVars.MagSenSDRight, "asd");
 	myCar.myVarMng.addWatchedVar(globalVars.MagSenFDLeft, "asd");
 	myCar.myVarMng.addWatchedVar(globalVars.MagSenFDRight, "asd");
-	myCar.myVarMng.addWatchedVar(globalVars.MagSenLRLeft, "asd");
-	myCar.myVarMng.addWatchedVar(globalVars.MagSenLRRight, "asd");
-	myCar.myVarMng.addWatchedVar(globalVars.magSenFilterQ, "asd");
-	myCar.myVarMng.addWatchedVar(globalVars.magSenFilterR, "asd");
+	myCar.myVarMng.addWatchedVar(globalVars.magSenDefaultMaxFDValue, "asd");
+	myCar.myVarMng.addWatchedVar(globalVars.lastTurningBeforeLowSignal, "asd");
 //	myCar.myVarMng.addWatchedVar(globalVars.speed, "asd");
 //	myCar.myVarMng.addWatchedVar(globalVars.lastCount, "asd");
 	myCar.myVarMng.Init(&myListener);
 
 	myCar.startMainLoop();
+	vector<Led> myLeds;
+	Gpo::Config config;
+	config.is_high = true;
+	config.pin = libbase::k60::Pin::Name::kPtc1;
+	Gpio a(config);
+
+	for (uint8_t i = 0; i < 4; i++)
+		myLeds.push_back(Led({i, false}));
+
+	while (true)
+		for (uint8_t j = 0; j < 4; j++)
+			myLeds[j].Switch();
+
 }

@@ -6,11 +6,10 @@
  */
 
 #include <cstring>
-#include <vector>
 #include <cassert>
+#include <stdlib.h>
 
 #include <libsc/config.h>
-#include <stdlib.h>
 #include <libsc/k60/system.h>
 
 #include "MySmartCar.h"
@@ -55,27 +54,20 @@ Button::Config MySmartCar::getButtonConfig(const uint8_t id)
 	return config;
 }
 
-Led::Config getLedConfig(const uint8_t id)
-{
-	Led::Config config;
-	config.id = id;
-	config.is_active_low = false;
-	return config;
-}
-
 MySmartCar::MySmartCar(MyConfig &config, MyVar &vars)
 :
 	myLoop(),
 	m_powerMode(&config.MySmartCarPowerMode),
 	m_turningMode(&config.MySmartCarTurningMode),
-	myLeds(getLeds()),
-	myButtons(getButtons()),
+	myLeds({Led({0, false}), Led({1, false}), Led({2, false}), Led({3, false})}),
+	myButtons({Button(getButtonConfig(0)), Button(getButtonConfig(1))}),
+	myLcd(config, vars, myLoop),
 	myMotor(config, vars, myLoop),
-	myServo(config, vars, myLoop)
+	myServo(config, vars, myLoop),
+	myConfig(config)
 {
 	m_smartCarInstance = this;
 	reset();
-//	myUart.EnableRx(&ExecuteCommand);
 }
 
 void MySmartCar::showValue(void)
@@ -83,14 +75,9 @@ void MySmartCar::showValue(void)
 	m_smartCarInstance->myVarMng.sendWatchData();
 }
 
-void MySmartCar::controlRoutine(void)
-{
-
-}
-
 void MySmartCar::startMainLoop(void)
 {
-	myLoop.addFunctionToLoop(&showValue, 2, 5);
+	myLoop.addFunctionToLoop(&showValue, 1, 5);
 	myLoop.start();
 }
 
@@ -98,22 +85,6 @@ void MySmartCar::reset(void)
 {
 	myMotor.reset();
 	myServo.reset();
-}
-
-vector<Led> MySmartCar::getLeds(void)
-{
-	vector<Led> newLeds;
-	for (Byte i = 0; i < getLedCount(); i++)
-		newLeds.push_back(Led(getLedConfig(i)));
-	return newLeds;
-}
-
-vector<Button> MySmartCar::getButtons(void)
-{
-	vector<Button> newButtons;
-	for (Byte i = 0; i < 2; i++)
-		newButtons.push_back(Button(getButtonConfig(i)));
-	return newButtons;
 }
 
 void MySmartCar::onButtonPress(const uint8_t id)
@@ -125,7 +96,8 @@ void MySmartCar::onButtonPress(const uint8_t id)
 		break;
 
 	case 1:
-		m_smartCarInstance->myServo.setEnabled(!m_smartCarInstance->myServo.isEnabled());
+		//m_smartCarInstance->myServo.getMagSenRange(2000);
+		//m_smartCarInstance->myServo.setEnabled(!m_smartCarInstance->myServo.isEnabled());
 		break;
 
 	default:

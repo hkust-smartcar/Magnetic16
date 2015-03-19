@@ -7,8 +7,6 @@
 
 #pragma once
 
-#include <vector>
-
 #include <libsc/k60/system.h>
 #include <libsc/k60/led.h>
 #include <libsc/k60/alternate_motor.h>
@@ -23,6 +21,7 @@
 #include <libsc/k60/ab_encoder.h>
 #include <libsc/k60/button.h>
 
+#include "MyLcd.h"
 #include "MyLoop.h"
 #include "MyVarManager.h"
 #include "MyMotor.h"
@@ -37,6 +36,7 @@ using namespace std;
 #define	inRange(n, v, x) ((v > x)? x : ((v < n)? n : v))
 #define outRangeOf(v, ov, r) ((v - ov < -r || v - ov > r)? v : 0)
 #define abs(v) ((v > 0)? v : -v)
+#define length(v) (sizeof(v) / sizeof(v[0]))
 
 #define CMD_FORWARD		0
 #define CMD_BACKWARD	1
@@ -68,23 +68,24 @@ public:
 private:
 
 #ifdef LIBSC_USE_LED
-	vector<Led>	myLeds;
+	Led					myLeds[4];
 #endif
 #ifdef LIBSC_USE_BUTTON
-	vector<Button> myButtons;
+	Button				myButtons[2];
 #endif
+
+	MyConfig			myConfig;
 
 	MyLoop				myLoop;
 	MyServo				myServo;
 	MyMotor				myMotor;
 
+	MyLcd				myLcd;
+
 	MyConfig::SmartCarPowerMode		*m_powerMode;
 	MyConfig::SmartCarTurningMode	*m_turningMode;
 
 	void controlRoutine(void);
-
-	vector<Led> getLeds(void);
-	vector<Button> getButtons(void);
 
 	static void onButtonPress(const uint8_t id);
 

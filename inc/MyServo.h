@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include <vector>
 #include <array>
 
 #include <libsc/config.h>
@@ -73,8 +72,10 @@ public:
 		float getMagSenDiff(void);
 		float getMagSenSum(void);
 
-		float *getFilteredLeftReading(void);
-		float *getFilteredRightReading(void);
+		float *getFilteredLeftReadingPointer(void);
+		float *getFilteredRightReadingPointer(void);
+		float getFilteredLeftReading(void);
+		float getFilteredRightReading(void);
 
 		float *getDistanceFromWire(void);
 
@@ -87,10 +88,10 @@ public:
 		float					*DistanceWhenMaxDiff;
 		float					*MaxSenReadingDiff;
 
-		vector<MyKalmanFilter> 	m_MagSenFilters;
-		vector<Adc>				m_MagSens;
+		MyKalmanFilter			m_MagSenFilters[2];
+		Adc						m_MagSens[2];
 
-		vector<MyKalmanFilter> getFilters(MyConfig &config);
+		MyKalmanFilter *getFilters(MyConfig &config);
 
 	};
 
@@ -103,28 +104,28 @@ public:
 
 	void reset(void);
 
-	void turnLeft(const uint16_t degree_x10);
-	void turnRight(const uint16_t degree_x10);
 	void turn(const int16_t degree_x10);
 
-	void dropDownLastAngle(void);
+	bool isNoSignal(const float ref);
+	bool isCrossRoad(void);
+
+	void getMagSenRange(const Timer::TimerInt interval);
+
+	void dropDownLastAngle(const int16_t degree_x10);
 
 	static void turningControlRoutine(void);
-
-	LastTurningDirection getLastCarState(void);
 
 private:
 
 	Timer::TimerInt		m_lastProcessTurningControlTime;
 	int16_t				m_lastTurningAngle;
 
-	array<int16_t, 5>	m_lastFiveTimesTurning;
-	Byte				m_lastFiveTimesTurningUpdateIndex;
-	LastTurningDirection m_lastTurningBeforeLowSignal;
-
-	float				*m_factorSD;
-	float				*m_factorFD;
-	float				*m_factorLR;
+	float				*m_maxSDValue;
+	float				*m_minSDValue;
+	float				*m_maxFDValue;
+	float				*m_minFDValue;
+	float				*m_maxLRValue;
+	float				*m_minLRValue;
 
 //#ifdef LIBSC_USE_MAGSEN
 	MyMagSenPair		m_MagSenSD;
@@ -138,15 +139,23 @@ private:
 	float 				sumResultLR;
 
 	bool				m_isStarted;
+	int16_t				m_setAngleList[20];
+	int8_t				m_lastAngleListIndex;
+	int32_t				m_lastAngleListSum;
 
-	Byte				usedMagSenPairs;
+	uint8_t				usedMagSenPairs;
 //#endif
 
 
 	PIDhandler 			m_TurningController;
 	TrsD05				m_servo;
 
-	void updateLastTurningAngle(void);
+
+	int16_t getNextAngle(void);
+
+	LastTurningDirection updateLastTurningAngle(void);
+
+	void turningDispatch(int16_t degree_x10);
 
 };
 

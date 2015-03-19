@@ -6,15 +6,25 @@
  * Refer to LICENSE for details
  */
 
+#include <cassert>
+#include <cstddef>
+
 #include "MyKalmanFilter.h"
 
-MyKalmanFilter::MyKalmanFilter(float *q, float *r, const float x,
-		const float p)
-		: m_q(q), m_r(r), m_k(0), m_x(x), m_lx(0), m_p(p), m_lp(0)
+MyKalmanFilter::MyKalmanFilter(nullptr_t)
+:
+	m_isUsable(false)
+{}
+
+MyKalmanFilter::MyKalmanFilter(float *q, float *r, const float x, const float p)
+:
+	m_q(q), m_r(r), m_k(0), m_x(x), m_lx(0), m_p(p), m_lp(0),
+	m_isUsable(true)
 {}
 
 float MyKalmanFilter::Filter(const float data)
 {
+	if (!m_isUsable) assert(false);
 	PredictState();
 	PredictCovariance();
 	Gain();

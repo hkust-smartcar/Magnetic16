@@ -37,6 +37,17 @@ public:
 	float				*magSenFilterQ;
 	float				*magSenFilterR;
 
+	float				*magSenDefaultMaxSDValue;
+	float				*magSenDefaultMinSDValue;
+	float				*magSenDefaultMaxFDValue;
+	float				*magSenDefaultMinFDValue;
+	float				*magSenDefaultMaxLRValue;
+	float				*magSenDefaultMinLRValue;
+
+	// MyBattteryMeter
+
+	float				*lastVoltage;
+
 	// MyServo
 
 	bool				*isServoStarted;

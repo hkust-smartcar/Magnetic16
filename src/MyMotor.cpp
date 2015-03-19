@@ -116,15 +116,9 @@ void MyMotor::reset(void)
 void MyMotor::speedControlRoutine(void)
 {
 	if (m_motorInstance->m_isStarted)
-	{
 		m_motorInstance->setSpeed((int16_t)m_motorInstance->m_speedController.updatePID((float)m_motorInstance->m_encoder.getEncoderReading()));
-		m_motorInstance->m_lastProcessSpeedControlTime = System::Time();
-	}
 	else
-	{
 		m_motorInstance->setSpeed(0);
-		m_motorInstance->m_lastProcessSpeedControlTime = System::Time();
-	}
 }
 
 void MyMotor::setSpeed(const int16_t speed)

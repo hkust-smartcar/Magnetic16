@@ -7,19 +7,19 @@
 
 #pragma once
 
-#include <libsc/k60/system.h>
-#include <libsc/k60/led.h>
-#include <libsc/k60/alternate_motor.h>
-#include <libsc/k60/dir_motor.h>
-#include <libsc/k60/tower_pro_mg995.h>
+#include <libsc/system.h>
+#include <libsc/led.h>
+#include <libsc/alternate_motor.h>
+#include <libsc/dir_motor.h>
+#include <libsc/tower_pro_mg995.h>
 #include <libbase/k60/adc.h>
 #include <libsc/k60/ftdi_ft232r.h>
-#include <libsc/k60/st7735r.h>
-#include <libsc/k60/mma8451q.h>
-#include <libsc/k60/futaba_s3010.h>
-#include <libsc/k60/trs_d05.h>
-#include <libsc/k60/ab_encoder.h>
-#include <libsc/k60/button.h>
+#include <libsc/st7735r.h>
+#include <libsc/mma8451q.h>
+#include <libsc/futaba_s3010.h>
+#include <libsc/trs_d05.h>
+#include <libsc/ab_encoder.h>
+#include <libsc/button.h>
 
 #include "MyLcd.h"
 #include "MyLoop.h"
@@ -29,6 +29,7 @@
 #include "MyConfig.h"
 #include "MyVar.h"
 
+using namespace libsc;
 using namespace libsc::k60;
 using namespace libbase::k60;
 using namespace std;
@@ -61,29 +62,29 @@ public:
 
 	void startMainLoop(void);
 
+	void motorSetEnabled(bool enabled);
+	void servoSetEnabled(bool enabled);
+
 	void reset(void);
 
 	MyVarManager		myVarMng;
 
 private:
 
-#ifdef LIBSC_USE_LED
-	Led					myLeds[4];
-#endif
 #ifdef LIBSC_USE_BUTTON
 	Button				myButtons[2];
 #endif
 
-	MyConfig			myConfig;
+	MyConfig			*myConfig;
+	MyVar				*myVars;
 
 	MyLoop				myLoop;
 	MyServo				myServo;
 	MyMotor				myMotor;
-
 	MyLcd				myLcd;
 
 	MyConfig::SmartCarPowerMode		*m_powerMode;
-	MyConfig::SmartCarTurningMode	*m_turningMode;
+	MyConfig::SmartCarTurning	*m_turningMode;
 
 	void controlRoutine(void);
 

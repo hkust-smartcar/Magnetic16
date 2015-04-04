@@ -10,9 +10,9 @@
 
 #include <cassert>
 
-#include <libsc/k60/alternate_motor.h>
-#include <libsc/k60/dir_motor.h>
-#include <libsc/k60/ab_encoder.h>
+#include <libsc/alternate_motor.h>
+#include <libsc/dir_motor.h>
+#include <libsc/ab_encoder.h>
 #include <libsc/config.h>
 
 #include "PIDhandler.h"
@@ -21,7 +21,7 @@
 #include "MyLoop.h"
 #include "PIDhandler.h"
 
-using namespace libsc::k60;
+using namespace libsc;
 using namespace libbase::k60;
 
 //#ifdef LIBSC_USE_MOTOR
@@ -44,11 +44,13 @@ public:
 
 		int32_t getEncoderReading(void);
 
+		int32_t getLastCount(void);
+
 		void reset(void);
 
 	private:
 
-		void getEncoderCount(void);
+		int32_t getEncoderCount(void);
 
 		int32_t				m_lastCount;
 
@@ -71,12 +73,17 @@ private:
 	Timer::TimerInt		m_lastProcessSpeedControlTime;
 	PIDhandler			m_speedController;
 
+	MyConfig::SmartCarPowerMode	*m_powerMode;
+
 	// Motor
 	void setSpeed(const int16_t speed);
 
 	MyEncoder			m_encoder;
 	int16_t				m_speed;
+	float				*m_targetEncoderCount;
 
+	uint8_t				m_stopDelayTime;
+	bool				m_isPushed;
 	bool				m_isStarted;
 
 //#ifdef LIBSC_MOTOR0_DIRMOTOR

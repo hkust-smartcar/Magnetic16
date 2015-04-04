@@ -11,8 +11,8 @@
 #include <utility>
 
 #include <libsc/config.h>
-#include <libsc/k60/system.h>
-#include <libsc/k60/trs_d05.h>
+#include <libsc/system.h>
+#include <libsc/trs_d05.h>
 #include <libbase/k60/adc.h>
 
 #include "MyKalmanFilter.h"
@@ -23,11 +23,22 @@
 #include "MyLoop.h"
 #include "MySmartCar.h"
 
-using namespace libsc::k60;
+using namespace libsc;
 using namespace libbase::k60;
 using namespace std;
 
 MyServo *m_servoInstance;
+
+inline uint8_t increaseInRange(uint8_t *v, uint8_t m, uint8_t x)
+{
+	*v = (*v + 1 >= x)? 0 : *v + 1;
+	return *v;
+}
+inline uint8_t decreaseInRange(uint8_t *v, uint8_t m, uint8_t x)
+{
+	*v = ((int8_t)*v - 1 < x)? x - 1 : *v - 1;
+	return *v;
+}
 
 TrsD05::Config getServoConfig(const uint8_t id)
 {
@@ -88,39 +99,41 @@ Adc::Config getAdcConfig(const uint8_t id)
 
 void MyServo::MyMagSenPair::processReading(void)
 {
-	m_MagSenFilteredLeft = m_MagSenFilters[0].Filter(m_MagSens[0].GetResultF());
-	m_MagSenFilteredRight = m_MagSenFilters[1].Filter(m_MagSens[1].GetResultF());
-	m_MagSenOffsetPrediction = (m_MagSenFilteredLeft - m_MagSenFilteredRight) / *MaxSenReadingDiff * *DistanceWhenMaxDiff;
+//	m_MagSenFilteredLeft = m_MagSenFilters[0].Filter(m_MagSens[0].GetResultF());
+//	m_MagSenFilteredRight = m_MagSenFilters[1].Filter(m_MagSens[1].GetResultF());
+	m_MagSenFilteredValue[0] = m_MagSens[0].GetResultF();
+	m_MagSenFilteredValue[1] = m_MagSens[1].GetResultF();
+	m_MagSenOffsetPrediction = (m_MagSenFilteredValue[0] - m_MagSenFilteredValue[1]) / *MaxSenReadingDiff * *DistanceWhenMaxDiff;
 }
 
 float MyServo::MyMagSenPair::getMagSenDiff(void)
 {
-	return m_MagSenFilteredLeft - m_MagSenFilteredRight;
+	return m_MagSenFilteredValue[0] - m_MagSenFilteredValue[1];
 }
 
 float MyServo::MyMagSenPair::getMagSenSum(void)
 {
-	return m_MagSenFilteredLeft + m_MagSenFilteredRight;
+	return m_MagSenFilteredValue[0] + m_MagSenFilteredValue[1];
+}
+
+float MyServo::MyMagSenPair::getMagSenPerentage(void)
+{
+	return getMagSenDiff() / getMagSenSum();
 }
 
 float *MyServo::MyMagSenPair::getFilteredLeftReadingPointer(void)
 {
-	return &m_MagSenFilteredLeft;
+	return &m_MagSenFilteredValue[0];
 }
 
 float *MyServo::MyMagSenPair::getFilteredRightReadingPointer(void)
 {
-	return &m_MagSenFilteredRight;
+	return &m_MagSenFilteredValue[1];
 }
 
-float MyServo::MyMagSenPair::getFilteredLeftReading(void)
+float MyServo::MyMagSenPair::operator[](size_t index)
 {
-	return m_MagSenFilteredLeft;
-}
-
-float MyServo::MyMagSenPair::getFilteredRightReading(void)
-{
-	return m_MagSenFilteredLeft;
+	return m_MagSenFilteredValue[index];
 }
 
 float *MyServo::MyMagSenPair::getDistanceFromWire(void)
@@ -131,16 +144,40 @@ float *MyServo::MyMagSenPair::getDistanceFromWire(void)
 MyServo::MyMagSenPair::MyMagSenPair(const uint8_t id, MyConfig &config)
 :
 	m_MagSens({ Adc(getAdcConfig(id + 0)), \
-				Adc(getAdcConfig(id + 1)) }),
-	m_MagSenFilteredLeft(0.0f),
-	m_MagSenFilteredRight(0.0f),
+				Adc(getAdcConfig(id + 1))}),
+	m_MagSenFilteredValue({0.0f,
+						   0.0f}),
 	m_MagSenFilters({ MyKalmanFilter(&config.MyMagSenFilterQ, &config.MyMagSenFilterR, 0.5f, 0.5f), \
-					  MyKalmanFilter(&config.MyMagSenFilterQ, &config.MyMagSenFilterR, 0.5f, 0.5f) }),
+					  MyKalmanFilter(&config.MyMagSenFilterQ, &config.MyMagSenFilterR, 0.5f, 0.5f)}),
 	DistanceWhenMaxDiff(&config.MyMagSenDistanceWhenMaxDiff),
 	MaxSenReadingDiff(&config.MyMagMaxSenReadingDiff)
 {}
 
 //#endif
+
+MyServo::MyLeds::MyLeds(MyConfig &config)
+:
+	m_leds({ Led({0, true}), Led({1, true}), Led({2, true}), Led({3, true}) })
+{}
+
+Led &MyServo::MyLeds::operator[](size_t index)
+{
+	return this->m_leds[index];
+}
+
+void MyServo::MyLeds::turnAllOff(void)
+{
+	for (uint8_t i = 0; i < 4; i++)
+		this->m_leds[i].SetEnable(false);
+}
+
+void MyServo::MyLeds::turnOffOtherAndSetEnabled(uint8_t id)
+{
+	for (uint8_t i = 0; i < 4; i++)
+		if (i != id)
+			this->m_leds[i].SetEnable(false);
+	this->m_leds[id].SetEnable(true);
+}
 
 //#ifdef LIBSC_USE_SERVO
 
@@ -149,30 +186,36 @@ MyServo::MyServo(MyConfig &config, MyVar &vars, MyLoop &loop)
 //#ifdef LIBSC_USE_MAGSEN
 	m_MagSenSD(config.MyMagSenPairId0, config),
 	m_MagSenFD(config.MyMagSenPairId1, config),
-	m_MagSenLR(config.MyMagSenPairId2, config),
-	m_minSDValue(&config.MyServoDefaultMinSDValue),
-	m_maxSDValue(&config.MyServoDefaultMaxSDValue),
-	m_minFDValue(&config.MyServoDefaultMinFDValue),
-	m_maxFDValue(&config.MyServoDefaultMaxFDValue),
-	m_minLRValue(&config.MyServoDefaultMinLRValue),
-	m_maxLRValue(&config.MyServoDefaultMaxLRValue),
+	m_MagSenHD(config.MyMagSenPairId2, config),
+//	m_maxSDValue(config.MyServoDefaultMaxSDValue),
+//	m_maxFDValue(config.MyServoDefaultMaxFDValue),
+//	m_maxLRValue(config.MyServoDefaultMaxLRValue),
+	m_referenceReading(0.0f),
 
 	diffResultSD(0.0f),
 	sumResultSD(0.0f),
 	diffResultFD(0.0f),
 	sumResultFD(0.0f),
-	diffResultLR(0.0f),
-	sumResultLR(0.0f),
+	diffResultHD(0.0f),
+	sumResultHD(0.0f),
 	m_isStarted(false),
 	usedMagSenPairs(config.MyMagSenPairCount),
 //#endif
+	m_leds(config),
+	m_turningState(config.MySmartCarTurningMode),
+	m_positionState(config.MySmartCarInitialPosition),
 	m_servo(getServoConfig(config.MyServoId)),
-	m_TurningController(&config.MyServoTurningRef, &config.MyServoTurningKp, &config.MyServoTurningKi, &config.MyServoTurningKd, MIN_SERVO_TURNING_DEGREE, MAX_SERVO_TURNING_DEGREE),
+	m_turningController(&config.MyServoTurningRef, &config.MyServoTurningKp, &config.MyServoTurningKi, &config.MyServoTurningKd, -MAX_SERVO_TURNING_DEGREE, MAX_SERVO_TURNING_DEGREE),
 	m_lastProcessTurningControlTime(System::Time()),
 	m_setAngleList({ 0 }),
 	m_lastTurningAngle(0),
 	m_lastAngleListSum(0),
-	m_lastAngleListIndex(0)
+	m_lastAngleListIndex(0),
+	m_curQueueIndex(0),
+	m_controlQueueLength(0),
+	m_HDNoSignalThreshold(config.MyMagSenHDLowestValue),
+	m_HDHighValueThreshold(config.MyMagSenHDStrongValue),
+	m_FDHighValueThreshold(config.MyMagSenFDStrongValue)
 {
 	m_servoInstance = this;
 	reset();
@@ -180,24 +223,23 @@ MyServo::MyServo(MyConfig &config, MyVar &vars, MyLoop &loop)
 	vars.MagSenSDRight = m_MagSenSD.getFilteredRightReadingPointer();
 	vars.MagSenFDLeft = m_MagSenFD.getFilteredLeftReadingPointer();
 	vars.MagSenFDRight = m_MagSenFD.getFilteredRightReadingPointer();
-	vars.MagSenLRLeft = m_MagSenLR.getFilteredLeftReadingPointer();
-	vars.MagSenLRRight = m_MagSenLR.getFilteredRightReadingPointer();
+	vars.MagSenHDLeft = m_MagSenHD.getFilteredLeftReadingPointer();
+	vars.MagSenHDRight = m_MagSenHD.getFilteredRightReadingPointer();
 	vars.diffResultSD = &diffResultSD;
 	vars.sumResultSD = &sumResultSD;
 	vars.diffResultFD = &diffResultFD;
 	vars.sumResultFD = &sumResultFD;
-	vars.diffResultLR = &diffResultLR;
-	vars.sumResultLR = &sumResultLR;
+	vars.diffResultLR = &diffResultHD;
+	vars.sumResultHD = &sumResultHD;
 	vars.isMotorStarted = &m_isStarted;
 	vars.lastTurningAngle = &m_lastTurningAngle;
-	vars.magSenFilterQ = &config.MyMagSenFilterQ;
-	vars.magSenFilterR = &config.MyMagSenFilterR;
-	vars.magSenDefaultMaxSDValue = m_maxSDValue;
-	vars.magSenDefaultMinSDValue = m_minSDValue;
-	vars.magSenDefaultMaxFDValue = m_maxFDValue;
-	vars.magSenDefaultMinFDValue = m_minFDValue;
-	vars.magSenDefaultMaxLRValue = m_maxLRValue;
-	vars.magSenDefaultMinLRValue = m_minLRValue;
+	vars.magSenDefaultMaxSDValue = &m_maxSDValue;
+	vars.magSenDefaultMaxFDValue = &m_maxFDValue;
+	vars.magSenDefaultMaxHDValue = &m_maxLRValue;
+	vars.magSenReferenceReading = &m_referenceReading;
+	vars.lastAngleListSum = &m_lastAngleListSum;
+	vars.PositionState = &m_positionState;
+	vars.TurningState = &m_turningState;
 	loop.addFunctionToLoop(&turningControlRoutine, LOOP_IMMEDIATELY, LOOP_EVERYTIME);
 }
 
@@ -217,32 +259,35 @@ void MyServo::reset(void)
 	m_lastAngleListIndex = 0;
 	m_lastAngleListSum = 0;
 	m_lastTurningAngle = 0;
+	m_leds.turnAllOff();
 }
 
 void MyServo::turn(const int16_t degree_x10)
 {
 	int16_t realAngle = outRangeOf(inRange(-MAX_SERVO_TURNING_DEGREE, degree_x10, MAX_SERVO_TURNING_DEGREE), 0, 60);
+//	m_servo.SetDegree(MID_SERVO_DEGREE + realAngle);
+//	m_lastTurningAngle = realAngle;
 	m_servo.SetDegree(MID_SERVO_DEGREE + getNextAngle());
 	dropDownLastAngle(realAngle);
 }
 
-bool MyServo::isNoSignal(const float ref)
+bool MyServo::isNoSignal(void)
 {
-	return (m_MagSenSD.getFilteredLeftReading() < ref && \
-			m_MagSenSD.getFilteredLeftReading() < ref && \
-			m_MagSenFD.getFilteredLeftReading() < ref && \
-			m_MagSenFD.getFilteredLeftReading() < ref && \
-			m_MagSenLR.getFilteredLeftReading() < ref && \
-			m_MagSenLR.getFilteredLeftReading() < ref);
+	return (m_MagSenSD[0] < m_referenceReading && \
+			m_MagSenSD[1] < m_referenceReading && \
+			m_MagSenFD[0] < m_referenceReading && \
+			m_MagSenFD[1] < m_referenceReading && \
+			m_MagSenHD[0] < m_referenceReading && \
+			m_MagSenHD[1] < m_referenceReading);
 }
 
-bool MyServo::isCrossRoad(void)
-{
-	return (m_MagSenFD.getFilteredLeftReading() > m_MagSenSD.getFilteredLeftReading() || \
-			m_MagSenFD.getFilteredLeftReading() > m_MagSenSD.getFilteredRightReading() || \
-			m_MagSenFD.getFilteredRightReading() > m_MagSenSD.getFilteredLeftReading() || \
-			m_MagSenFD.getFilteredRightReading() > m_MagSenSD.getFilteredRightReading());
-}
+//bool MyServo::isCrossRoad(void)
+//{
+//	return (m_MagSenFD[1] > m_MagSenSD.getFilteredLeftReading() || \
+//			m_MagSenFD[1] > m_MagSenSD.getFilteredRightReading() || \
+//			m_MagSenFD[1] > m_MagSenSD.getFilteredLeftReading() || \
+//			m_MagSenFD[1] > m_MagSenSD.getFilteredRightReading());
+//}
 
 void MyServo::getMagSenRange(const Timer::TimerInt interval)
 {
@@ -253,8 +298,8 @@ void MyServo::getMagSenRange(const Timer::TimerInt interval)
 	float *SDR = m_MagSenSD.getFilteredRightReadingPointer();
 	float *FDL = m_MagSenFD.getFilteredLeftReadingPointer();
 	float *FDR = m_MagSenFD.getFilteredRightReadingPointer();
-	float *LRL = m_MagSenLR.getFilteredLeftReadingPointer();
-	float *LRR = m_MagSenLR.getFilteredRightReadingPointer();
+	float *LRL = m_MagSenHD.getFilteredLeftReadingPointer();
+	float *LRR = m_MagSenHD.getFilteredRightReadingPointer();
 
 	while (Timer::TimeDiff(System::Time(), startTime) < interval)
 	{
@@ -262,66 +307,121 @@ void MyServo::getMagSenRange(const Timer::TimerInt interval)
 		{
 			m_MagSenSD.processReading();
 			m_MagSenFD.processReading();
-			m_MagSenLR.processReading();
-			*m_maxSDValue = max(*m_maxSDValue, (float)((*SDL + *SDR) / 2));
-			*m_minSDValue = min(*m_minSDValue, (float)((*SDL + *SDR) / 2));
-			*m_maxFDValue = max(*m_maxFDValue, (float)((*FDL + *FDR) / 2));
-			*m_minFDValue = min(*m_minFDValue, (float)((*FDL + *FDR) / 2));
-			*m_maxLRValue = max(*m_maxLRValue, (float)((*LRL + *LRR) / 2));
-			*m_minLRValue = min(*m_minLRValue, (float)((*LRL + *LRR) / 2));
+			m_MagSenHD.processReading();
+			m_maxSDValue = max(m_maxSDValue, (float)max(*SDL, *SDR));
+			m_maxFDValue = max(m_maxFDValue, (float)max(*FDL, *FDR));
+			m_maxLRValue = max(m_maxLRValue, (float)max(*LRL, *LRR));
 			lastTime = System::Time();
 		}
+		m_referenceReading = max(max(m_maxSDValue, m_maxFDValue), m_maxLRValue);
 	}
 }
 
 void MyServo::dropDownLastAngle(const int16_t degree_x10)
 {
 	m_lastTurningAngle = degree_x10;
-	m_setAngleList[m_lastAngleListIndex++] = m_lastTurningAngle;
-	m_lastAngleListSum += m_lastTurningAngle;
+	m_setAngleList[m_lastAngleListIndex] = m_lastTurningAngle;
+	m_lastAngleListIndex = increaseInRange(&m_lastAngleListIndex, 1, 20);
+}
+
+MyConfig::SmartCarPosition MyServo::getPosState(void)
+{
+	return m_positionState;
+}
+
+MyServo *MyServo::getServoInstance(void)
+{
+	return m_servoInstance;
 }
 
 int16_t MyServo::getNextAngle(void)
 {
-	uint8_t nextIndex = 0;
 	if (m_lastAngleListIndex < 10)
-		nextIndex = m_setAngleList[10 + m_lastAngleListIndex];
+		return m_setAngleList[10 + m_lastAngleListIndex];
 	else
-		nextIndex = m_setAngleList[m_lastAngleListIndex - 10];
-
-	m_lastAngleListSum -= m_setAngleList[nextIndex];
-	return m_setAngleList[nextIndex];
+		return m_setAngleList[m_lastAngleListIndex - 10];
 }
 
 MyServo::LastTurningDirection MyServo::updateLastTurningAngle(void)
 {
-	int32_t sumOfAngle = 0;
+	m_lastAngleListSum = 0;
 	for (uint8_t i = 0; i < length(m_setAngleList); i++)
-		sumOfAngle += m_setAngleList[i];
-	return ((sumOfAngle > 0)? LastTurningDirection::LEFT : LastTurningDirection::RIGHT);
+		m_lastAngleListSum += m_setAngleList[i];
+	return ((m_lastAngleListSum > 0)? LastTurningDirection::LEFT : ((m_lastAngleListSum < 0)? LastTurningDirection::RIGHT : LastTurningDirection::FORWARD));
 }
 
-void MyServo::turningDispatch(int16_t degree_x10)
+//void MyServo::turningDispatch(int16_t degree_x10)
+//{
+//	if (isCrossRoad())
+//	{
+//		turn(0);
+//		m_leds.turnOffOtherAndSetEnabled(1);
+//	}
+//	else if (isNoSignal())
+//	{
+//		switch ((uint8_t)updateLastTurningAngle())
+//		{
+//		case (uint8_t)LastTurningDirection::FORWARD:
+//			turn(0);
+//			m_leds.turnOffOtherAndSetEnabled(2);
+//			break;
+//		case (uint8_t)LastTurningDirection::LEFT:
+//			turn(MAX_SERVO_TURNING_DEGREE);
+//			m_leds.turnOffOtherAndSetEnabled(3);
+//			break;
+//		case (uint8_t)LastTurningDirection::RIGHT:
+//			turn(-MAX_SERVO_TURNING_DEGREE);
+//			m_leds.turnOffOtherAndSetEnabled(0);
+//			break;
+//		}
+//	}
+//	else
+//	{
+//		turn(degree_x10);
+//		m_leds.turnAllOff();
+//	}
+//}
+
+void MyServo::updateLastState(void)
 {
-	if (isCrossRoad())
-		turn(0);
-	else if (isNoSignal(*m_maxFDValue))
-	{
-		switch ((uint8_t)updateLastTurningAngle())
-		{
-		case (uint8_t)LastTurningDirection::FORWARD:
-			turn(0);
-			break;
-		case (uint8_t)LastTurningDirection::LEFT:
-			turn(MAX_SERVO_TURNING_DEGREE);
-			break;
-		case (uint8_t)LastTurningDirection::RIGHT:
-			turn(-MAX_SERVO_TURNING_DEGREE);
-			break;
-		}
-	}
+	if (m_MagSenHD[MyMagSenPair::LEFT] < m_HDNoSignalThreshold && m_MagSenHD[MyMagSenPair::RIGHT] < m_HDNoSignalThreshold)
+		m_positionState = MyConfig::SmartCarPosition::kGGed;
+	else if ((m_MagSenHD[MyMagSenPair::LEFT] > m_HDHighValueThreshold && m_MagSenHD[MyMagSenPair::RIGHT] < m_HDHighValueThreshold) ||
+		(m_MagSenHD[MyMagSenPair::LEFT] < m_HDHighValueThreshold && m_MagSenHD[MyMagSenPair::RIGHT] < m_HDNoSignalThreshold))
+		m_positionState = MyConfig::SmartCarPosition::kRight;
+	else if ((m_MagSenHD[MyMagSenPair::RIGHT] > m_HDHighValueThreshold && m_MagSenHD[MyMagSenPair::LEFT] < m_HDHighValueThreshold) ||
+			 (m_MagSenHD[MyMagSenPair::RIGHT] < m_HDHighValueThreshold && m_MagSenHD[MyMagSenPair::LEFT] < m_HDNoSignalThreshold))
+		m_positionState = MyConfig::SmartCarPosition::kLeft;
 	else
-		turn(degree_x10);
+		m_positionState = MyConfig::SmartCarPosition::kIdeal;
+
+	if (m_MagSenFD[MyMagSenPair::LEFT] > m_FDHighValueThreshold && m_MagSenFD[MyMagSenPair::RIGHT] > m_FDHighValueThreshold)
+	{
+		m_turningState = MyConfig::SmartCarTurning::kCrossRoad;
+		m_controlQueue[m_controlQueueLength].targetAngle = 0;
+		m_controlQueue[m_controlQueueLength++].stopUntilType = MyConfig::SmartCarTurning::kStraightLine;
+	}
+	else if ((m_MagSenFD[MyMagSenPair::LEFT]  < m_FDHighValueThreshold && m_MagSenFD[MyMagSenPair::RIGHT]  > m_FDHighValueThreshold) ||
+			 (m_MagSenFD[MyMagSenPair::RIGHT]  < m_FDHighValueThreshold && m_MagSenFD[MyMagSenPair::LEFT]  > m_FDHighValueThreshold))
+		m_turningState = MyConfig::SmartCarTurning::k90Degree;
+	else
+		m_turningState = MyConfig::SmartCarTurning::kStraightLine;
+}
+
+void MyServo::processControlQueue(void)
+{
+	if (m_positionState == MyConfig::SmartCarPosition::kGGed)
+		turn(0);
+	if (m_controlQueueLength != 0)
+		if (m_controlQueue[m_curQueueIndex].stopUntilType == m_turningState)
+		{
+			decreaseInRange(&m_curQueueIndex, 1, 5);
+			m_controlQueueLength -= 1;
+		}
+		else
+			turn((int16_t)m_controlQueue[m_curQueueIndex].targetAngle);
+	else
+		turn((int16_t)m_turningController.updatePID_ori(-diffResultSD * 0.7 + diffResultHD * 0.3));
 }
 
 void MyServo::turningControlRoutine(void)
@@ -340,11 +440,18 @@ void MyServo::turningControlRoutine(void)
 		}
 		if (m_servoInstance->usedMagSenPairs >= 3)
 		{
-			m_servoInstance->m_MagSenLR.processReading();
-			m_servoInstance->diffResultLR = m_servoInstance->m_MagSenLR.getMagSenDiff();
+			m_servoInstance->m_MagSenHD.processReading();
+			m_servoInstance->diffResultHD = m_servoInstance->m_MagSenHD.getMagSenDiff();
 		}
+//		m_servoInstance->turningDispatch(m_servoInstance->diffResultSD * MAX_SERVO_TURNING_DEGREE);
 
-		m_servoInstance->turningDispatch(m_servoInstance->diffResultSD * MAX_SERVO_TURNING_DEGREE);
+		m_servoInstance->updateLastState();
+
+		m_servoInstance->processControlQueue();
+
+//		m_servoInstance->applyResult();
+
+//		m_servoInstance->turn((int16_t)m_servoInstance->m_turningController.updatePID_ori(-m_servoInstance->diffResultSD));
 	}
 }
 

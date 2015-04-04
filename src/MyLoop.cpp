@@ -8,7 +8,7 @@
 #include <functional>
 #include <vector>
 
-#include <libsc/k60/system.h>
+#include <libsc/system.h>
 
 #include "MyLoop.h"
 

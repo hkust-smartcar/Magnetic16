@@ -7,12 +7,14 @@
 
 #include <cstring>
 
-#include <libsc/k60/system.h>
+#include <libsc/system.h>
 
 #include "PIDhandler.h"
 #include "MySmartCar.h"
 
-using namespace libsc::k60;
+using namespace libsc;
+
+#define abs(v) ((v > 0)? v : -v)
 
 PIDhandler::PIDhandler(float *ref, float *kp, float *ki, float *kd, const float min, const float max)
 :
@@ -69,3 +71,19 @@ float PIDhandler::updatePID(float val)
 	return inRange(min, output, max);
 
 }
+
+float PIDhandler::updatePID_ori(float val)
+{
+	float error = *reference - val;
+	uint32_t dt = Timer::TimeDiff(System::Time(), lastTimeUpdate);
+	float dE = (error - lastError) / dt;
+	lastError = error;
+
+	output = *Kp * lastError/* - *Kp * lastError * abs(lastError)*/ + *Ki * eSum + *Kd * dE;
+
+	lastTimeUpdate = System::Time();
+
+	return inRange(min, output, max);
+
+}
+

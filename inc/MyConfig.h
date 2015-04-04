@@ -19,39 +19,53 @@ public:
 		kRcCarMode
 	};
 
-	enum struct SmartCarTurningMode
+	enum struct SmartCarTurning
 	{
 		kStraightLine = 0,
-		kNormal,
 		k90Degree,
 		kCrossRoad
+	};
+
+	enum struct SmartCarPosition
+	{
+		kLeft = -1,
+		kIdeal,
+		kRight,
+		kGGed = 99
 	};
 
 	// Put All Configuration Here
 
 	// MyMotorPID
-	float			MyMotorSpeedControlRef = 300.0f;
-	float			MyMotorSpeedControlKp = 0.005f;
+	float			MyMotorSpeedControlRef = 60.0f;
+	float			MyMotorSpeedControlKp = 0.06f;
 	float			MyMotorSpeedControlKi = 0.0f;
-	float			MyMotorSpeedControlKd = 0.000f;
+	float			MyMotorSpeedControlKd = 0.0f;
 
 	// MyServoTurningPID
 	float			MyServoTurningRef = 0.0f;
-	float			MyServoTurningKp = 1.0f;
+	float			MyServoTurningKp = 1700.0f;
 	float			MyServoTurningKi = 0.0f;
-	float			MyServoTurningKd = 0.0f;
+	float			MyServoTurningKd = 1000.0f;
 
 	// MyMagSen
 	uint8_t			MyMagSenPairCount = 3;
 	uint8_t			MyMagSenPairId0 = 0;
-	uint8_t			MyMagSenPairId1 = 2;
-	uint8_t			MyMagSenPairId2 = 4;
+	uint8_t			MyMagSenPairId1 = 4;
+	uint8_t			MyMagSenPairId2 = 2;
 
-	float			MyMagSenFilterQ = 0.0015f;
-	float			MyMagSenFilterR = 0.9f;
+	float			MyMagSenFilterQ = 0.05f;
+	float			MyMagSenFilterR = 0.5f;
 
 	float			MyMagSenDistanceWhenMaxDiff = 10.0f;
 	float			MyMagMaxSenReadingDiff = 1.4f;
+
+	float			MyMagSenHDLowestValue = 0.25f;
+	float			MyMagSenHDStrongValue = 1.2f;
+
+	float			MyMagSenFDStrongValue = 0.8f;
+
+	// MyLeds
 
 	// MyServo
 	uint8_t			MyServoId = 0;
@@ -70,11 +84,10 @@ public:
 	uint8_t			MyEncoderId = 0;
 
 	// MyBatteryMeter
-
 	float			MyBatteryMeterVoltageRatio = 0.32984f;
 	float			MyBatteryMeterUpdateEvery = 0.02f;
-	float			MyBatteryMeterVoltageMax = 8.0f;
-	float			MyBatteryMeterVoltageMin = 7.2f;
+	float			MyBatteryMeterVoltageMax = 8.25f;
+	float			MyBatteryMeterVoltageMin = 7.5f;
 
 	uint16_t		MyBatteryMeterHighColor = 0x063F;
 	uint16_t		MyBatteryMeterNormalColor = 0x07E0;
@@ -88,8 +101,10 @@ public:
 
 	// MySmartCar
 	SmartCarPowerMode
-					MySmartCarPowerMode = MyConfig::SmartCarPowerMode::kLowFrictionMode;
-	SmartCarTurningMode
-					MySmartCarTurningMode = MyConfig::SmartCarTurningMode::kStraightLine;
+					MySmartCarPowerMode = MyConfig::SmartCarPowerMode::kNormalMode;
+	SmartCarTurning
+					MySmartCarTurningMode = MyConfig::SmartCarTurning::kStraightLine;
+	SmartCarPosition
+					MySmartCarInitialPosition = MyConfig::SmartCarPosition::kIdeal;
 
 };

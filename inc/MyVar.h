@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include "MyConfig.h"
+
 class MyVar
 {
 
@@ -24,25 +26,20 @@ public:
 	float				*MagSenSDRight;
 	float				*MagSenFDLeft;
 	float				*MagSenFDRight;
-	float				*MagSenLRLeft;
-	float				*MagSenLRRight;
+	float				*MagSenHDLeft;
+	float				*MagSenHDRight;
 
 	float 				*diffResultSD;
 	float 				*sumResultSD;
 	float 				*diffResultFD;
 	float 				*sumResultFD;
 	float 				*diffResultLR;
-	float 				*sumResultLR;
-
-	float				*magSenFilterQ;
-	float				*magSenFilterR;
+	float 				*sumResultHD;
 
 	float				*magSenDefaultMaxSDValue;
-	float				*magSenDefaultMinSDValue;
 	float				*magSenDefaultMaxFDValue;
-	float				*magSenDefaultMinFDValue;
-	float				*magSenDefaultMaxLRValue;
-	float				*magSenDefaultMinLRValue;
+	float				*magSenDefaultMaxHDValue;
+	float				*magSenReferenceReading;
 
 	// MyBattteryMeter
 
@@ -52,6 +49,11 @@ public:
 
 	bool				*isServoStarted;
 	int16_t				*lastTurningAngle;
-	uint8_t				*lastTurningBeforeLowSignal;
+	int32_t				*lastAngleListSum;
+
+	MyConfig::
+	SmartCarTurning		*TurningState;
+	MyConfig::
+	SmartCarPosition	*PositionState;
 
 };

@@ -10,9 +10,9 @@
 #include <functional>
 #include <vector>
 
-#include <libsc/k60/system.h>
+#include <libsc/system.h>
 
-using namespace libsc::k60;
+using namespace libsc;
 using namespace std;
 
 #define LOOP_IMMEDIATELY	0

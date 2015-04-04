@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 #include <libsc/config.h>
-#include <libsc/k60/system.h>
+#include <libsc/system.h>
 
 #include "MySmartCar.h"
 #include "MyMotor.h"
@@ -18,7 +18,7 @@
 #include "MyConfig.h"
 #include "MyVar.h"
 
-using namespace libsc::k60;
+using namespace libsc;
 using namespace libbase::k60;
 using namespace std;
 
@@ -58,13 +58,12 @@ MySmartCar::MySmartCar(MyConfig &config, MyVar &vars)
 :
 	myLoop(),
 	m_powerMode(&config.MySmartCarPowerMode),
-	m_turningMode(&config.MySmartCarTurningMode),
-	myLeds({Led({0, false}), Led({1, false}), Led({2, false}), Led({3, false})}),
 	myButtons({Button(getButtonConfig(0)), Button(getButtonConfig(1))}),
 	myLcd(config, vars, myLoop),
 	myMotor(config, vars, myLoop),
 	myServo(config, vars, myLoop),
-	myConfig(config)
+	myConfig(&config),
+	myVars(&vars)
 {
 	m_smartCarInstance = this;
 	reset();
@@ -73,12 +72,44 @@ MySmartCar::MySmartCar(MyConfig &config, MyVar &vars)
 void MySmartCar::showValue(void)
 {
 	m_smartCarInstance->myVarMng.sendWatchData();
+
+//	int n = sprintf(buffer, "Left: %.4f\nRight: %.4f\nDiff: %.4f\nLastAngle: %d\nKp: %.0f\nKd: %.0f\nSpeed: %.0f", *(m_smartCarInstance->myVars->MagSenSDLeft), *(m_smartCarInstance->myVars->MagSenSDRight), *(m_smartCarInstance->myVars->diffResultSD), *(m_smartCarInstance->myVars->lastTurningAngle), (m_smartCarInstance->myConfig->MyServoTurningKp), (m_smartCarInstance->myConfig->MyServoTurningKd), (m_smartCarInstance->myConfig->MyMotorSpeedControlRef));
+//	int n = sprintf(buffer, "SLeft: %.4f\nSRight: %.4f\nFLeft: %.4f\nFRight: %.4f\nLastAngle: %d\n
+//	kQ: %.4f\nkR: %.4f\nkP:%.0f kD:%.0f\nSpeed: %.3f", *(m_smartCarInstance->myVars->MagSenSDLeft),
+//	*(m_smartCarInstance->myVars->MagSenSDRight), *(m_smartCarInstance->myVars->MagSenFDLeft),
+//	*(m_smartCarInstance->myVars->MagSenFDRight), *(m_smartCarInstance->myVars->lastTurningAngle),
+//	(m_smartCarInstance->myConfig->MyMagSenFilterQ), (m_smartCarInstance->myConfig->MyMagSenFilterR),
+//	(m_smartCarInstance->myConfig->MyServoTurningKp), (m_smartCarInstance->myConfig->MyServoTurningKd),
+//	(m_smartCarInstance->myConfig->MyMotorSpeedControlRef));
+
+	MyLcd::getMyLcdInstance()->setRow(1)
+				 << "SLeft: " << *(m_smartCarInstance->myVars->MagSenSDLeft) << MyLcd::endl
+				 << "SRight: " << *(m_smartCarInstance->myVars->MagSenSDRight) << MyLcd::endl
+				 << "FLeft: " << *(m_smartCarInstance->myVars->MagSenFDLeft) << MyLcd::endl
+				 << "FRight: " << *(m_smartCarInstance->myVars->MagSenFDRight) << MyLcd::endl
+//				 << "kQ:" << (m_smartCarInstance->myConfig->MyMagSenFilterQ) << " " << "kR:" << (m_smartCarInstance->myConfig->MyMagSenFilterR) << MyLcd::endl
+//				 << "kP:" << (m_smartCarInstance->myConfig->MyServoTurningKp) << " " << "kD:" << (m_smartCarInstance->myConfig->MyServoTurningKd) << MyLcd::endl
+				 << "HLeft: " << *(m_smartCarInstance->myVars->MagSenHDLeft) << MyLcd::endl
+				 << "HRight: " << *(m_smartCarInstance->myVars->MagSenHDRight) << MyLcd::endl
+				 << "LastAngle: " << *(m_smartCarInstance->myVars->lastTurningAngle) << MyLcd::endl
+				 << "Speed: " << (int16_t)(m_smartCarInstance->myConfig->MyMotorSpeedControlRef) << MyLcd::endl
+				 << "Type: " << (uint8_t)*(m_smartCarInstance->myVars->TurningState) << " Pos: " << (int8_t)*(m_smartCarInstance->myVars->PositionState) << " ";
 }
 
 void MySmartCar::startMainLoop(void)
 {
-	myLoop.addFunctionToLoop(&showValue, 1, 5);
+	myLoop.addFunctionToLoop(&showValue, 1, 150);
 	myLoop.start();
+}
+
+void MySmartCar::motorSetEnabled(bool enabled)
+{
+	myMotor.setEnabled(enabled);
+}
+
+void MySmartCar::servoSetEnabled(bool enabled)
+{
+	myServo.setEnabled(enabled);
 }
 
 void MySmartCar::reset(void)
@@ -96,17 +127,12 @@ void MySmartCar::onButtonPress(const uint8_t id)
 		break;
 
 	case 1:
-		//m_smartCarInstance->myServo.getMagSenRange(2000);
-		//m_smartCarInstance->myServo.setEnabled(!m_smartCarInstance->myServo.isEnabled());
+		m_smartCarInstance->myServo.getMagSenRange(2000);
+		m_smartCarInstance->myServo.setEnabled(!m_smartCarInstance->myServo.isEnabled());
 		break;
 
 	default:
 		assert(false);
 		// no break
 	}
-}
-
-void MySmartCar::doBlink(Byte id)
-{
-	myLeds[id].Switch();
 }

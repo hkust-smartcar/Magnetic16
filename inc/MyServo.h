@@ -10,9 +10,10 @@
 #include <array>
 
 #include <libsc/config.h>
-#include <libsc/k60/trs_d05.h>
+#include <libsc/trs_d05.h>
 #include <libbase/k60/adc.h>
-#include <libsc/k60/system.h>
+#include <libsc/system.h>
+#include <libsc/led.h>
 
 #include "MyKalmanFilter.h"
 #include "PIDhandler.h"
@@ -20,7 +21,7 @@
 #include "MyVar.h"
 #include "MyLoop.h"
 
-using namespace libsc::k60;
+using namespace libsc;
 using namespace libbase::k60;
 using namespace std;
 
@@ -71,18 +72,18 @@ public:
 
 		float getMagSenDiff(void);
 		float getMagSenSum(void);
+		float getMagSenPerentage(void);
 
 		float *getFilteredLeftReadingPointer(void);
 		float *getFilteredRightReadingPointer(void);
-		float getFilteredLeftReading(void);
-		float getFilteredRightReading(void);
+
+		float operator[](size_t index);
 
 		float *getDistanceFromWire(void);
 
 	private:
 
-		float					m_MagSenFilteredLeft;
-		float					m_MagSenFilteredRight;
+		float					m_MagSenFilteredValue[2];
 		float					m_MagSenOffsetPrediction;
 
 		float					*DistanceWhenMaxDiff;
@@ -92,6 +93,24 @@ public:
 		Adc						m_MagSens[2];
 
 		MyKalmanFilter *getFilters(MyConfig &config);
+
+	};
+
+	class MyLeds
+	{
+
+	public:
+
+		explicit MyLeds(MyConfig &config);
+
+		Led &operator[](size_t index);
+
+		void turnAllOff(void);
+		void turnOffOtherAndSetEnabled(uint8_t id);
+
+	private:
+
+		Led						m_leds[4];
 
 	};
 
@@ -106,26 +125,33 @@ public:
 
 	void turn(const int16_t degree_x10);
 
-	bool isNoSignal(const float ref);
+	bool isNoSignal(void);
 	bool isCrossRoad(void);
 
 	void getMagSenRange(const Timer::TimerInt interval);
 
 	void dropDownLastAngle(const int16_t degree_x10);
 
+	MyConfig::SmartCarPosition getPosState(void);
+
+	static MyServo *getServoInstance(void);
+
 	static void turningControlRoutine(void);
 
 private:
 
+	typedef struct AngleControlQueue
+	{
+		int16_t targetAngle;
+		MyConfig::SmartCarTurning stopUntilType;
+	};
+
 	Timer::TimerInt		m_lastProcessTurningControlTime;
 	int16_t				m_lastTurningAngle;
 
-	float				*m_maxSDValue;
-	float				*m_minSDValue;
-	float				*m_maxFDValue;
-	float				*m_minFDValue;
-	float				*m_maxLRValue;
-	float				*m_minLRValue;
+	float				m_maxSDValue;
+	float				m_maxFDValue;
+	float				m_maxLRValue;
 
 //#ifdef LIBSC_USE_MAGSEN
 	MyMagSenPair		m_MagSenSD;
@@ -134,20 +160,33 @@ private:
 	MyMagSenPair		m_MagSenFD;
 	float 				diffResultFD;
 	float 				sumResultFD;
-	MyMagSenPair		m_MagSenLR;
-	float 				diffResultLR;
-	float 				sumResultLR;
+	MyMagSenPair		m_MagSenHD;
+	float 				diffResultHD;
+	float 				sumResultHD;
+
+	float				m_referenceReading;
 
 	bool				m_isStarted;
 	int16_t				m_setAngleList[20];
-	int8_t				m_lastAngleListIndex;
+	uint8_t				m_lastAngleListIndex;
 	int32_t				m_lastAngleListSum;
+
+	float				m_HDNoSignalThreshold;
+	float				m_HDHighValueThreshold;
+	float				m_FDHighValueThreshold;
+
+	array<AngleControlQueue, 5>	m_controlQueue;
+	uint8_t				m_curQueueIndex;
+	int8_t				m_controlQueueLength;
 
 	uint8_t				usedMagSenPairs;
 //#endif
 
+	MyLeds				m_leds;
+	MyConfig::SmartCarTurning 	m_turningState;
+	MyConfig::SmartCarPosition	m_positionState;
 
-	PIDhandler 			m_TurningController;
+	PIDhandler 			m_turningController;
 	TrsD05				m_servo;
 
 
@@ -155,7 +194,13 @@ private:
 
 	LastTurningDirection updateLastTurningAngle(void);
 
-	void turningDispatch(int16_t degree_x10);
+//	void turningDispatch(int16_t degree_x10);
+
+	void updateLastState(void);
+
+	void applyResult(void);
+
+	void processControlQueue(void);
 
 };
 

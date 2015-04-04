@@ -30,7 +30,7 @@ namespace libbase
 	}
 }
 
-using namespace libsc::k60;
+using namespace libsc;
 using namespace libbase::k60;
 using namespace std;
 
@@ -44,24 +44,31 @@ void myListener(const vector<Byte> &bytes)
 	{
 
 	case 'm':
-		globalConfig.MyMotorSpeedControlRef += 50;
+		globalConfig.MyMotorSpeedControlRef += 10;
 		break;
 	case 'M':
-		globalConfig.MyMotorSpeedControlRef = max(globalConfig.MyMotorSpeedControlRef - 50, 0.0f);
+		globalConfig.MyMotorSpeedControlRef = max(globalConfig.MyMotorSpeedControlRef - 10, 0.0f);
 		break;
 
 	case 'p':
-		globalConfig.MyMotorSpeedControlKp += 0.00005f;
+		globalConfig.MyMotorSpeedControlKp += 0.0001f;
 		break;
 	case 'P':
-		globalConfig.MyMotorSpeedControlKp = max(globalConfig.MyMotorSpeedControlKp - 0.00005f, 0.0f);
+		globalConfig.MyMotorSpeedControlKp = max(globalConfig.MyMotorSpeedControlKp - 0.0001f, 0.0f);
 		break;
 
 	case 'i':
-		globalConfig.MyMotorSpeedControlKi += 0.00005f;
+		globalConfig.MyMotorSpeedControlKi += 0.00001f;
 		break;
 	case 'I':
-		globalConfig.MyMotorSpeedControlKi = max(globalConfig.MyMotorSpeedControlKi - 0.00005f, 0.0f);
+		globalConfig.MyMotorSpeedControlKi = max(globalConfig.MyMotorSpeedControlKi - 0.0001f, 0.0f);
+		break;
+
+	case 'd':
+		globalConfig.MyMotorSpeedControlKd += 0.001f;
+		break;
+	case 'D':
+		globalConfig.MyMotorSpeedControlKd = max(globalConfig.MyMotorSpeedControlKi - 0.001f, 0.0f);
 		break;
 
 	case 'q':
@@ -76,6 +83,51 @@ void myListener(const vector<Byte> &bytes)
 	case 'R':
 		globalConfig.MyMagSenFilterR = max(globalConfig.MyMagSenFilterR - 0.01f, 0.0f);
 		break;
+
+	case 'h':
+		globalConfig.MyServoTurningKp += 10.0f;
+		break;
+	case 'H':
+		globalConfig.MyServoTurningKp = max(globalConfig.MyServoTurningKp - 10.0f, 0.0f);
+		break;
+	case 'j':
+		globalConfig.MyServoTurningKd += 10.0f;
+		break;
+	case 'J':
+		globalConfig.MyServoTurningKd = max(globalConfig.MyServoTurningKd - 10.0f, 0.0f);
+		break;
+
+	case 'k':
+		globalConfig.MyMagSenFilterQ += 0.0001f;
+		break;
+	case 'K':
+		globalConfig.MyMagSenFilterQ = max(globalConfig.MyMagSenFilterQ - 0.0001f, 0.0f);
+		break;
+	case 'l':
+		globalConfig.MyMagSenFilterR += 0.05f;
+		break;
+	case 'L':
+		globalConfig.MyMagSenFilterR = max(globalConfig.MyMagSenFilterR - 0.05f, 0.0f);
+		break;
+
+	case ';':
+		myCar.motorSetEnabled(true);
+		break;
+	case ':':
+		myCar.motorSetEnabled(false);
+		break;
+	case '\'':
+		myCar.servoSetEnabled(true);
+		break;
+	case '\"':
+		myCar.servoSetEnabled(false);
+		break;
+	case ',':
+		globalConfig.MySmartCarPowerMode = MyConfig::SmartCarPowerMode::kNormalMode;
+		break;
+	case '<':
+		globalConfig.MySmartCarPowerMode = MyConfig::SmartCarPowerMode::kLowFrictionMode;
+		break;
 	}
 }
 
@@ -85,24 +137,17 @@ int main()
 	myCar.myVarMng.addWatchedVar(globalVars.MagSenSDRight, "asd");
 	myCar.myVarMng.addWatchedVar(globalVars.MagSenFDLeft, "asd");
 	myCar.myVarMng.addWatchedVar(globalVars.MagSenFDRight, "asd");
-	myCar.myVarMng.addWatchedVar(globalVars.magSenDefaultMaxFDValue, "asd");
-	myCar.myVarMng.addWatchedVar(globalVars.lastTurningBeforeLowSignal, "asd");
+	myCar.myVarMng.addWatchedVar(globalVars.MagSenHDLeft, "asd");
+	myCar.myVarMng.addWatchedVar(globalVars.MagSenHDRight, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.magSenReferenceReading, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.lastAngleListSum, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.MagSenFDRight, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.lastTurningAngle, "asd");
 //	myCar.myVarMng.addWatchedVar(globalVars.speed, "asd");
 //	myCar.myVarMng.addWatchedVar(globalVars.lastCount, "asd");
+//	myCar.myVarMng.addWatchedVar(&globalConfig.MyMotorSpeedControlRef, "asd");
 	myCar.myVarMng.Init(&myListener);
 
 	myCar.startMainLoop();
-	vector<Led> myLeds;
-	Gpo::Config config;
-	config.is_high = true;
-	config.pin = libbase::k60::Pin::Name::kPtc1;
-	Gpio a(config);
-
-	for (uint8_t i = 0; i < 4; i++)
-		myLeds.push_back(Led({i, false}));
-
-	while (true)
-		for (uint8_t j = 0; j < 4; j++)
-			myLeds[j].Switch();
 
 }

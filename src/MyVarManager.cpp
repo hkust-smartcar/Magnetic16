@@ -13,7 +13,7 @@
 #include <utility>
 
 
-#include <libsc/k60/system.h>
+#include <libsc/system.h>
 #include <libsc/k60/ftdi_ft232r.h>
 #include <libbase/k60/sys_tick.h>
 #include <libsc/k60/jy_mcu_bt_106.h>
@@ -24,6 +24,7 @@
 //#ifdef LIBSC_USE_UART
 
 using namespace libbase::k60;
+using namespace libsc;
 using namespace libsc::k60;
 using namespace std;
 

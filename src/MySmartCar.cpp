@@ -88,9 +88,10 @@ void MySmartCar::showValue(void)
 				 << "FLeft: " << *(m_smartCarInstance->myVars->MagSenFDLeft) << MyLcd::endl
 				 << "FRight: " << *(m_smartCarInstance->myVars->MagSenFDRight) << MyLcd::endl
 //				 << "kQ:" << (m_smartCarInstance->myConfig->MyMagSenFilterQ) << " " << "kR:" << (m_smartCarInstance->myConfig->MyMagSenFilterR) << MyLcd::endl
-//				 << "kP:" << (m_smartCarInstance->myConfig->MyServoTurningKp) << " " << "kD:" << (m_smartCarInstance->myConfig->MyServoTurningKd) << MyLcd::endl
-				 << "HLeft: " << *(m_smartCarInstance->myVars->MagSenHDLeft) << MyLcd::endl
-				 << "HRight: " << *(m_smartCarInstance->myVars->MagSenHDRight) << MyLcd::endl
+				 << "kP:" << (m_smartCarInstance->myConfig->MyServoTurningKp) << MyLcd::endl
+				 << "kD:" << (m_smartCarInstance->myConfig->MyServoTurningKd) << MyLcd::endl
+//				 << "HLeft: " << *(m_smartCarInstance->myVars->MagSenHDLeft) << MyLcd::endl
+//				 << "HRight: " << *(m_smartCarInstance->myVars->MagSenHDRight) << MyLcd::endl
 				 << "LastAngle: " << *(m_smartCarInstance->myVars->lastTurningAngle) << MyLcd::endl
 				 << "Speed: " << (int16_t)(m_smartCarInstance->myConfig->MyMotorSpeedControlRef) << MyLcd::endl
 				 << "Type: " << (uint8_t)*(m_smartCarInstance->myVars->TurningState) << " Pos: " << (int8_t)*(m_smartCarInstance->myVars->PositionState) << " ";

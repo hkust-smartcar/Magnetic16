@@ -14,6 +14,7 @@
 #include <libsc/system.h>
 #include <libsc/trs_d05.h>
 #include <libbase/k60/adc.h>
+#include <libsc/led.h>
 
 #include "MyKalmanFilter.h"
 #include "MyServo.h"
@@ -205,17 +206,17 @@ MyServo::MyServo(MyConfig &config, MyVar &vars, MyLoop &loop)
 	m_turningState(config.MySmartCarTurningMode),
 	m_positionState(config.MySmartCarInitialPosition),
 	m_servo(getServoConfig(config.MyServoId)),
-	m_turningController(&config.MyServoTurningRef, &config.MyServoTurningKp, &config.MyServoTurningKi, &config.MyServoTurningKd, -MAX_SERVO_TURNING_DEGREE, MAX_SERVO_TURNING_DEGREE),
+	m_turningController(&config.MyServoTurningRef, &config.MyServoTurningKp, &config.MyServoTurningKi, &config.MyServoTurningKd, -MAX_SERVO_TURNING_ANGLE, MAX_SERVO_TURNING_ANGLE),
 	m_lastProcessTurningControlTime(System::Time()),
 	m_setAngleList({ 0 }),
 	m_lastTurningAngle(0),
 	m_lastAngleListSum(0),
 	m_lastAngleListIndex(0),
-	m_curQueueIndex(0),
-	m_controlQueueLength(0),
-	m_HDNoSignalThreshold(config.MyMagSenHDLowestValue),
+	m_hasItem(false),
+	m_HDNoSignalThreshold(config.MyMagSenHDWeakValue),
 	m_HDHighValueThreshold(config.MyMagSenHDStrongValue),
-	m_FDHighValueThreshold(config.MyMagSenFDStrongValue)
+	m_FDHighValueThreshold(config.MyMagSenFDStrongValue),
+	m_FDLowValueThreshold(config.MyMagSenFDWeakValue)
 {
 	m_servoInstance = this;
 	reset();
@@ -264,7 +265,7 @@ void MyServo::reset(void)
 
 void MyServo::turn(const int16_t degree_x10)
 {
-	int16_t realAngle = outRangeOf(inRange(-MAX_SERVO_TURNING_DEGREE, degree_x10, MAX_SERVO_TURNING_DEGREE), 0, 60);
+	int16_t realAngle = outRangeOf(inRange(-MAX_SERVO_TURNING_ANGLE, degree_x10, MAX_SERVO_TURNING_ANGLE), 0, 60);
 //	m_servo.SetDegree(MID_SERVO_DEGREE + realAngle);
 //	m_lastTurningAngle = realAngle;
 	m_servo.SetDegree(MID_SERVO_DEGREE + getNextAngle());
@@ -398,30 +399,55 @@ void MyServo::updateLastState(void)
 	if (m_MagSenFD[MyMagSenPair::LEFT] > m_FDHighValueThreshold && m_MagSenFD[MyMagSenPair::RIGHT] > m_FDHighValueThreshold)
 	{
 		m_turningState = MyConfig::SmartCarTurning::kCrossRoad;
-		m_controlQueue[m_controlQueueLength].targetAngle = 0;
-		m_controlQueue[m_controlQueueLength++].stopUntilType = MyConfig::SmartCarTurning::kStraightLine;
+		updateControlInstruction(turnAccordingToMagSenHD, MyConfig::SmartCarTurning::kStraightLine, false);
 	}
-	else if ((m_MagSenFD[MyMagSenPair::LEFT]  < m_FDHighValueThreshold && m_MagSenFD[MyMagSenPair::RIGHT]  > m_FDHighValueThreshold) ||
-			 (m_MagSenFD[MyMagSenPair::RIGHT]  < m_FDHighValueThreshold && m_MagSenFD[MyMagSenPair::LEFT]  > m_FDHighValueThreshold))
+	else if ((m_MagSenFD[MyMagSenPair::LEFT]  < m_FDLowValueThreshold && m_MagSenFD[MyMagSenPair::RIGHT]  > m_FDHighValueThreshold) ||
+			 (m_MagSenFD[MyMagSenPair::RIGHT]  < m_FDLowValueThreshold && m_MagSenFD[MyMagSenPair::LEFT]  > m_FDHighValueThreshold))
+	{
 		m_turningState = MyConfig::SmartCarTurning::k90Degree;
+		updateControlInstruction(turnAccordingToMagSenFD, MyConfig::SmartCarTurning::kStraightLine, true);
+	}
 	else
 		m_turningState = MyConfig::SmartCarTurning::kStraightLine;
 }
 
 void MyServo::processControlQueue(void)
 {
-	if (m_positionState == MyConfig::SmartCarPosition::kGGed)
-		turn(0);
-	if (m_controlQueueLength != 0)
-		if (m_controlQueue[m_curQueueIndex].stopUntilType == m_turningState)
-		{
-			decreaseInRange(&m_curQueueIndex, 1, 5);
-			m_controlQueueLength -= 1;
-		}
+	if (m_hasItem)
+		if (m_specialControl.stopUntilType == m_turningState)
+			removeControlInstruction();
 		else
-			turn((int16_t)m_controlQueue[m_curQueueIndex].targetAngle);
+		{
+			switch (m_specialControl.functionIndex)
+			{
+			case turnAccordingToMagSenHD:
+				turn((int16_t)diffResultHD * 2000);
+				break;
+
+			case turnAccordingToMagSenFD:
+				turn((int16_t)diffResultFD * 2000);
+				break;
+			}
+		}
 	else
-		turn((int16_t)m_turningController.updatePID_ori(-diffResultSD * 0.7 + diffResultHD * 0.3));
+		turn((int16_t)m_turningController.updatePID_ori(-diffResultSD * 0.5 + diffResultHD * 0.5));
+}
+
+void MyServo::updateControlInstruction(const /*int16_t targetAngle*/Functions functionIndex, const MyConfig::SmartCarTurning until, const bool allowChange)
+{
+	if (!(m_specialControl.canBeChanged && m_hasItem))
+	{
+		m_hasItem = true;
+//		m_specialControl.targetAngle = targetAngle;
+		m_specialControl.functionIndex = functionIndex;
+		m_specialControl.stopUntilType = until;
+		m_specialControl.canBeChanged = allowChange;
+	}
+}
+
+void MyServo::removeControlInstruction(void)
+{
+	m_hasItem = false;
 }
 
 void MyServo::turningControlRoutine(void)

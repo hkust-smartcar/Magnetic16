@@ -44,9 +44,9 @@ public:
 
 	// MyServoTurningPID
 	float			MyServoTurningRef = 0.0f;
-	float			MyServoTurningKp = 1700.0f;
+	float			MyServoTurningKp = 1200.0f;
 	float			MyServoTurningKi = 0.0f;
-	float			MyServoTurningKd = 1000.0f;
+	float			MyServoTurningKd = 0.0f;
 
 	// MyMagSen
 	uint8_t			MyMagSenPairCount = 3;
@@ -60,10 +60,11 @@ public:
 	float			MyMagSenDistanceWhenMaxDiff = 10.0f;
 	float			MyMagMaxSenReadingDiff = 1.4f;
 
-	float			MyMagSenHDLowestValue = 0.25f;
-	float			MyMagSenHDStrongValue = 1.2f;
+	float			MyMagSenHDWeakValue = 0.5050f;
+	float			MyMagSenHDStrongValue = 1.05f;
 
 	float			MyMagSenFDStrongValue = 0.8f;
+	float			MyMagSenFDWeakValue = 0.34f;
 
 	// MyLeds
 

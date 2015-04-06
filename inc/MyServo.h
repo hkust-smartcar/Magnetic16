@@ -28,8 +28,8 @@ using namespace std;
 //#ifdef LIBSC_USE_SERVO
 
 #define MID_SERVO_DEGREE 			900
-#define MIN_SERVO_TURNING_DEGREE 	0
-#define MAX_SERVO_TURNING_DEGREE	800
+#define MIN_SERVO_TURNING_ANGLE 	0
+#define MAX_SERVO_TURNING_ANGLE 	800
 
 // cross road ->
 //			  |
@@ -140,10 +140,18 @@ public:
 
 private:
 
+	enum Functions
+	{
+		turnAccordingToMagSenHD = 0,
+		turnAccordingToMagSenFD
+	};
+
 	typedef struct AngleControlQueue
 	{
-		int16_t targetAngle;
+//		int16_t targetAngle;
 		MyConfig::SmartCarTurning stopUntilType;
+		bool canBeChanged;
+		Functions functionIndex;
 	};
 
 	Timer::TimerInt		m_lastProcessTurningControlTime;
@@ -173,11 +181,12 @@ private:
 
 	float				m_HDNoSignalThreshold;
 	float				m_HDHighValueThreshold;
-	float				m_FDHighValueThreshold;
 
-	array<AngleControlQueue, 5>	m_controlQueue;
-	uint8_t				m_curQueueIndex;
-	int8_t				m_controlQueueLength;
+	float				m_FDHighValueThreshold;
+	float				m_FDLowValueThreshold;
+
+	AngleControlQueue	m_specialControl;
+	bool				m_hasItem;
 
 	uint8_t				usedMagSenPairs;
 //#endif
@@ -201,6 +210,9 @@ private:
 	void applyResult(void);
 
 	void processControlQueue(void);
+
+	void updateControlInstruction(const /*int16_t targetAngle*/Functions functionIndex, const MyConfig::SmartCarTurning until, const bool allowChange);
+	void removeControlInstruction(void);
 
 };
 

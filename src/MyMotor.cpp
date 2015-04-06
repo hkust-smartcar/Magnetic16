@@ -152,7 +152,11 @@ void MyMotor::speedControlRoutine(void)
 					}
 			}
 		}
-		m_motorInstance->setSpeed((int16_t)m_motorInstance->m_speedController.updatePID((float)m_motorInstance->m_encoder.getLastCount()));
+
+		if (MyServo::getServoInstance()->getPosState() == MyConfig::SmartCarPosition::kGGed)
+			m_motorInstance->setSpeed(0);
+		else
+			m_motorInstance->setSpeed((int16_t)m_motorInstance->m_speedController.updatePID((float)m_motorInstance->m_encoder.getLastCount()));
 	}
 	else
 		m_motorInstance->setSpeed(0);

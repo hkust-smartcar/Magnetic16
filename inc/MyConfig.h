@@ -23,7 +23,8 @@ public:
 	{
 		kStraightLine = 0,
 		k90Degree,
-		kCrossRoad
+		kCrossRoad,
+		kNone
 	};
 
 	enum struct SmartCarPosition
@@ -31,39 +32,50 @@ public:
 		kLeft = -1,
 		kIdeal,
 		kRight,
-		kGGed = 99
+		kNone
+	};
+
+	enum struct SmartCarStatus
+	{
+		kNormal = 0,
+		kGGed,
+		kNone
 	};
 
 	// Put All Configuration Here
 
 	// MyMotorPID
+	// Kp:2.3 Pu: 140ms
 	float			MyMotorSpeedControlRef = 60.0f;
-	float			MyMotorSpeedControlKp = 0.06f;
+	float			MyMotorSpeedControlKp = 0.25f;
 	float			MyMotorSpeedControlKi = 0.0f;
-	float			MyMotorSpeedControlKd = 0.0f;
+	float			MyMotorSpeedControlKd = 1.8f;
 
 	// MyServoTurningPID
 	float			MyServoTurningRef = 0.0f;
-	float			MyServoTurningKp = 1200.0f;
+	float			MyServoTurningKp = 2000.0f;
 	float			MyServoTurningKi = 0.0f;
 	float			MyServoTurningKd = 0.0f;
 
 	// MyMagSen
 	uint8_t			MyMagSenPairCount = 3;
 	uint8_t			MyMagSenPairId0 = 0;
-	uint8_t			MyMagSenPairId1 = 4;
-	uint8_t			MyMagSenPairId2 = 2;
+	uint8_t			MyMagSenPairId1 = 2;
+	uint8_t			MyMagSenPairId2 = 4;
 
-	float			MyMagSenFilterQ = 0.05f;
-	float			MyMagSenFilterR = 0.5f;
+	float			MyMagSenFilterQ = 0.0005f;
+	float			MyMagSenFilterR = 0.43f;
 
 	float			MyMagSenDistanceWhenMaxDiff = 10.0f;
 	float			MyMagMaxSenReadingDiff = 1.4f;
 
-	float			MyMagSenHDWeakValue = 0.5050f;
+	float			MyMagSenSDWeakValue = 0.25f;
+	float			MyMagSenSDStrongValue = 1.5f;
+
+	float			MyMagSenHDWeakValue = 0.3050f;
 	float			MyMagSenHDStrongValue = 1.05f;
 
-	float			MyMagSenFDStrongValue = 0.8f;
+	float			MyMagSenFDStrongValue = 1.85f;
 	float			MyMagSenFDWeakValue = 0.34f;
 
 	// MyLeds
@@ -76,6 +88,9 @@ public:
 	float			MyServoDefaultMinFDValue = 0.0f;
 	float			MyServoDefaultMaxLRValue = 0.0f;
 	float			MyServoDefaultMinLRValue = 0.0f;
+
+	float			MyServoCrossRoadKp = 2000.0f;
+	float			MyServo90DegreeKp = 2000.0f;
 
 	// MyMotor
 	uint8_t			MyMotorId = 0;
@@ -107,5 +122,7 @@ public:
 					MySmartCarTurningMode = MyConfig::SmartCarTurning::kStraightLine;
 	SmartCarPosition
 					MySmartCarInitialPosition = MyConfig::SmartCarPosition::kIdeal;
+	SmartCarStatus
+					MySmartCarInitialStatus = MyConfig::SmartCarStatus::kNormal;
 
 };

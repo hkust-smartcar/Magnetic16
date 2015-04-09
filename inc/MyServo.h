@@ -27,9 +27,9 @@ using namespace std;
 
 //#ifdef LIBSC_USE_SERVO
 
-#define MID_SERVO_DEGREE 			900
+#define MID_SERVO_DEGREE 			9000
 #define MIN_SERVO_TURNING_ANGLE 	0
-#define MAX_SERVO_TURNING_ANGLE 	800
+#define MAX_SERVO_TURNING_ANGLE 	8000
 
 // cross road ->
 //			  |
@@ -77,6 +77,10 @@ public:
 		float *getFilteredLeftReadingPointer(void);
 		float *getFilteredRightReadingPointer(void);
 
+		float *getRawLeftReadingPointer(void);
+
+		float *getRawRightReadingPointer(void);
+
 		float operator[](size_t index);
 
 		float *getDistanceFromWire(void);
@@ -84,6 +88,7 @@ public:
 	private:
 
 		float					m_MagSenFilteredValue[2];
+		float					m_MagSenRawValue[2];
 		float					m_MagSenOffsetPrediction;
 
 		float					*DistanceWhenMaxDiff;
@@ -143,14 +148,17 @@ private:
 	enum Functions
 	{
 		turnAccordingToMagSenHD = 0,
-		turnAccordingToMagSenFD
+		turnAccordingToMagSenFD,
+		turnWithMaxAngle
 	};
 
 	typedef struct AngleControlQueue
 	{
 //		int16_t targetAngle;
 		MyConfig::SmartCarTurning stopUntilType;
+		MyConfig::SmartCarStatus runWhileStatus;
 		bool canBeChanged;
+		bool determinedByStatus;
 		Functions functionIndex;
 	};
 
@@ -171,6 +179,7 @@ private:
 	MyMagSenPair		m_MagSenHD;
 	float 				diffResultHD;
 	float 				sumResultHD;
+	bool				diffHDLocked;
 
 	float				m_referenceReading;
 
@@ -179,11 +188,17 @@ private:
 	uint8_t				m_lastAngleListIndex;
 	int32_t				m_lastAngleListSum;
 
-	float				m_HDNoSignalThreshold;
+	float				m_SDHighValueThreshold;
+	float				m_SDNoSignalThreshold;
+
 	float				m_HDHighValueThreshold;
+	float				m_HDNoSignalThreshold;
 
 	float				m_FDHighValueThreshold;
 	float				m_FDLowValueThreshold;
+
+	float				m_CrossRoadKp;
+	float				m_90DegreeKp;
 
 	AngleControlQueue	m_specialControl;
 	bool				m_hasItem;
@@ -194,6 +209,7 @@ private:
 	MyLeds				m_leds;
 	MyConfig::SmartCarTurning 	m_turningState;
 	MyConfig::SmartCarPosition	m_positionState;
+	MyConfig::SmartCarStatus	m_currentStatus;
 
 	PIDhandler 			m_turningController;
 	TrsD05				m_servo;
@@ -211,7 +227,7 @@ private:
 
 	void processControlQueue(void);
 
-	void updateControlInstruction(const /*int16_t targetAngle*/Functions functionIndex, const MyConfig::SmartCarTurning until, const bool allowChange);
+	void updateControlInstruction(const /*int16_t targetAngle*/Functions functionIndex, const bool allowChange, const MyConfig::SmartCarTurning stopUntil, const MyConfig::SmartCarStatus runWhile);
 	void removeControlInstruction(void);
 
 };

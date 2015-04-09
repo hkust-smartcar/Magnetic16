@@ -108,11 +108,12 @@ MyMotor::MyMotor(MyConfig &config, MyVar &vars, MyLoop &loop)
 	vars.speed = &m_speed;
 	vars.isServoStarted = &m_isStarted;
 	m_motorInstance = this;
-	loop.addFunctionToLoop(&speedControlRoutine, LOOP_IMMEDIATELY, 2);
+	loop.addFunctionToLoop(&speedControlRoutine, LOOP_IMMEDIATELY, 10);
 }
 
 void MyMotor::setEnabled(const bool enabled)
 {
+	reset();
 	m_isStarted = enabled;
 }
 bool MyMotor::isEnabled(void)
@@ -123,6 +124,7 @@ bool MyMotor::isEnabled(void)
 void MyMotor::reset(void)
 {
 	setSpeed(0);
+	m_speedController.reset();
 	m_encoder.reset();
 	m_isStarted = false;
 }
@@ -152,9 +154,6 @@ void MyMotor::speedControlRoutine(void)
 					}
 			}
 		}
-
-		if (MyServo::getServoInstance()->getPosState() == MyConfig::SmartCarPosition::kGGed)
-			m_motorInstance->setSpeed(0);
 		else
 			m_motorInstance->setSpeed((int16_t)m_motorInstance->m_speedController.updatePID((float)m_motorInstance->m_encoder.getLastCount()));
 	}

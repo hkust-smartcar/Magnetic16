@@ -29,6 +29,9 @@ public:
 	float				*MagSenHDLeft;
 	float				*MagSenHDRight;
 
+	float				*MagSenSDRawLeft;
+	float				*MagSenSDRawRight;
+
 	float 				*diffResultSD;
 	float 				*sumResultSD;
 	float 				*diffResultFD;
@@ -55,5 +58,7 @@ public:
 	SmartCarTurning		*TurningState;
 	MyConfig::
 	SmartCarPosition	*PositionState;
+	MyConfig::
+	SmartCarStatus		*CurrentStatus;
 
 };

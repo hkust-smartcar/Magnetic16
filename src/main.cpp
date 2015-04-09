@@ -51,24 +51,24 @@ void myListener(const vector<Byte> &bytes)
 		break;
 
 	case 'p':
-		globalConfig.MyMotorSpeedControlKp += 0.0001f;
+		globalConfig.MyMotorSpeedControlKp += 0.05f;
 		break;
 	case 'P':
-		globalConfig.MyMotorSpeedControlKp = max(globalConfig.MyMotorSpeedControlKp - 0.0001f, 0.0f);
+		globalConfig.MyMotorSpeedControlKp = max(globalConfig.MyMotorSpeedControlKp - 0.05f, 0.0f);
 		break;
 
 	case 'i':
-		globalConfig.MyMotorSpeedControlKi += 0.00001f;
+		globalConfig.MyMotorSpeedControlKi += 0.0001f;
 		break;
 	case 'I':
 		globalConfig.MyMotorSpeedControlKi = max(globalConfig.MyMotorSpeedControlKi - 0.0001f, 0.0f);
 		break;
 
 	case 'd':
-		globalConfig.MyMotorSpeedControlKd += 0.001f;
+		globalConfig.MyMotorSpeedControlKd += 0.1f;
 		break;
 	case 'D':
-		globalConfig.MyMotorSpeedControlKd = max(globalConfig.MyMotorSpeedControlKi - 0.001f, 0.0f);
+		globalConfig.MyMotorSpeedControlKd = max(globalConfig.MyMotorSpeedControlKd - 0.1f, 0.0f);
 		break;
 
 	case 'q':
@@ -133,19 +133,26 @@ void myListener(const vector<Byte> &bytes)
 
 int main()
 {
-	myCar.myVarMng.addWatchedVar(globalVars.MagSenSDLeft, "asd");
-	myCar.myVarMng.addWatchedVar(globalVars.MagSenSDRight, "asd");
-	myCar.myVarMng.addWatchedVar(globalVars.MagSenFDLeft, "asd");
-	myCar.myVarMng.addWatchedVar(globalVars.MagSenFDRight, "asd");
-	myCar.myVarMng.addWatchedVar(globalVars.MagSenHDLeft, "asd");
-	myCar.myVarMng.addWatchedVar(globalVars.MagSenHDRight, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.MagSenSDLeft, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.MagSenSDRight, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.MagSenSDRawLeft, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.MagSenSDRawRight, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.MagSenFDLeft, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.MagSenFDRight, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.MagSenHDLeft, "asd");
+//	myCar.myVarMng.addWatchedVar(globalVars.MagSenHDRight, "asd");
 //	myCar.myVarMng.addWatchedVar(globalVars.magSenReferenceReading, "asd");
 //	myCar.myVarMng.addWatchedVar(globalVars.lastAngleListSum, "asd");
 //	myCar.myVarMng.addWatchedVar(globalVars.MagSenFDRight, "asd");
 //	myCar.myVarMng.addWatchedVar(globalVars.lastTurningAngle, "asd");
+//	myCar.myVarMng.addWatchedVar(&globalConfig.MyMagSenFilterQ, "ASd");
+//	myCar.myVarMng.addWatchedVar(&globalConfig.MyMagSenFilterR, "ASF");
 //	myCar.myVarMng.addWatchedVar(globalVars.speed, "asd");
-//	myCar.myVarMng.addWatchedVar(globalVars.lastCount, "asd");
-//	myCar.myVarMng.addWatchedVar(&globalConfig.MyMotorSpeedControlRef, "asd");
+	myCar.myVarMng.addWatchedVar(&globalConfig.MyMotorSpeedControlKp, "asd");
+	myCar.myVarMng.addWatchedVar(&globalConfig.MyMotorSpeedControlKi, "asd");
+	myCar.myVarMng.addWatchedVar(&globalConfig.MyMotorSpeedControlKd, "asd");
+	myCar.myVarMng.addWatchedVar(globalVars.lastCount, "asd");
+	myCar.myVarMng.addWatchedVar(&globalConfig.MyMotorSpeedControlRef, "asd");
 	myCar.myVarMng.Init(&myListener);
 
 	myCar.startMainLoop();

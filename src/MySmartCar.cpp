@@ -71,35 +71,27 @@ MySmartCar::MySmartCar(MyConfig &config, MyVar &vars)
 
 void MySmartCar::showValue(void)
 {
-	m_smartCarInstance->myVarMng.sendWatchData();
-
-//	int n = sprintf(buffer, "Left: %.4f\nRight: %.4f\nDiff: %.4f\nLastAngle: %d\nKp: %.0f\nKd: %.0f\nSpeed: %.0f", *(m_smartCarInstance->myVars->MagSenSDLeft), *(m_smartCarInstance->myVars->MagSenSDRight), *(m_smartCarInstance->myVars->diffResultSD), *(m_smartCarInstance->myVars->lastTurningAngle), (m_smartCarInstance->myConfig->MyServoTurningKp), (m_smartCarInstance->myConfig->MyServoTurningKd), (m_smartCarInstance->myConfig->MyMotorSpeedControlRef));
-//	int n = sprintf(buffer, "SLeft: %.4f\nSRight: %.4f\nFLeft: %.4f\nFRight: %.4f\nLastAngle: %d\n
-//	kQ: %.4f\nkR: %.4f\nkP:%.0f kD:%.0f\nSpeed: %.3f", *(m_smartCarInstance->myVars->MagSenSDLeft),
-//	*(m_smartCarInstance->myVars->MagSenSDRight), *(m_smartCarInstance->myVars->MagSenFDLeft),
-//	*(m_smartCarInstance->myVars->MagSenFDRight), *(m_smartCarInstance->myVars->lastTurningAngle),
-//	(m_smartCarInstance->myConfig->MyMagSenFilterQ), (m_smartCarInstance->myConfig->MyMagSenFilterR),
-//	(m_smartCarInstance->myConfig->MyServoTurningKp), (m_smartCarInstance->myConfig->MyServoTurningKd),
-//	(m_smartCarInstance->myConfig->MyMotorSpeedControlRef));
+//	m_smartCarInstance->myVarMng.sendWatchData();
 
 	MyLcd::getMyLcdInstance()->setRow(1)
 				 << "SLeft: " << *(m_smartCarInstance->myVars->MagSenSDLeft) << MyLcd::endl
 				 << "SRight: " << *(m_smartCarInstance->myVars->MagSenSDRight) << MyLcd::endl
 				 << "FLeft: " << *(m_smartCarInstance->myVars->MagSenFDLeft) << MyLcd::endl
 				 << "FRight: " << *(m_smartCarInstance->myVars->MagSenFDRight) << MyLcd::endl
-//				 << "kQ:" << (m_smartCarInstance->myConfig->MyMagSenFilterQ) << " " << "kR:" << (m_smartCarInstance->myConfig->MyMagSenFilterR) << MyLcd::endl
-				 << "kP:" << (m_smartCarInstance->myConfig->MyServoTurningKp) << MyLcd::endl
-				 << "kD:" << (m_smartCarInstance->myConfig->MyServoTurningKd) << MyLcd::endl
-//				 << "HLeft: " << *(m_smartCarInstance->myVars->MagSenHDLeft) << MyLcd::endl
-//				 << "HRight: " << *(m_smartCarInstance->myVars->MagSenHDRight) << MyLcd::endl
-				 << "LastAngle: " << *(m_smartCarInstance->myVars->lastTurningAngle) << MyLcd::endl
-				 << "Speed: " << (int16_t)(m_smartCarInstance->myConfig->MyMotorSpeedControlRef) << MyLcd::endl
-				 << "Type: " << (uint8_t)*(m_smartCarInstance->myVars->TurningState) << " Pos: " << (int8_t)*(m_smartCarInstance->myVars->PositionState) << " ";
+				 << "HLeft: " << *(m_smartCarInstance->myVars->MagSenHDLeft) << MyLcd::endl
+				 << "HRight: " << *(m_smartCarInstance->myVars->MagSenHDRight) << MyLcd::endl
+//				 << "kP:" << (uint16_t)(m_smartCarInstance->myConfig->MyServoTurningKp) << " kD:" << (uint16_t)(m_smartCarInstance->myConfig->MyServoTurningKd) << MyLcd::endl
+// 				 << "kQ:" << (m_smartCarInstance->myConfig->MyMagSenFilterQ) << " kR:" << (m_smartCarInstance->myConfig->MyMagSenFilterR) << MyLcd::endl
+//				 << "Angle: " << (int16_t)*(m_smartCarInstance->myVars->lastTurningAngle) << MyLcd::endl
+				 << "Encoder: " << (int32_t)*(m_smartCarInstance->myVars->lastCount) << MyLcd::endl
+//				 << "Speed: " << (int16_t)(m_smartCarInstance->myConfig->MyMotorSpeedControlRef) << MyLcd::endl
+				 << "T:" << (uint8_t)*(m_smartCarInstance->myVars->TurningState) << " S:" << (uint8_t)*(m_smartCarInstance->myVars->CurrentStatus) << " P:" << (int8_t)*(m_smartCarInstance->myVars->PositionState) << " ";
 }
 
 void MySmartCar::startMainLoop(void)
 {
 	myLoop.addFunctionToLoop(&showValue, 1, 150);
+//	myLoop.addFunctionToLoop(&showValue, 1, 20);
 	myLoop.start();
 }
 

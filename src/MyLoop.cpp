@@ -28,29 +28,35 @@ MyLoop::MyLoop(void)
 	System::Init();
 }
 
-void MyLoop::addFunctionToLoop(const LoopFunction &func, Timer::TimerInt delay, uint16_t often)
+void MyLoop::addFunctionToLoop(const LoopFunction &func, TimeInterval delay)
 {
-	m_function_list.push_back(func);
-	m_delay_list.push_back(delay);
-	m_often_list.push_back(often);
-	m_counter_list.push_back(0);
+	if (m_timer_list.size() == 0)
+		return ;
+
+	for (uint8_t i = 0; i < m_timer_list.size(); i++)
+		if (m_timer_list[i].interval > delay)
+		{
+			m_timer_list.emplace(m_timer_list.begin() + i, (TimerInfo) {func, delay, 0});
+			return;
+		}
+
+	m_timer_list.emplace_back((TimerInfo) {func, delay, 0});
 }
 
 void MyLoop::start(void)
 {
-	Timer::TimerInt timeDiff = 0;
+	m_start_time = System::Time();
+
+	for (uint8_t i = 0; i < m_timer_list.size(); i++)
+		m_timer_list[i].lastRunTime = m_start_time;
 
 	while (true)
 	{
-		for (uint16_t i = 0; i < m_function_list.size(); i++)
-		{
-			if (m_counter_list[i] >= m_often_list[i])
+		for (uint8_t i = 0; i < m_timer_list.size(); i++)
+			if (System::Time() - m_timer_list[i].lastRunTime >= m_timer_list[i].interval)
 			{
-				((LoopFunction)m_function_list[i])();
-				m_counter_list[i] = 0;
+				((LoopFunction)m_timer_list[i].func)(System::Time() - m_timer_list[i].lastRunTime - m_timer_list[i].interval);
+				m_timer_list[i].lastRunTime = System::Time();
 			}
-			DelayMsByTicks(m_delay_list[i]);
-			(m_counter_list[i])++;
-		}
 	}
 }

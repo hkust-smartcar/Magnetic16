@@ -26,26 +26,26 @@ class MyLoop
 {
 public:
 
-	/*
-	 * function:
-	 * void (Timer::TimerInt timeError)
-	 */
-	typedef function<void (void)> LoopFunction;
+	typedef function<void (Timer::TimerInt)> LoopFunction;
+	typedef Timer::TimerInt TimeInterval;
+
+	typedef struct TimerInfo
+	{
+		LoopFunction	func;
+		TimeInterval	interval;
+		Timer::TimerInt	lastRunTime;
+	};
 
 	MyLoop();
 
 	void start(void);
 
-	void addFunctionToLoop(const LoopFunction &func, Timer::TimerInt delay, uint16_t often);
+	void addFunctionToLoop(const LoopFunction &func, TimeInterval delay);
 
 private:
 
-	vector<LoopFunction>			m_function_list;
-	vector<Timer::TimerInt>			m_delay_list;
-	vector<uint16_t>				m_often_list;
-	vector<uint16_t>				m_counter_list;
+	vector<TimerInfo>			m_timer_list;
 
-	Timer::TimerInt					m_start_time;
-	Timer::TimerInt					m_last_time;
+	Timer::TimerInt				m_start_time;
 
 };

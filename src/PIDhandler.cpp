@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include <libsc/system.h>
+#include <libsc/timer.h>
 
 #include "PIDhandler.h"
 #include "MySmartCar.h"
@@ -24,6 +25,7 @@ PIDhandler::PIDhandler(float *ref, float *kp, float *ki, float *kd, const float 
 	Kd(kd),
 	eSum(0),
 	lastError(0),
+	output(0),
 	epsilon(*reference * EPSILON_RATIO),
 	lastTimeUpdate(0),
 	min(min),

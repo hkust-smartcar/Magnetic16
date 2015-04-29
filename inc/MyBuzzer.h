@@ -9,10 +9,9 @@
 
 #include <libbase/k60/Ftm.h>
 #include <libbase/k60/ftm_pwm.h>
+#include "MyResource.h"
 
 using namespace libbase::k60;
-
-#define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
 
 class MyBuzzer
 {

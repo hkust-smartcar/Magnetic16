@@ -35,27 +35,21 @@ int main(void)
 
 	MySmartCar myCar;
 
-	for (char c = 32; c < 32 + 21; c++)
-	{
-		myCar.m_lcdConsole << c;
-		System::DelayMs(50);
-	}
-	myCar.m_lcdConsole << MyLcd::endl;
-	for (char c = 32 + 21; c < 32 + 21 * 2; c++)
-	{
-//		if (c != 58)
-		myCar.m_lcdConsole << c;
-		System::DelayMs(50);
-	}
-	myCar.m_lcdConsole << MyLcd::endl;
-	for (char c = 32 + 21 * 2; c < 32 + 21 * 3; c++)
-	{
-//		if (c != 58)
-		myCar.m_lcdConsole << c;
-		System::DelayMs(50);
-	}
-	myCar.m_lcdConsole.setRow(14) << "REF:00500 P:0.00015\nI:0.0005 D:0.0001";
+	myCar.m_lcdConsole.setRow(0) << "Similar to Task 1, but the input now is a long integer. Do not enter a number that is \"too long\"";
 
-	while (true);
+	float i = 55.5;
+	int16_t j = 120;
+
+	myCar.m_varMng.Init();
+	myCar.m_varMng.addWatchedVar(&i);
+	myCar.m_varMng.addSharedVar(&i, "i");
+	myCar.m_varMng.addWatchedVar(&j);
+	myCar.m_varMng.addSharedVar(&j, "j");
+
+	while (true)
+	{
+		myCar.m_varMng.sendWatchData();
+		System::DelayMs(10);
+	}
 
 }

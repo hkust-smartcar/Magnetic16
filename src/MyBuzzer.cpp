@@ -5,15 +5,13 @@
  *      Author: Peter
  */
 
-#include <cassert>
 #include <cstring>
-#include <libsc/system.h>
-#include <libsc/k60/config/2015_magnetic.h>
 #include <libbase/k60/ftm_pwm.h>
 #include <libbase/k60/ftm.h>
 #include <libbase/k60/pin.h>
 #include <libbase/k60/pwm_utils.h>
 #include "MyBuzzer.h"
+#include "MyResource.h"
 
 using namespace libbase::k60;
 using namespace libsc;

@@ -7,39 +7,21 @@
 
 #pragma once
 
-#include <array>
 #include <libbase/k60/adc.h>
 #include <libsc/trs_d05.h>
+#include "MyMagSen.h"
 #include "PIDhandler.h"
+#include "MyResource.h"
 
 using namespace libsc;
 using namespace libbase::k60;
 using namespace std;
 
-class MyServo : TrsD05
+class MyServo : private TrsD05
 {
 
 public:
 
-	class MyMagSen : Adc
-	{
-
-	public:
-
-		MyMagSen(void);
-
-	private:
-
-
-
-	};
-
-	enum struct MagSen
-	{
-		SD = 0,
-		FD,
-		HD
-	};
 	array<MyMagSen, 3>		m_MagSen;
 
 	MyServo(void);

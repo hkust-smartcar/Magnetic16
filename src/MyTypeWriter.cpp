@@ -29,6 +29,7 @@ MyTypeWriter::MyTypeWriter(const Config &config)
 		: m_lcd(config.lcd),
 		  m_fg_color(config.text_color),
 		  m_bg_color(config.bg_color),
+		  m_is_text_wrap(config.is_text_wrap),
 		  m_is_clear_line(config.is_clear_line),
 		  kCursorX(0),
 		  kCursorY(0)
@@ -49,7 +50,7 @@ bool MyTypeWriter::setActiveRegion(const uint8_t cursorX, const uint8_t cursorY)
 
 void MyTypeWriter::WriteChar(const char c)
 {
-	if (c == '\n')
+	if (c == '\n' || (kCursorX == kMaxColumn && m_is_text_wrap))
 	{
 		kCursorY++;
 		kCursorX = 0;
@@ -89,7 +90,7 @@ void MyTypeWriter::WriteBuffer(const char *buf, const size_t length)
 	uint currentIndex = 0;
 	while (currentIndex < length)
 	{
-		for (uint8_t x = kCursorX; x < kMaxColumn && currentIndex < length; x++, currentIndex++)
+		for (uint8_t &x = kCursorX; currentIndex < length; currentIndex++)
 		{
 			if (buf[currentIndex] == '\n')
 			{
@@ -101,154 +102,36 @@ void MyTypeWriter::WriteBuffer(const char *buf, const size_t length)
 				kCursorY++; currentIndex++;
 				break;
 			}
-			else if (checkInRange(31, buf[currentIndex], 126))
+			else if (kCursorX == kMaxColumn && m_is_text_wrap)
+			{
+				if (m_is_clear_line)
+					for (int8_t i = 0; i < kMaxColumn - kCursorX; i++)
+						WriteChar(CharTable_Size5[0]);
+				kCursorX = 0;
+				kCursorY++;
+			}
+
+			if (checkInRange(31, buf[currentIndex], 126))
 				WriteChar(CharTable_Size5[buf[currentIndex] - 32]);
 			else
 				WriteChar(CharTable_Size5[0]);
 		}
 	}
-//	size_t start = 0;
-//	size_t count = 0;
-//	const size_t max_count = std::max<size_t>(region.w / kFontW, 1);
-//	size_t y = region.y;
-//	size_t h = region.h;
-//	size_t print = 0;
-//	while (print < length)
-//	{
-//		if (buf[print] == '\n' || (m_is_text_wrap && count == max_count))
-//		{
-//			m_lcd->SetRegion({region.x, y, region.w, h});
-//			WriteOneLineBuffer(buf + start, count);
-//			count = 0;
-//			y += kFontH;
-//			h -= kFontH;
-//			if (buf[print] == '\n')
-//			{
-//				start = print + 1;
-//				++print;
-//			}
-//			else
-//			{
-//				start = print;
-//			}
-//		}
-//		else
-//		{
-//			++count;
-//			++print;
-//		}
-//	}
-	// Last line
-//	if (count > 0)
-//	{
-//		m_lcd->SetRegion({region.x, y, region.w, h});
-//		WriteOneLineBuffer(buf + start, count);
-//	}
-
-
-//	m_lcd->SetRegion(region);
 }
-//
-//void MyTypeWriter::WriteOneLineBuffer(const char *buf, const size_t length)
-//{
-//	if (length == 0)
-//	{
-//		return;
-//	}
-//
-//	unique_ptr<const Byte*> font_data(new const Byte*[length]);
-//	for (size_t i = 0; i < length; ++i)
-//	{
-//		if (buf[i] < 32 || buf[i] > 126)
-//		{
-//			LOG_WL("Unsupported char");
-//			font_data.get()[i] = &CharTable_Size5[0][0];
-//		}
-//		else
-//		{
-//			font_data.get()[i] = &CharTable_Size5[buf[i] - 32][0];
-//		}
-//	}
-//	const Lcd::Rect &region = m_lcd->GetRegion();
-//	const Uint w = std::min<Uint>(region.w, kFontW * length);
-//	const Uint full_w = m_is_clear_line ? region.w : w;
-//	const Uint h = std::min<Uint>(region.h, kFontH);
-//	if (w == 0 || h == 0)
-//	{
-//		return;
-//	}
-//	const Uint pixel_count = full_w * h;
-//	vector<Byte> bitset((pixel_count + 7) / 8, 0);
-//	Byte *bs_ptr = &bitset[0];
-//	Uint filled_bit = 0;
-//
-//	Uint row_remaining_pixel = full_w - w;
-//
-//	// Won't work if kFontW != 8 BTW
-//	Uint font_pos = 0;
-//	for (Uint y = 0; y < h; ++y)
-//	{
-//		for (Uint x = 0; x < w; x += 8)
-//		{
-//			const Uint bit_count = std::min<Uint>(w - x, 8);
-//			const uint8_t bit_mask = 0xFF << (8 - bit_count);
-//
-//			*bs_ptr |= (*font_data.get()[font_pos] & bit_mask) >> filled_bit;
-//
-//			if (filled_bit + bit_count > 8)
-//			{
-//				// Fill the remaining bits
-//				*++bs_ptr |= (*font_data.get()[font_pos] & bit_mask)
-//						<< (8 - filled_bit);
-//				filled_bit = (filled_bit + bit_count) % 8;
-//			}
-//			else if (filled_bit + bit_count == 8)
-//			{
-//				++bs_ptr;
-//				filled_bit = 0;
-//			}
-//			else
-//			{
-//				filled_bit += bit_count;
-//			}
-//			++font_data.get()[font_pos];
-//			++font_pos;
-//		}
-//		font_pos = 0;
-//
-//		if (m_is_clear_line)
-//		{
-//			for (Uint i = 0; i < row_remaining_pixel; ++i)
-//			{
-//				if (++filled_bit == 8)
-//				{
-//					filled_bit = 0;
-//					++bs_ptr;
-//				}
-//			}
-//		}
-//	}
-//	m_lcd->SetRegion({region.x, region.y, full_w, h});
-//	m_lcd->FillBits(m_fg_color, m_bg_color, bitset.data(), pixel_count);
-//	m_lcd->SetRegion(region);
-//}
 
-
-/* (?>\,|\{)\ */
-//static const uint8_t CharTable_Size5[MAX_ASCII_INDEX - MIN_ASCII_INDEX][8] =
 const uint8_t MyTypeWriter::CharTable_Size5[][10] =
 {
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ 0, 4, 4, 4, 4, 4, 0, 0, 4, 0 },
 	{ 0, 27, 18, 18, 0, 0, 0, 0, 0, 0 },
 	{ 0, 5, 5, 10, 31, 10, 31, 10, 20, 0 },
-	{ 0, 2, 7, 8, 8, 7, 9, 14, 2, 0 },
+	{ 0, 2, 7, 8, 8, 7, 1, 14, 2, 0 },
 	{ 0, 8, 20, 8, 3, 28, 2, 5, 2, 0 },
 	{ 0, 12, 18, 22, 12, 8, 21, 18, 13, 0 }, // &
 	{ 0, 2, 2, 2, 2, 0, 0, 0, 0, 0 },
 	{ 0, 2, 2, 4, 4, 4, 4, 2, 2, 0 }, // '('
 	{ 0, 8, 8, 4, 4, 4, 4, 8, 8, 0 },
-	{ 0, 4, 31, 4, 10, 10, 0, 0, 0, 0 },
+	{ 0, 4, 31, 4, 10, 0, 0, 0, 0, 0 },
 	{ 0, 0, 0, 4, 4, 31, 4, 4, 0, 0 },
 	{ 0, 0, 0, 0, 0, 0, 6, 4, 12, 8 },
 	{ 0, 0, 0, 0, 0, 31, 0, 0, 0, 0 }, // '-'
@@ -291,35 +174,48 @@ const uint8_t MyTypeWriter::CharTable_Size5[][10] =
 	{ 0, 30, 17, 17, 17, 30, 18, 17, 17, 0 },
 	{ 0, 14, 17, 16, 14, 1, 1, 17, 14, 0 },
 	{ 0, 31, 4, 4, 4, 4, 4, 4, 4, 0 },
-	{ 0, 17, 17, 17, 17, 17, 17, 17, 14, 0 },
+	{ 0, 17, 17, 17, 17, 17, 17, 17, 14, 0 }, // 'U'
 	{ 0, 17, 17, 17, 10, 10, 10, 4, 4, 0 },
 	{ 0, 17, 17, 17, 21, 21, 21, 21, 10, 0 },
 	{ 0, 17, 17, 10, 4, 4, 10, 17, 17, 0 },
 	{ 0, 17, 17, 10, 10, 4, 4, 4, 4, 0 },
-	{ 0, 31, 17, 2, 4, 4, 8, 17, 31, 0 },
+	{ 0, 31, 17, 2, 4, 4, 8, 17, 31, 0 }, // 'Z'
 	{ 0, 14, 8, 8, 8, 8, 8, 8, 14, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 16, 16, 8, 8, 4, 4, 2, 2, 0 },
+	{ 0, 14, 2, 2, 2, 2, 2, 2, 14, 0 },
+	{ 0, 4, 4, 10, 17, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 31, 0 }, // '_'
+	{ 0, 4, 2, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 14, 17, 15, 17, 17, 15, 0 },
+	{ 0, 16, 16, 22, 25, 17, 17, 17, 30, 0 },
+	{ 0, 0, 0, 14, 17, 16, 16, 17, 14, 0 },
+	{ 0, 1, 1, 13, 19, 17, 17, 17, 15, 0 }, // 'd'
+	{ 0, 0, 0, 14, 17, 31, 16, 16, 15, 0 },
+	{ 0, 7, 8, 31, 8, 8, 8, 8, 8, 0 },
+	{ 0, 0, 13, 19, 17, 17, 17, 15, 1, 14 },
+	{ 0, 16, 16, 22, 25, 17, 17, 17, 17, 0 },
+	{ 0, 4, 0, 4, 4, 4, 4, 4, 4, 0 }, // 'i'
+	{ 0, 4, 0, 4, 4, 4, 4, 4, 20, 8 },
+	{ 0, 16, 16, 17, 18, 28, 20, 18, 17, 0 },
+	{ 0, 12, 4, 4, 4, 4, 4, 4, 4, 0 },
+	{ 0, 0, 0, 26, 21, 21, 21, 21, 21, 0 },
+	{ 0, 0, 0, 22, 25, 17, 17, 17, 17, 0 }, // 'n'
+	{ 0, 0, 0, 14, 17, 17, 17, 17, 14, 0 },
+	{ 0, 0, 0, 22, 25, 17, 17, 30, 16, 16 },
+	{ 0, 0, 0, 13, 19, 17, 17, 15, 1, 1 },
+	{ 0, 0, 0, 22, 25, 16, 16, 16, 16, 0 },
+	{ 0, 0, 0, 15, 16, 14, 1, 17, 14, 0 }, // 's'
+	{ 0, 0, 8, 31, 8, 8, 8, 8, 7, 0 },
+	{ 0, 0, 0, 17, 17, 17, 17, 19, 13, 0 },
+	{ 0, 0, 0, 17, 17, 17, 10, 10, 4, 0 },
+	{ 0, 0, 0, 17, 17, 21, 21, 21, 10, 0 },
+	{ 0, 0, 0, 17, 17, 14, 14, 17, 17, 0 }, // 'x'
+	{ 0, 0, 0, 17, 17, 9, 10, 6, 4, 8 },
+	{ 0, 0, 0, 31, 2, 4, 8, 17, 31, 0 },
+	{ 0, 2, 4, 4, 4, 8, 4, 4, 2, 0 },
+	{ 0, 4, 4, 4, 4, 4, 4, 4, 4, 4 },
+	{ 0, 8, 4, 4, 4, 2, 4, 4, 8, 0 }, // '}'
+	{ 0, 0, 0, 0, 9, 22, 0, 0, 0, 0 },
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
 };
 

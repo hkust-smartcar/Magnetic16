@@ -5,7 +5,7 @@
  *      Author: Peter
  */
 
-#include <libsc/system.h>
+#include "MyResource.h"
 
 #pragma once
 

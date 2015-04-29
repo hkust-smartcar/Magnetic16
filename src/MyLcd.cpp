@@ -62,6 +62,7 @@ MyTypeWriter::Config MyLcd::getTypeWriterConfig(void)
 	config.bg_color = MyResource::ConfigTable::LcdConfig::BgColor;
 	config.text_color = MyResource::ConfigTable::LcdConfig::TxtColor;
 	config.is_clear_line = true;
+	config.is_text_wrap = true;
 
 	St7735r::Config lcdConfig;
 	lcdConfig.is_revert = true;

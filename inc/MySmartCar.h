@@ -11,6 +11,8 @@
 #include "MyLcd.h"
 #include "MyBuzzer.h"
 #include "MyResource.h"
+#include "MyLoop.h"
+#include "MyVarManager.h"
 
 using namespace libsc;
 
@@ -28,6 +30,8 @@ public:
 
 	MyResource		m_res;
 	MyLcd			m_lcdConsole;
+	MyLoop			m_loop;
+	MyVarManager	m_varMng;
 
 private:
 

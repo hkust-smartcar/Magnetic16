@@ -28,6 +28,7 @@ public:
 	MyMotor(void);
 
 	void setSpeed(int16_t speed);
+	void updateSpeed(void);
 
 	void setEnabled(const bool enabled);
 	bool isEnabled(void);
@@ -37,5 +38,11 @@ public:
 	static void speedControlRoutine(void);
 
 private:
+
+	int16_t				m_speed;
+	bool				m_enabled;
+	PIDhandler			m_speedPID;
+
+	static MyMotor		*m_instance;
 
 };

@@ -35,16 +35,22 @@ int main(void)
 
 	MySmartCar myCar;
 
-	myCar.m_lcdConsole.setRow(0) << "Similar to Task 1, but the input now is a long integer. Do not enter a number that is \"too long\"";
+	myCar.m_lcdConsole.setRow(0);
 
 	float i = 55.5;
 	int16_t j = 120;
 
 	myCar.m_varMng.Init();
 	myCar.m_varMng.addWatchedVar(&i);
-	myCar.m_varMng.addSharedVar(&i, "i");
+	myCar.m_varMng.addSharedVar(&i, "Lincoln");
 	myCar.m_varMng.addWatchedVar(&j);
-	myCar.m_varMng.addSharedVar(&j, "j");
+	myCar.m_varMng.addSharedVar(&j, "Peter");
+	myCar.m_varMng.addSharedVar(&j, "Peter2");
+	myCar.m_varMng.addSharedVar(&j, "Peter3");
+	myCar.m_varMng.addSharedVar(&j, "Peter4");
+	myCar.m_varMng.addSharedVar(&j, "Peter5");
+	myCar.m_varMng.addSharedVar(&j, "Peter6");
+	myCar.m_varMng.addSharedVar(&j, "Peter5");
 
 	while (true)
 	{

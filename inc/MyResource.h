@@ -15,6 +15,7 @@
 
 #define MAX(a, b) ((a > b)? a : b)
 #define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
+#define ABS(v) ((v > 0)? v : -v)
 
 class MySmartCar;
 

@@ -23,10 +23,56 @@ DirMotor::Config getMotorConfig(uint8_t id)
 MyMotor::MyMotor(void)
 :
 	DirMotor(getMotorConfig(0)),
-	m_encoder()
-{}
-
-void setSpeed(int16_t speed)
+	m_encoder(),
+	m_speed(0),
+	m_enabled(false),
+	m_speedPID(&MyResource::ConfigTable::MotorConfig::Reference, &MyResource::ConfigTable::MotorConfig::Kp, &MyResource::ConfigTable::MotorConfig::Ki, &MyResource::ConfigTable::MotorConfig::Kd, -MAX_MOTOR_POWER, MAX_MOTOR_POWER)
 {
+	if (!m_instance)
+		m_instance = new MyMotor;
+	reset();
+}
 
+void MyMotor::setSpeed(int16_t speed)
+{
+	if (m_enabled)
+	{
+		if (speed > 0)
+			SetClockwise(true);
+		else
+			SetClockwise(false);
+
+		m_speed = inRange(-MAX_MOTOR_POWER, speed, MAX_MOTOR_POWER);
+		SetPower(ABS(m_speed));
+	}
+	else
+		SetPower(0);
+}
+
+void MyMotor::updateSpeed(void)
+{
+	//SetPower(m_speedPID.updatePID(m_encoder.GetCount()));
+}
+
+void MyMotor::setEnabled(const bool enabled)
+{
+	m_enabled = enabled;
+}
+
+bool MyMotor::isEnabled(void)
+{
+	return m_enabled;
+}
+
+void MyMotor::reset(void)
+{
+	m_speed = 0;
+	SetPower(0);
+	SetClockwise(true);
+	m_speedPID.reset();
+}
+
+void MyMotor::speedControlRoutine(void)
+{
+	m_instance->updateSpeed();
 }

@@ -37,6 +37,9 @@ int main(void)
 
 	myCar.m_lcdConsole.setRow(0);
 
+	for (int k = 123; k >= 32; k--)
+		myCar.m_lcdConsole << (char)k;
+
 	float i = 55.5;
 	int16_t j = 120;
 

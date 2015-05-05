@@ -1,8 +1,9 @@
 /*
  * MyResource.h
  *
- *  Created on: Apr 25, 2015
- *      Author: Peter
+ * Author: Peter
+ * Copyright (c) 2014-2015 HKUST SmartCar Team
+ * Refer to LICENSE for details
  */
 
 #pragma once
@@ -59,6 +60,12 @@ public:
 			static float Ki;
 			static float Kd;
 
+			static float WeightSD;
+			static float WeightFD;
+			static float WeightHD;
+
+			static uint32_t UpdateFreq;
+
 		};
 
 		class MotorConfig
@@ -70,6 +77,17 @@ public:
 			static float Kp;
 			static float Ki;
 			static float Kd;
+
+			static uint32_t UpdateFreq;
+
+		};
+
+		class VarMngConfig
+		{
+
+		public:
+
+			static uint16_t UpdateFreq;
 
 		};
 
@@ -96,6 +114,8 @@ public:
 			static uint16_t HighPowerColor;
 			static uint16_t NormalPowerColor;
 			static uint16_t LowPowerColor;
+
+			static uint16_t UpdateFreq;
 
 		};
 

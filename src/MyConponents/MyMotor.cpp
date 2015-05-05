@@ -8,10 +8,15 @@
 
 #include <libsc/dir_motor.h>
 #include <libsc/ab_encoder.h>
+#include "MySmartCar.h"
+#include "MyLcd.h"
 #include "MyMotor.h"
 #include "MyResource.h"
+#include "MyLoop.h"
 
 using namespace libsc;
+
+MyMotor *MyMotor::m_instance = nullptr;
 
 DirMotor::Config getMotorConfig(uint8_t id)
 {
@@ -24,12 +29,12 @@ MyMotor::MyMotor(void)
 :
 	DirMotor(getMotorConfig(0)),
 	m_encoder(),
+	m_speedPID(MyResource::ConfigTable::MotorConfig::Reference, MyResource::ConfigTable::MotorConfig::Kp, MyResource::ConfigTable::MotorConfig::Ki, MyResource::ConfigTable::MotorConfig::Kd, -MAX_MOTOR_POWER, MAX_MOTOR_POWER, -1.0f, 1.0f),
 	m_speed(0),
-	m_enabled(false),
-	m_speedPID(&MyResource::ConfigTable::MotorConfig::Reference, &MyResource::ConfigTable::MotorConfig::Kp, &MyResource::ConfigTable::MotorConfig::Ki, &MyResource::ConfigTable::MotorConfig::Kd, -MAX_MOTOR_POWER, MAX_MOTOR_POWER)
+	m_enabled(false)
 {
 	if (!m_instance)
-		m_instance = new MyMotor;
+		m_instance = this;
 	reset();
 }
 
@@ -51,11 +56,19 @@ void MyMotor::setSpeed(int16_t speed)
 
 void MyMotor::updateSpeed(void)
 {
-	//SetPower(m_speedPID.updatePID(m_encoder.GetCount()));
+	setSpeed(m_speedPID.updateMotorPID(m_encoder.getEncoderReading()));
+}
+
+int16_t *MyMotor::getSpeed(void)
+{
+	return &m_speed;
 }
 
 void MyMotor::setEnabled(const bool enabled)
 {
+	reset();
+	m_encoder.reset();
+	m_speedPID.reset();
 	m_enabled = enabled;
 }
 
@@ -70,9 +83,4 @@ void MyMotor::reset(void)
 	SetPower(0);
 	SetClockwise(true);
 	m_speedPID.reset();
-}
-
-void MyMotor::speedControlRoutine(void)
-{
-	m_instance->updateSpeed();
 }

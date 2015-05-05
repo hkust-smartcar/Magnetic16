@@ -68,8 +68,8 @@ FtdiFt232r::Config MyVarManager::get232UartConfig(const uint8_t id)
 MyVarManager::MyVarManager(void)
 :
 	rx_threshold(7),
-	m_uart(get106UartConfig(0)),
-	isStarted(false)
+	isStarted(false),
+	m_uart(get106UartConfig(0))
 {
 	m_pd_instance = this;
 	System::Init();

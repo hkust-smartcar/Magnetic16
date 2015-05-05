@@ -6,11 +6,14 @@
  * Refer to LICENSE for details
  */
 
+#include <array>
 #include <libbase/k60/pin.h>
 #include <libbase/k60/adc.h>
 #include "MyMagSen.h"
 #include "MyResource.h"
+#include "MyKalmanFilter.h"
 
+using namespace std;
 using namespace libbase::k60;
 
 inline Pin::Name getPin(const uint8_t id)
@@ -19,7 +22,8 @@ inline Pin::Name getPin(const uint8_t id)
 	{
 	default:
 		assert(false);
-		// no break
+		return Pin::Name::kDisable;
+
 #ifdef LIBSC_USE_MAGSEN
 	case 0:
 		return LIBSC_MAGSEN4;
@@ -58,14 +62,39 @@ Adc::Config getAdcConfig(MyMagSen::MagSen type, MyMagSen::Side which)
 	config.avg_pass = Adc::Config::AveragePass::k16;
 	config.speed = Adc::Config::SpeedMode::kSlow;
 	config.resolution = Adc::Config::Resolution::k16Bit;
-	config.pin = getPin((uint8_t)type + (uint8_t)which);
+	config.pin = getPin((uint8_t)(type << 1) + (uint8_t)which);
 	return config;
 }
 
 MyMagSen::MyMagSen(MagSen type)
 :
-		m_magSen({ Adc(getAdcConfig(type, Side::LEFT)), Adc(getAdcConfig(type, Side::RIGHT)) })
-{
+	m_magSen({ Adc(getAdcConfig(type, Side::LEFT)), Adc(getAdcConfig(type, Side::RIGHT)) }),
+	m_filter({ MyKalmanFilter(MyResource::ConfigTable::MagSenConfig::Kq,
+							  MyResource::ConfigTable::MagSenConfig::Kr,
+							  0.5f, 0.5f),
+			   MyKalmanFilter(MyResource::ConfigTable::MagSenConfig::Kq,
+					   	      MyResource::ConfigTable::MagSenConfig::Kr,
+							  0.5f, 0.5f)
+			 }),
+	m_reading(0.0f)
+{}
 
+void MyMagSen::reset(void)
+{
+	m_reading = 0.0f;
 }
 
+float MyMagSen::getValue(void)
+{
+	m_rawReading[0] = m_magSen[Side::LEFT].GetResultF();
+	m_rawReading[1] = m_magSen[Side::LEFT].GetResultF();
+	float l = m_filter[Side::LEFT].Filter(m_rawReading[0]);
+	float r = m_filter[Side::RIGHT].Filter(m_rawReading[1]);
+	m_reading = (r - l)/(l + r);
+	return m_reading;
+}
+
+array<float, 2> &MyMagSen::getRawValue(void)
+{
+	return m_rawReading;
+}

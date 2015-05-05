@@ -17,8 +17,7 @@ class MyKalmanFilter
 
 public:
 
-	MyKalmanFilter(float *q, float *r, const float x, const float p);
-	MyKalmanFilter(nullptr_t);
+	MyKalmanFilter(float &q, float &r, const float x, const float p);
 
 	float Filter(const float data);
 
@@ -32,5 +31,5 @@ private:
 
 	bool m_isUsable;
 
-	float *m_q, *m_r, m_k, m_x, m_lx, m_p, m_lp;
+	float &m_q, &m_r, m_k, m_x, m_lx, m_p, m_lp;
 };

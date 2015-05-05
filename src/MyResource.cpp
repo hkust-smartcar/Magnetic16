@@ -1,10 +1,12 @@
 /*
  * MyResource.cpp
  *
- *  Created on: Apr 25, 2015
- *      Author: Peter
+ * Author: Peter
+ * Copyright (c) 2014-2015 HKUST SmartCar Team
+ * Refer to LICENSE for details
  */
 
+#include <libsc/system.h>
 #include "MyResource.h"
 #include "MySmartCar.h"
 
@@ -12,6 +14,7 @@ MyResource *m_resInstance = nullptr;
 
 MyResource::MyResource(MySmartCar *sc)
 {
+	System::Init();
 	if (!m_resInstance && sc)
 	{
 		m_resInstance = this;
@@ -29,20 +32,35 @@ MySmartCar &MyResource::smartCar(void)
 int MyResource::ConfigTable::BuzzerConfig::WarningPitch = 70;
 int MyResource::ConfigTable::BuzzerConfig::WarningTimes = 3;
 
+// MagSen
+float MyResource::ConfigTable::MagSenConfig::Kq = 0.6;
+float MyResource::ConfigTable::MagSenConfig::Kr = 0.5;
+
 // Servo
 float MyResource::ConfigTable::ServoConfig::Reference = 0.0f;
 float MyResource::ConfigTable::ServoConfig::Kp = 0.0f;
 float MyResource::ConfigTable::ServoConfig::Ki = 0.0f;
 float MyResource::ConfigTable::ServoConfig::Kd = 0.0f;
 
+uint32_t MyResource::ConfigTable::ServoConfig::UpdateFreq = 10;
+
+float MyResource::ConfigTable::ServoConfig::WeightSD = 0.5f;
+float MyResource::ConfigTable::ServoConfig::WeightFD = 0.2f;
+float MyResource::ConfigTable::ServoConfig::WeightHD = 0.3f;
+
 // Motor
-float MyResource::ConfigTable::MotorConfig::Reference = 100.0f;
-float MyResource::ConfigTable::MotorConfig::Kp = 0.0f;
+float MyResource::ConfigTable::MotorConfig::Reference = 1500.0f;
+float MyResource::ConfigTable::MotorConfig::Kp = 0.072f;
 float MyResource::ConfigTable::MotorConfig::Ki = 0.0f;
-float MyResource::ConfigTable::MotorConfig::Kd = 0.0f;
+float MyResource::ConfigTable::MotorConfig::Kd = 2.25f;
+
+uint32_t MyResource::ConfigTable::MotorConfig::UpdateFreq = 20;
+
+// VarMng
+uint16_t MyResource::ConfigTable::VarMngConfig::UpdateFreq = 10;
 
 // BatteryMeter
-float MyResource::ConfigTable::BatteryMeterConfig::Ratio = 3.3f;
+float MyResource::ConfigTable::BatteryMeterConfig::Ratio = 0.32984f;
 float MyResource::ConfigTable::BatteryMeterConfig::MaxVoltage = 8.2f;
 float MyResource::ConfigTable::BatteryMeterConfig::MinVoltage = 7.6f;
 
@@ -53,3 +71,4 @@ uint16_t MyResource::ConfigTable::LcdConfig::TxtColor = -1;
 uint16_t MyResource::ConfigTable::LcdConfig::HighPowerColor = 0x063F;
 uint16_t MyResource::ConfigTable::LcdConfig::NormalPowerColor = 0x07E0;
 uint16_t MyResource::ConfigTable::LcdConfig::LowPowerColor = 0xF800;
+uint16_t MyResource::ConfigTable::LcdConfig::UpdateFreq = 500;

@@ -1,8 +1,9 @@
 /*
  * MyLoop.cpp
  *
- *  Created on: Feb 28, 2015
- *      Author: Peter
+ * Author: Peter
+ * Copyright (c) 2014-2015 HKUST SmartCar Team
+ * Refer to LICENSE for details
  */
 
 #include <functional>
@@ -18,7 +19,7 @@ void DelayMsByTicks(Timer::TimerInt delay)
 {
 	Timer::TimerInt startTime = System::Time();
 
-	while (Timer::TimeDiff(startTime, System::Time()) < delay);
+	while (System::Time() - startTime < delay);
 }
 
 MyLoop::MyLoop(void)
@@ -30,9 +31,6 @@ MyLoop::MyLoop(void)
 
 void MyLoop::addFunctionToLoop(const LoopFunction &func, TimeInterval delay)
 {
-	if (m_timer_list.size() == 0)
-		return ;
-
 	for (uint8_t i = 0; i < m_timer_list.size(); i++)
 		if (m_timer_list[i].interval > delay)
 		{
@@ -45,6 +43,9 @@ void MyLoop::addFunctionToLoop(const LoopFunction &func, TimeInterval delay)
 
 void MyLoop::start(void)
 {
+	if (m_timer_list.size() == 0)
+		return ;
+
 	m_start_time = System::Time();
 
 	for (uint8_t i = 0; i < m_timer_list.size(); i++)

@@ -40,13 +40,15 @@ public:
 
 		uint16_t getColor(float volt);
 
+	private:
+
 	};
 
 	const static char endl = '\n';
 
 	explicit MyLcd(void);
 
-	static void onDraw(void);
+	static void onDraw(const uint32_t &timeDelay);
 
 	MyLcd &setRow(const uint8_t &row);
 	MyLcd &operator<<(const char c);
@@ -69,7 +71,6 @@ private:
 	MyTypeWriter::Config getTypeWriterConfig(void);
 
 	static const bool BatteryCharge[];
-	static const bool BatteryOutlook[];
-	static const uint8_t BatteryOutlook_Test[];
+	static const uint8_t BatteryOutlook[];
 
 };

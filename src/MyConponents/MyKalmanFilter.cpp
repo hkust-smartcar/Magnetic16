@@ -11,15 +11,10 @@
 
 #include "MyKalmanFilter.h"
 
-MyKalmanFilter::MyKalmanFilter(nullptr_t)
+MyKalmanFilter::MyKalmanFilter(float &q, float &r, const float x, const float p)
 :
-	m_isUsable(false)
-{}
-
-MyKalmanFilter::MyKalmanFilter(float *q, float *r, const float x, const float p)
-:
-	m_q(q), m_r(r), m_k(0), m_x(x), m_lx(0), m_p(p), m_lp(0),
-	m_isUsable(true)
+	m_isUsable(true),
+	m_q(q), m_r(r), m_k(0), m_x(x), m_lx(0), m_p(p), m_lp(0)
 {}
 
 float MyKalmanFilter::Filter(const float data)
@@ -40,7 +35,7 @@ void MyKalmanFilter::PredictState()
 
 void MyKalmanFilter::PredictCovariance()
 {
-	m_lp = m_p + *m_q;
+	m_lp = m_p + m_q;
 }
 
 void MyKalmanFilter::UpdateState(const float z)
@@ -55,5 +50,5 @@ void MyKalmanFilter::UpdateCovariance()
 
 void MyKalmanFilter::Gain()
 {
-	m_k = m_lp / (m_lp + *m_r);
+	m_k = m_lp / (m_lp + m_r);
 }

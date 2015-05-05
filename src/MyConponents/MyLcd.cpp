@@ -13,29 +13,14 @@
 #include <libsc/lcd_console.h>
 #include <libbase/misc_utils_c.h>
 #include <libsc/lcd.h>
+#include "MyLoop.h"
 #include "MyLcd.h"
 #include "MySmartCar.h"
 #include "MyResource.h"
 
 using namespace libsc;
 
-const bool MyLcd::BatteryOutlook[8 * 13] =
-{
-	0, 0, 1, 1, 1, 1, 0, 0,
-	1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 0, 0, 0, 0, 1, 1,
-	1, 1, 0, 0, 0, 0, 1, 1,
-	1, 1, 0, 0, 0, 0, 1, 1,
-	1, 1, 0, 0, 0, 0, 1, 1,
-	1, 1, 0, 0, 0, 0, 1, 1,
-	1, 1, 0, 0, 0, 0, 1, 1,
-	1, 1, 0, 0, 0, 0, 1, 1,
-	1, 1, 0, 0, 0, 0, 1, 1,
-	1, 1, 0, 0, 0, 0, 1, 1,
-	1, 1, 0, 0, 0, 0, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1
-};
-const uint8_t MyLcd::BatteryOutlook_Test[13] =
+const uint8_t MyLcd::BatteryOutlook[] =
 {
 	60, 255, 195, 195, 195, 195, 195,
 	195, 195, 195, 195, 195, 255
@@ -80,6 +65,11 @@ MyLcd::MyBatteryMeter::MyBatteryMeter(void)
 	BatteryMeter({ MyResource::ConfigTable::BatteryMeterConfig::Ratio })
 {}
 
+float MyLcd::MyBatteryMeter::getRealVoltage(void)
+{
+	return GetVoltage();
+}
+
 float MyLcd::MyBatteryMeter::getVolatagePercentage(void)
 {
 	return (1 - (GetVoltage() - MyResource::ConfigTable::BatteryMeterConfig::MinVoltage)
@@ -101,27 +91,22 @@ MyLcd::MyLcd(void)
 :
 	MyTypeWriter(getTypeWriterConfig()),
 	m_batteryMeter()
-{
-	// TODO: Add onDraw to MyLoop
-}
+{}
 
-void MyLcd::onDraw(void)
+void MyLcd::onDraw(const uint32_t &timeDelay)
 {
-	char buffer[125] = { 0 };
-	float voltageRet = MyResource::smartCar().m_lcdConsole.m_batteryMeter.getVolatagePercentage();
-
-	MyResource::smartCar().m_lcdConsole.SetCursorRow(0);
-	int n = sprintf(buffer, "Voltage: %.2fV\n", MyResource::smartCar().m_lcdConsole.m_batteryMeter.getRealVoltage());
-	MyResource::smartCar().m_lcdConsole.WriteBuffer(buffer, n);
-	MyResource::smartCar().m_lcdConsole.m_lcd->SetRegion(St7735r::Rect(MyResource::smartCar().m_lcdConsole.m_lcd->GetW() - 10, 1, 8, 13));
-	MyResource::smartCar().m_lcdConsole.m_lcd->FillBits(
-			MyResource::ConfigTable::LcdConfig::TxtColor,
-			MyResource::ConfigTable::LcdConfig::BgColor,
-			MyResource::smartCar().m_lcdConsole.BatteryOutlook_Test,
-			length(MyResource::smartCar().m_lcdConsole.BatteryOutlook_Test));
-	MyResource::smartCar().m_lcdConsole.m_lcd->SetRegion(St7735r::Rect(MyResource::smartCar().m_lcdConsole.m_lcd->GetW() - 8, 3 + floor(10 * voltageRet), 4, 10 - floor(10 * voltageRet)));
-	MyResource::smartCar().m_lcdConsole.m_lcd->FillColor(MyResource::smartCar().m_lcdConsole.m_batteryMeter.getColor(voltageRet));
-	MyResource::smartCar().m_lcdConsole.m_lcd->ClearRegion();
+//	float voltageRet = MyResource::smartCar().m_lcdConsole.m_batteryMeter.getVolatagePercentage();
+//
+//	MyResource::smartCar().m_lcdConsole.setRow(0) << "Voltage: " << MyResource::smartCar().m_lcdConsole.m_batteryMeter.getRealVoltage() << MyLcd::endl;
+//	MyResource::smartCar().m_lcdConsole.m_lcd->SetRegion(St7735r::Rect(MyResource::smartCar().m_lcdConsole.m_lcd->GetW() - 10, 1, 8, 13));
+//	MyResource::smartCar().m_lcdConsole.m_lcd->FillBits(
+//			MyResource::ConfigTable::LcdConfig::TxtColor,
+//			MyResource::ConfigTable::LcdConfig::BgColor,
+//			MyResource::smartCar().m_lcdConsole.BatteryOutlook,
+//			length(MyResource::smartCar().m_lcdConsole.BatteryOutlook) * 8);
+//	MyResource::smartCar().m_lcdConsole.m_lcd->SetRegion(St7735r::Rect(MyResource::smartCar().m_lcdConsole.m_lcd->GetW() - 8, 3 + floor(10 * voltageRet), 4, 10 - floor(10 * voltageRet)));
+//	MyResource::smartCar().m_lcdConsole.m_lcd->FillColor(MyResource::smartCar().m_lcdConsole.m_batteryMeter.getColor(voltageRet));
+//	MyResource::smartCar().m_lcdConsole.m_lcd->ClearRegion();
 }
 
 MyLcd &MyLcd::setRow(const uint8_t &row)
@@ -169,7 +154,7 @@ MyLcd &MyLcd::operator<<(const uint16_t &us)
 MyLcd &MyLcd::operator<<(const uint32_t &ui)
 {
 	char buffer[20] = { 0 };
-	size_t n = sprintf(buffer, "%d", ui);
+	size_t n = sprintf(buffer, "%ld", ui);
 	WriteBuffer(buffer, n);
 	return *this;
 }
@@ -193,7 +178,7 @@ MyLcd &MyLcd::operator<<(const int16_t &s)
 MyLcd &MyLcd::operator<<(const int32_t &i)
 {
 	char buffer[20] = { 0 };
-	size_t n = sprintf(buffer, "%d", i);
+	size_t n = sprintf(buffer, "%ld", i);
 	WriteBuffer(buffer, n);
 	return *this;
 }

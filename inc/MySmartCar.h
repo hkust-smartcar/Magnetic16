@@ -9,6 +9,8 @@
 
 #include <libsc/system.h>
 #include "MyLcd.h"
+#include "MyServo.h"
+#include "MyMotor.h"
 #include "MyBuzzer.h"
 #include "MyResource.h"
 #include "MyLoop.h"
@@ -21,18 +23,17 @@ class MySmartCar
 
 public:
 
-//	MyServo			m_servo;
-//	MyMotor			m_motor;
-//	MyLoop			m_loop;
-//	MyVarManager	m_varMng;
-
 	explicit MySmartCar(void);
 
 	MyResource		m_res;
 	MyLcd			m_lcdConsole;
 	MyLoop			m_loop;
 	MyVarManager	m_varMng;
+	MyServo			m_servo;
+	MyMotor			m_motor;
 
 private:
+
+	static void showValue(const uint32_t &timeDelay);
 
 };

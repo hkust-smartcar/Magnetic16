@@ -21,11 +21,12 @@ public:
 	MyEncoder(void);
 
 	int32_t getEncoderReading(void);
+	int32_t *getEncoderCountPointer(void);
 
 	void reset(void);
 
 private:
 
-	int32_t			lastCount;
+	int32_t			m_lastCount;
 
 };

@@ -26,10 +26,10 @@ class MyLoop
 {
 public:
 
-	typedef function<void (Timer::TimerInt)> LoopFunction;
+	typedef function<void (const uint32_t &)> LoopFunction;
 	typedef Timer::TimerInt TimeInterval;
 
-	typedef struct TimerInfo
+	struct TimerInfo
 	{
 		LoopFunction	func;
 		TimeInterval	interval;

@@ -1,8 +1,9 @@
 /*
  * MyBuzzer.cpp
  *
- *  Created on: Apr 23, 2015
- *      Author: Peter
+ * Author: Peter
+ * Copyright (c) 2014-2015 HKUST SmartCar Team
+ * Refer to LICENSE for details
  */
 
 #include <cstring>

@@ -8,8 +8,10 @@
 
 #pragma once
 
+#include <array>
 #include <libbase/k60/adc.h>
 #include "MyResource.h"
+#include "MyKalmanFilter.h"
 
 using namespace std;
 using namespace libbase::k60;
@@ -19,14 +21,14 @@ class MyMagSen
 
 public:
 
-	enum struct MagSen
+	enum MagSen
 	{
 		SD = 0,
 		FD,
 		HD
 	};
 
-	enum struct Side
+	enum Side
 	{
 		LEFT = 0,
 		RIGHT
@@ -34,8 +36,15 @@ public:
 
 	MyMagSen(MagSen type);
 
+	void reset(void);
+
+	float getValue(void);
+	array<float, 2> &getRawValue(void);
+
 private:
 	
-	array<Adc, 2>			m_magSen;
-
+	array<Adc, 2>				m_magSen;
+	array<MyKalmanFilter, 2>	m_filter;
+	array<float, 2>				m_rawReading;
+	float						m_reading;
 };

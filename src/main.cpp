@@ -1,8 +1,9 @@
 /*
  * main.cpp
  *
- *  Created on: Apr 22, 2015
- *      Author: Peter
+ * Author: Peter
+ * Copyright (c) 2014-2015 HKUST SmartCar Team
+ * Refer to LICENSE for details
  */
 
 #include <cstring>
@@ -29,36 +30,42 @@ namespace libbase
 
 using namespace libsc;
 
+MySmartCar myCar;
+
+void myListener(const std::vector<Byte>& bytes)
+{
+	switch (bytes[0])
+	{
+	case 'a':
+		MyResource::smartCar().m_motor.setEnabled(true);
+		break;
+
+	case 's':
+		MyResource::smartCar().m_motor.setEnabled(false);
+		break;
+	}
+}
+
 int main(void)
 {
 	System::Init();
 
-	MySmartCar myCar;
 
-	myCar.m_lcdConsole.setRow(0);
+//	myCar.m_varMng.addWatchedVar((float *)&(myCar.m_servo.m_MagSen[0].getRawValue()[0]));
+//	myCar.m_varMng.addWatchedVar((float *)&(myCar.m_servo.m_MagSen[0].getRawValue()[1]));
 
-	for (int k = 123; k >= 32; k--)
-		myCar.m_lcdConsole << (char)k;
+	myCar.m_varMng.addWatchedVar(myCar.m_motor.m_encoder.getEncoderCountPointer());
+	myCar.m_varMng.addWatchedVar(myCar.m_motor.getSpeed());
+	myCar.m_varMng.addWatchedVar(&MyResource::ConfigTable::MotorConfig::Reference);
+	myCar.m_varMng.addWatchedVar(myCar.m_motor.m_speedPID.getLastError());
 
-	float i = 55.5;
-	int16_t j = 120;
+	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Kp, "Kp");
+	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Ki, "Ki");
+	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Kd, "Kd");
+	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Reference, "Ref");
 
-	myCar.m_varMng.Init();
-	myCar.m_varMng.addWatchedVar(&i);
-	myCar.m_varMng.addSharedVar(&i, "Lincoln");
-	myCar.m_varMng.addWatchedVar(&j);
-	myCar.m_varMng.addSharedVar(&j, "Peter");
-	myCar.m_varMng.addSharedVar(&j, "Peter2");
-	myCar.m_varMng.addSharedVar(&j, "Peter3");
-	myCar.m_varMng.addSharedVar(&j, "Peter4");
-	myCar.m_varMng.addSharedVar(&j, "Peter5");
-	myCar.m_varMng.addSharedVar(&j, "Peter6");
-	myCar.m_varMng.addSharedVar(&j, "Peter5");
+	myCar.m_varMng.Init(&myListener);
 
-	while (true)
-	{
-		myCar.m_varMng.sendWatchData();
-		System::DelayMs(10);
-	}
+	myCar.m_loop.start();
 
 }

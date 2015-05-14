@@ -8,9 +8,11 @@
 #pragma once
 
 #include <libsc/system.h>
+#include <libsc/led.h>
 #include "MyLcd.h"
 #include "MyServo.h"
 #include "MyMotor.h"
+#include "MyBuzzer.h"
 #include "MyBuzzer.h"
 #include "MyResource.h"
 #include "MyLoop.h"
@@ -31,6 +33,8 @@ public:
 	MyVarManager	m_varMng;
 	MyServo			m_servo;
 	MyMotor			m_motor;
+	Led				m_led;
+	MyBuzzer		m_buzzer;
 
 private:
 

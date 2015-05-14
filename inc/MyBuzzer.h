@@ -10,6 +10,7 @@
 
 #include <libbase/k60/Ftm.h>
 #include <libbase/k60/ftm_pwm.h>
+#include <libbase/k60/gpio.h>
 #include "MyResource.h"
 
 using namespace libbase::k60;
@@ -32,6 +33,8 @@ public:
 	void noteDown(const uint8_t note, const uint16_t delayMs, const uint8_t times = 0);
 	void noteDown(const char noteName[5], const uint16_t delayMs, const uint8_t times = 0);
 
+	void setEnabled(const bool enabled);
+
 	/* Duty Cycle: 0 to 0.4 */
 	void setLoudness(const uint8_t percentage);
 
@@ -40,9 +43,12 @@ private:
 	uint8_t		m_noteIndex;
 	uint8_t		m_loudness;
 
-	FtmPwm		m_pwm;
+	Gpo			m_gpo;
+
+//	FtmPwm		m_pwm;
 
 	FtmPwm::Config getFtmConfig(const uint8_t id);
+	Gpo::Config getGpoConfig(void);
 	uint8_t getNoteIndexByName(const char noteName[5]);
 
 	uint32_t getPeriod(const float freq);

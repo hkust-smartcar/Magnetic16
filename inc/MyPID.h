@@ -23,10 +23,19 @@ class MyPID
 {
 public:
 
-	explicit MyPID(float &ref, float &kp, float &ki, float &kd, const float outputMin, const float outputMax, const float errorMin, const float errorMax);
-	float updateMotorPID(float val);
-	float updateServoPID(float val);
-	float updateNonLinearPID(float val);
+	enum Type
+	{
+		Motor = 0,
+		Servo,
+		NonLinear
+	};
+
+	explicit MyPID(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax);
+
+	float update(float val);
+	float updateMotorPID(void);
+	float updateServoPID(void);
+	float updateNonLinearPID(void);
 
 	float &getKp(void);
 	float &getKi(void);
@@ -50,6 +59,8 @@ private:
 	float &m_Kp;
 	float &m_Ki;
 	float &m_Kd;
+
+	Type m_type;
 
 	float m_eDer;
 	float m_eSum;

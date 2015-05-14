@@ -21,17 +21,18 @@ MyServo::MyServo(void)
 	TrsD05({ 0 }),
 	m_MagSen({ MyMagSen(MyMagSen::MagSen::SD),
 			   MyMagSen(MyMagSen::MagSen::FD),
-			   MyMagSen(MyMagSen::MagSen::HD)}),
+			   MyMagSen(MyMagSen::MagSen::HD) }),
 	m_servoPID(MyResource::ConfigTable::ServoConfig::Reference,
 			   MyResource::ConfigTable::ServoConfig::Kp,
 			   MyResource::ConfigTable::ServoConfig::Ki,
 			   MyResource::ConfigTable::ServoConfig::Kd,
+			   MyPID::Servo,
 			   MIN_SERVO_ANGLE,
 			   MAX_SERVO_ANGLE,
 			   -1.0f,
 			   1.0f),
 	m_lastAngle(0),
-	m_weight({ MyResource::ConfigTable::ServoConfig::WeightSD, MyResource::ConfigTable::ServoConfig::WeightFD, MyResource::ConfigTable::ServoConfig::WeightHD })
+	m_weight({ &MyResource::ConfigTable::ServoConfig::WeightSD, &MyResource::ConfigTable::ServoConfig::WeightFD, &MyResource::ConfigTable::ServoConfig::WeightHD })
 {
 	if (!m_instance)
 		m_instance = this;
@@ -50,8 +51,8 @@ float MyServo::getFinalAngle(void)
 {
 	m_lastAngle = 0.0f;
 	for (uint8_t i = 0; i < m_MagSen.size(); i++)
-		m_lastAngle += m_MagSen[i].getValue() * m_weight[i];
-	return m_servoPID.updateNonLinearPID(m_lastAngle);
+		m_lastAngle += m_MagSen[i].getValue() * *m_weight[i];
+	return m_servoPID.update(m_lastAngle);
 }
 
 float MyServo::updateAngle(void)

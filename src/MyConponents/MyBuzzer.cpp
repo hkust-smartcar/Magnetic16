@@ -28,43 +28,49 @@ MyBuzzer::MyBuzzer(void)
 :
 	m_noteIndex(40),
 	m_loudness(100),
-	m_pwm(getFtmConfig(0))
+	m_gpo(getGpoConfig())
+//	m_pwm(getFtmConfig(0))
 {
 	System::Init();
 }
 
-void MyBuzzer::noteDown(const uint8_t note, const uint16_t delayMs, uint8_t times)
+//void MyBuzzer::noteDown(const uint8_t note, const uint16_t delayMs, uint8_t times)
+//{
+//	assert(times >= 1);
+//
+//	while (times--)
+//	{
+//		setNote(note);
+//		System::DelayMs(delayMs);
+//	}
+//
+//	setLoudness(0);
+//}
+//
+//void MyBuzzer::noteDown(const char noteName[5], const uint16_t delayMs, uint8_t times)
+//{
+//	assert(times >= 1);
+//
+//	while (times--)
+//	{
+//		setNote(noteName);
+//		System::DelayMs(delayMs);
+//	}
+//
+//	setLoudness(0);
+//}
+
+void MyBuzzer::setEnabled(const bool enabled)
 {
-	assert(times >= 1);
-
-	while (times--)
-	{
-		setNote(note);
-		System::DelayMs(delayMs);
-	}
-
-	setLoudness(0);
+	m_gpo.Set(!enabled);
 }
 
-void MyBuzzer::noteDown(const char noteName[5], const uint16_t delayMs, uint8_t times)
-{
-	assert(times >= 1);
-
-	while (times--)
-	{
-		setNote(noteName);
-		System::DelayMs(delayMs);
-	}
-
-	setLoudness(0);
-}
-
-void MyBuzzer::setLoudness(const uint8_t percentage)
-{
-	if (percentage)
-		m_loudness = percentage;
-	m_pwm.SetPosWidth(getPosWidth(percentage));
-}
+//void MyBuzzer::setLoudness(const uint8_t percentage)
+//{
+//	if (percentage)
+//		m_loudness = percentage;
+//	m_pwm.SetPosWidth(getPosWidth(percentage));
+//}
 
 uint32_t MyBuzzer::getPeriod(const float freq)
 {
@@ -76,18 +82,18 @@ uint32_t MyBuzzer::getPosWidth(const uint8_t percentage)
 	return (uint32_t)(getPeriod(notes[m_noteIndex].freq) * inRange(0, percentage, 100) * 0.003f);
 }
 
-void MyBuzzer::setNote(const uint8_t index, const uint8_t percentage)
-{
-	m_noteIndex = inRange(0, index, 87);
-	m_loudness = (percentage > 100)? m_loudness : percentage;
-	m_pwm.SetPeriod(getPeriod(notes[m_noteIndex].freq), getPosWidth((percentage > 100)? m_loudness : percentage));
-}
-void MyBuzzer::setNote(const char noteName[5], const uint8_t percentage)
-{
-	m_noteIndex = getNoteIndexByName(noteName);
-	m_loudness = (percentage > 100)? m_loudness : percentage;
-	m_pwm.SetPeriod(getPeriod(notes[m_noteIndex].freq), getPosWidth((percentage > 100)? m_loudness : percentage));
-}
+//void MyBuzzer::setNote(const uint8_t index, const uint8_t percentage)
+//{
+//	m_noteIndex = inRange(0, index, 87);
+//	m_loudness = (percentage > 100)? m_loudness : percentage;
+//	m_pwm.SetPeriod(getPeriod(notes[m_noteIndex].freq), getPosWidth((percentage > 100)? m_loudness : percentage));
+//}
+//void MyBuzzer::setNote(const char noteName[5], const uint8_t percentage)
+//{
+//	m_noteIndex = getNoteIndexByName(noteName);
+//	m_loudness = (percentage > 100)? m_loudness : percentage;
+//	m_pwm.SetPeriod(getPeriod(notes[m_noteIndex].freq), getPosWidth((percentage > 100)? m_loudness : percentage));
+//}
 
 FtmPwm::Config MyBuzzer::getFtmConfig(const uint8_t id)
 {
@@ -97,7 +103,15 @@ FtmPwm::Config MyBuzzer::getFtmConfig(const uint8_t id)
 	config.period = getPeriod(m_noteIndex);
 	config.pos_width = getPosWidth(m_loudness);
 	config.precision = Pwm::Config::Precision::kUs;
-	config.alignment = FtmPwm::Config::Alignment::kEdge;
+	config.alignment = FtmPwm::Config::Alignment::kCenter;
+	return config;
+}
+
+Gpo::Config MyBuzzer::getGpoConfig(void)
+{
+	Gpo::Config config;
+	config.is_high = false;
+	config.pin = getPwmPin(0);
 	return config;
 }
 

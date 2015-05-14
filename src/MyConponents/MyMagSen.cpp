@@ -76,22 +76,33 @@ MyMagSen::MyMagSen(MagSen type)
 					   	      MyResource::ConfigTable::MagSenConfig::Kr,
 							  0.5f, 0.5f)
 			 }),
-	m_reading(0.0f)
+			 m_output(0.0f)
 {}
 
 void MyMagSen::reset(void)
 {
-	m_reading = 0.0f;
+	m_output = 0.0f;
 }
 
 float MyMagSen::getValue(void)
 {
 	m_rawReading[0] = m_magSen[Side::LEFT].GetResultF();
-	m_rawReading[1] = m_magSen[Side::LEFT].GetResultF();
-	float l = m_filter[Side::LEFT].Filter(m_rawReading[0]);
-	float r = m_filter[Side::RIGHT].Filter(m_rawReading[1]);
-	m_reading = (r - l)/(l + r);
-	return m_reading;
+	m_rawReading[1] = m_magSen[Side::RIGHT].GetResultF();
+	m_filteredReading[0] = m_filter[Side::LEFT].Filter(m_rawReading[0]);
+	m_filteredReading[1] = m_filter[Side::RIGHT].Filter(m_rawReading[1]);
+	m_output = (m_filteredReading[1] - m_filteredReading[0]) / (m_filteredReading[0] + m_filteredReading[1]);
+//	m_output = (m_rawReading[1] - m_rawReading[0]) / (m_rawReading[0] + m_rawReading[1]);
+	return m_output;
+}
+
+float &MyMagSen::getOutputValue(void)
+{
+	return m_output;
+}
+
+array<float, 2> &MyMagSen::getFilteredValue(void)
+{
+	return m_filteredReading;
 }
 
 array<float, 2> &MyMagSen::getRawValue(void)

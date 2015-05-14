@@ -29,7 +29,7 @@ MyMotor::MyMotor(void)
 :
 	DirMotor(getMotorConfig(0)),
 	m_encoder(),
-	m_speedPID(MyResource::ConfigTable::MotorConfig::Reference, MyResource::ConfigTable::MotorConfig::Kp, MyResource::ConfigTable::MotorConfig::Ki, MyResource::ConfigTable::MotorConfig::Kd, -MAX_MOTOR_POWER, MAX_MOTOR_POWER, -1.0f, 1.0f),
+	m_speedPID(MyResource::ConfigTable::MotorConfig::Reference, MyResource::ConfigTable::MotorConfig::Kp, MyResource::ConfigTable::MotorConfig::Ki, MyResource::ConfigTable::MotorConfig::Kd, MyPID::Motor, -MAX_MOTOR_POWER, MAX_MOTOR_POWER, -1.0f, 1.0f),
 	m_speed(0),
 	m_enabled(false)
 {
@@ -56,7 +56,7 @@ void MyMotor::setSpeed(int16_t speed)
 
 void MyMotor::updateSpeed(void)
 {
-	setSpeed(m_speedPID.updateMotorPID(m_encoder.getEncoderReading()));
+	setSpeed(m_speedPID.update(m_encoder.getEncoderReading()));
 }
 
 int16_t *MyMotor::getSpeed(void)

@@ -107,6 +107,9 @@ void MyLcd::onDraw(const uint32_t &timeDelay)
 //	MyResource::smartCar().m_lcdConsole.m_lcd->SetRegion(St7735r::Rect(MyResource::smartCar().m_lcdConsole.m_lcd->GetW() - 8, 3 + floor(10 * voltageRet), 4, 10 - floor(10 * voltageRet)));
 //	MyResource::smartCar().m_lcdConsole.m_lcd->FillColor(MyResource::smartCar().m_lcdConsole.m_batteryMeter.getColor(voltageRet));
 //	MyResource::smartCar().m_lcdConsole.m_lcd->ClearRegion();
+
+	if (MyResource::smartCar().m_lcdConsole.m_batteryMeter.getVolatagePercentage() < 0.0f)
+		MyResource::smartCar().m_led.SetEnable(true);
 }
 
 MyLcd &MyLcd::setRow(const uint8_t &row)

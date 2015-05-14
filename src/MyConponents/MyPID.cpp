@@ -19,7 +19,7 @@ using namespace libsc;
 
 #define abs(v) ((v > 0)? v : -v)
 
-MyPID::MyPID(float &ref, float &kp, float &ki, float &kd, const float outputMin, const float outputMax, const float errorMin, const float errorMax)
+MyPID::MyPID(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax)
 :
 	m_outputMin(outputMin),
 	m_outputMax(outputMax),
@@ -31,6 +31,8 @@ MyPID::MyPID(float &ref, float &kp, float &ki, float &kd, const float outputMin,
 	m_Kp(kp),
 	m_Ki(ki),
 	m_Kd(kd),
+
+	m_type(type),
 
 	m_eSum(0),
 	m_lastError(0),
@@ -79,47 +81,53 @@ void MyPID::reset(void)
 	m_eSum = 0;
 }
 
-float MyPID::updateMotorPID(float val)
+float MyPID::update(float val)
 {
 	float error = m_reference - val;
 	uint32_t dt = System::Time() - m_lastTimeUpdate;
 	m_eDer = (error - m_lastError) / dt;
 	m_lastError = error;
 
-	if (abs(m_lastError) >= m_epsilon)
-		m_eSum += error*dt;
+	m_lastTimeUpdate = System::Time();
 
+	switch (m_type)
+	{
+	case Type::Motor:
+
+		if (abs(m_lastError) >= m_epsilon)
+			m_eSum += error*dt;
+
+		return updateMotorPID();
+
+	case Type::Servo:
+	case Type::NonLinear:
+
+		return updateNonLinearPID();
+
+	default:
+		assert(false);
+		return 0.0f;
+
+	}
+}
+
+float MyPID::updateMotorPID(void)
+{
 	m_output += m_Kp * m_lastError + m_Ki * m_eSum + m_Kd * m_eDer;
 
-	m_lastTimeUpdate = System::Time();
-
 	return inRange(m_outputMin, m_output, m_outputMax);
 }
 
-float MyPID::updateServoPID(float val)
+float MyPID::updateServoPID(void)
 {
-	float error = m_reference - val;
-	uint32_t dt = System::Time() - m_lastTimeUpdate;
-	m_eDer = (error - m_lastError) / dt;
-	m_lastError = error;
-
 	m_output = m_Kp * m_lastError + m_Ki * m_eSum + m_Kd * m_eDer;
 
-	m_lastTimeUpdate = System::Time();
-
 	return inRange(m_outputMin, m_output, m_outputMax);
 }
 
-float MyPID::updateNonLinearPID(float val)
+float MyPID::updateNonLinearPID(void)
 {
-	float error = m_reference - val;
-	uint32_t dt = System::Time() - m_lastTimeUpdate;
-	m_eDer = (error - m_lastError) / dt;
-	m_lastError = error;
-
-	m_output = m_Kp * (ABS(error) / m_errorRange) * m_lastError + m_Ki * m_eSum + m_Kd * m_eDer;
-
-	m_lastTimeUpdate = System::Time();
+	m_output = m_Kp * (ABS(m_lastError) / m_errorRange) * m_lastError + m_Ki * m_eSum + m_Kd * m_eDer;
 
 	return inRange(m_outputMin, m_output, m_outputMax);
 }

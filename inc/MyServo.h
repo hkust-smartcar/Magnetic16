@@ -38,13 +38,13 @@ public:
 
 	static void servoAngleRoutine(const uint32_t &timeDelay);
 
+	float					m_lastAngle;
+
 private:
 
 	MyPID					m_servoPID;
 
-	int16_t					m_lastAngle;
-
-	array<float, 3>			m_weight;
+	array<float *, 3>			m_weight;
 
 	static MyServo			*m_instance;
 

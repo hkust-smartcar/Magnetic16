@@ -39,6 +39,8 @@ public:
 	void reset(void);
 
 	float getValue(void);
+	float &getOutputValue(void);
+	array<float, 2> &getFilteredValue(void);
 	array<float, 2> &getRawValue(void);
 
 private:
@@ -46,5 +48,6 @@ private:
 	array<Adc, 2>				m_magSen;
 	array<MyKalmanFilter, 2>	m_filter;
 	array<float, 2>				m_rawReading;
-	float						m_reading;
+	array<float, 2>				m_filteredReading;
+	float						m_output;
 };

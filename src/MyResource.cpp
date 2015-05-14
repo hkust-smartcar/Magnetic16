@@ -38,18 +38,18 @@ float MyResource::ConfigTable::MagSenConfig::Kr = 0.5;
 
 // Servo
 float MyResource::ConfigTable::ServoConfig::Reference = 0.0f;
-float MyResource::ConfigTable::ServoConfig::Kp = 0.0f;
+float MyResource::ConfigTable::ServoConfig::Kp = 1000.0f;
 float MyResource::ConfigTable::ServoConfig::Ki = 0.0f;
-float MyResource::ConfigTable::ServoConfig::Kd = 0.0f;
+float MyResource::ConfigTable::ServoConfig::Kd = 3.0f;
 
 uint32_t MyResource::ConfigTable::ServoConfig::UpdateFreq = 10;
 
-float MyResource::ConfigTable::ServoConfig::WeightSD = 0.5f;
+float MyResource::ConfigTable::ServoConfig::WeightSD = 0.4f;
 float MyResource::ConfigTable::ServoConfig::WeightFD = 0.2f;
-float MyResource::ConfigTable::ServoConfig::WeightHD = 0.3f;
+float MyResource::ConfigTable::ServoConfig::WeightHD = 0.6f;
 
 // Motor
-float MyResource::ConfigTable::MotorConfig::Reference = 1500.0f;
+float MyResource::ConfigTable::MotorConfig::Reference = 300.0f;
 float MyResource::ConfigTable::MotorConfig::Kp = 0.072f;
 float MyResource::ConfigTable::MotorConfig::Ki = 0.0f;
 float MyResource::ConfigTable::MotorConfig::Kd = 2.25f;

@@ -21,7 +21,4 @@ void MyMotor::speedControlRoutine(const uint32_t &timeDelay)
 void MyServo::servoAngleRoutine(const uint32_t &timeDelay)
 {
 	MyResource::smartCar().m_servo.updateAngle();
-//	MyResource::smartCar().m_servo.m_MagSen[0].getValue();
-//	MyResource::smartCar().m_servo.m_MagSen[1].getValue();
-//	MyResource::smartCar().m_servo.m_MagSen[2].getValue();
 }

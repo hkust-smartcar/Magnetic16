@@ -34,17 +34,19 @@ public:
 	void reset(void);
 
 	float getFinalAngle(void);
+	void setDegree(const int16_t degree);
 	float updateAngle(void);
 
 	static void servoAngleRoutine(const uint32_t &timeDelay);
 
 	float					m_lastAngle;
+	uint16_t				m_lastDegree;
 
 private:
 
 	MyPID					m_servoPID;
 
-	array<float *, 3>			m_weight;
+	array<float *, 3>		m_weight;
 
 	static MyServo			*m_instance;
 

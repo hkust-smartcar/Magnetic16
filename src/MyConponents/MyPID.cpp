@@ -23,7 +23,7 @@ MyPID::MyPID(float &ref, float &kp, float &ki, float &kd, const Type type, const
 :
 	m_outputMin(outputMin),
 	m_outputMax(outputMax),
-	m_errorRange(outputMax - outputMin),
+	m_errorRange((errorMax - errorMin) / 2),
 	m_errorMin(errorMin),
 	m_errorMax(errorMax),
 
@@ -85,7 +85,7 @@ float MyPID::update(float val)
 {
 	float error = m_reference - val;
 	uint32_t dt = System::Time() - m_lastTimeUpdate;
-	m_eDer = (error - m_lastError) / dt;
+	m_eDer = (error - m_lastError) / (((float)dt)/1000.0f);
 	m_lastError = error;
 
 	m_lastTimeUpdate = System::Time();

@@ -109,7 +109,7 @@ void MyLcd::onDraw(const uint32_t &timeDelay)
 //	MyResource::smartCar().m_lcdConsole.m_lcd->ClearRegion();
 
 	if (MyResource::smartCar().m_lcdConsole.m_batteryMeter.getVolatagePercentage() < 0.0f)
-		MyResource::smartCar().m_led.SetEnable(true);
+		MyResource::smartCar().m_buzzer.setEnabled(true);
 }
 
 MyLcd &MyLcd::setRow(const uint8_t &row)

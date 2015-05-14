@@ -51,9 +51,9 @@ private:
 
 	float m_outputMin;
 	float m_outputMax;
-	float m_errorRange;
 	float m_errorMin;
 	float m_errorMax;
+	float m_errorRange;
 
 	float &m_reference;
 	float &m_Kp;

@@ -33,7 +33,6 @@ public:
 	MyVarManager	m_varMng;
 	MyServo			m_servo;
 	MyMotor			m_motor;
-	Led				m_led;
 	MyBuzzer		m_buzzer;
 
 private:

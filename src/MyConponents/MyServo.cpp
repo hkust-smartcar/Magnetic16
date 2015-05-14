@@ -55,7 +55,13 @@ float MyServo::getFinalAngle(void)
 	return m_servoPID.update(m_lastAngle);
 }
 
+void MyServo::setDegree(const int16_t degree)
+{
+	m_lastDegree = degree;
+	SetDegree(m_lastDegree);
+}
+
 float MyServo::updateAngle(void)
 {
-	SetDegree(MID_SERVO_ANGLE + (int16_t)getFinalAngle());
+	setDegree(MID_SERVO_ANGLE - (int16_t)getFinalAngle());
 }

@@ -22,8 +22,7 @@ MySmartCar::MySmartCar(void)
 	m_varMng(),
 	m_servo(),
 	m_motor(),
-	m_led({0})
-//	m_buzzer()
+	m_buzzer()
 {
 	m_loop.addFunctionToLoop(&m_motor.speedControlRoutine, MyResource::ConfigTable::MotorConfig::UpdateFreq);
 	m_loop.addFunctionToLoop(&m_servo.servoAngleRoutine, MyResource::ConfigTable::MotorConfig::UpdateFreq);

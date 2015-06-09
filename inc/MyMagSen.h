@@ -41,6 +41,7 @@ public:
 	float getValue(void);
 	float &getOutputValue(void);
 	array<float, 2> &getFilteredValue(void);
+	float getFilteredValueAvg(void);
 	array<float, 2> &getRawValue(void);
 
 private:

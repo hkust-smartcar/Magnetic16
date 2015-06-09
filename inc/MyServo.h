@@ -27,6 +27,12 @@ class MyServo : private TrsD05
 
 public:
 
+	enum Direction
+	{
+		LEFT = 0,
+		RIGHT
+	};
+
 	array<MyMagSen, 3>		m_MagSen;
 
 	MyServo(void);
@@ -35,18 +41,24 @@ public:
 
 	float getFinalAngle(void);
 	void setDegree(const int16_t degree);
-	float updateAngle(void);
+	void updateAngle(void);
+
+	void setEnabled(const bool enabled);
+	bool isEnabled(void);
 
 	static void servoAngleRoutine(const uint32_t &timeDelay);
 
 	float					m_lastAngle;
 	uint16_t				m_lastDegree;
+	Direction				m_lastTurningDirection;
 
 private:
 
 	MyPID					m_servoPID;
 
 	array<float *, 3>		m_weight;
+
+	bool					m_enabled;
 
 	static MyServo			*m_instance;
 

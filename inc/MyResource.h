@@ -99,6 +99,7 @@ public:
 			static float MinVoltage;
 			static float MaxVoltage;
 			static float Ratio;
+			static uint16_t UpdateFreq;
 
 		};
 

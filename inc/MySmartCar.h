@@ -17,6 +17,7 @@
 #include "MyResource.h"
 #include "MyLoop.h"
 #include "MyVarManager.h"
+#include "MyBatteryMeter.h"
 
 using namespace libsc;
 
@@ -34,6 +35,7 @@ public:
 	MyServo			m_servo;
 	MyMotor			m_motor;
 	MyBuzzer		m_buzzer;
+	MyBatteryMeter	m_batteryMeter;
 
 private:
 

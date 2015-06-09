@@ -28,22 +28,6 @@ class MyLcd : private MyTypeWriter
 
 public:
 
-	class MyBatteryMeter : public BatteryMeter
-	{
-
-	public:
-
-		MyBatteryMeter(void);
-
-		float getRealVoltage(void);
-		float getVolatagePercentage(void);
-
-		uint16_t getColor(float volt);
-
-	private:
-
-	};
-
 	const static char endl = '\n';
 
 	explicit MyLcd(void);
@@ -61,11 +45,10 @@ public:
 	MyLcd &operator<<(const int16_t &s);
 	MyLcd &operator<<(const int32_t &i);
 
-	MyBatteryMeter			m_batteryMeter;
-
 private:
 
 	St7735r					*m_lcd;
+	Timer::TimerInt			m_lastUpdateTime;
 
 	LcdConsole::Config getLcdConsoleConfig(void);
 	MyTypeWriter::Config getTypeWriterConfig(void);

@@ -26,6 +26,12 @@ class MySmartCar
 
 public:
 
+	enum Mode
+	{
+		Runtime = 0,
+		Debug
+	};
+
 	explicit MySmartCar(void);
 
 	MyResource		m_res;
@@ -36,9 +42,15 @@ public:
 	MyMotor			m_motor;
 	MyBuzzer		m_buzzer;
 	MyBatteryMeter	m_batteryMeter;
+	Gpi				m_switch7;
+
+	Mode			m_mode;
 
 private:
 
+	Gpi::Config getSwitchConfig(const uint8_t id);
+
+	static void switchOnTriggered(Gpi *gpi);
 	static void showValue(const uint32_t &timeDelay);
 
 };

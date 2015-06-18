@@ -1,7 +1,7 @@
 /*
  * MyBatteryMeter.cpp
  *
- * Author: gowen
+ * Author: Peter
  * Copyright (c) 2014-2015 HKUST SmartCar Team
  * Refer to LICENSE for details
  */
@@ -23,14 +23,13 @@ MyBatteryMeter::MyBatteryMeter(void)
 	m_lastVoltage(GetVoltage())
 {
 	System::Init();
-	m_lastUpdateTime = System::Time();
 	if (!m_batteryMeterInstance)
 		m_batteryMeterInstance = this;
 }
 
 float MyBatteryMeter::getBatteryVoltage(void)
 {
-	if (System::Time() - m_lastUpdateTime >= MyResource::ConfigTable::BatteryMeterConfig::UpdateFreq)
+	if (System::Time() - m_lastUpdateTime >= MyResource::ConfigTable::BatteryMeterConfig::UpdateFreq || System::Time() <= 5000)
 		m_lastVoltage = GetVoltage();
 	return m_lastVoltage;
 }
@@ -52,8 +51,28 @@ uint16_t MyBatteryMeter::getColor(void)
 	return 0xFFFF;
 }
 
-void MyBatteryMeter::checkBattery(const uint32_t &timeDelay)
+uint8_t MyBatteryMeter::checkBattery(const uint32_t &)
 {
-	if (m_batteryMeterInstance->getBatteryPercentage() < 1.0f && !MyResource::smartCar().m_motor.isEnabled())
-		MyResource::smartCar().m_buzzer.setEnabled(true);
+	if (!MyResource::smartCar().m_motor.isEnabled())
+	{
+		float newPercentage = 0.0f, oldPercentage = m_batteryMeterInstance->getBatteryPercentage();
+		while (oldPercentage != newPercentage)
+		{
+			DelayMsByTicks(500);
+			oldPercentage = newPercentage;
+			newPercentage = m_batteryMeterInstance->getBatteryPercentage();
+		}
+		if (newPercentage <= 0.0f)
+		{
+			MyResource::smartCar().m_buzzer.setEnabled(true, false);
+			return 0;
+		}
+		else
+			if (newPercentage > 66.67f)
+				return 3;
+			else if (newPercentage > 33.33f)
+				return 2;
+			else
+				return 1;
+	}
 }

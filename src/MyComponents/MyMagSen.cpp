@@ -26,12 +26,12 @@ inline Pin::Name getPin(const uint8_t id)
 
 #ifdef LIBSC_USE_MAGSEN
 	case 0:
-		return LIBSC_MAGSEN4;
+		return LIBSC_MAGSEN5;
 #endif
 
 #if LIBSC_USE_MAGSEN > 1
 	case 1:
-		return LIBSC_MAGSEN5;
+		return LIBSC_MAGSEN4;
 #endif
 
 #if LIBSC_USE_MAGSEN > 2
@@ -88,10 +88,11 @@ float MyMagSen::getValue(void)
 {
 	m_rawReading[Side::LEFT] = m_magSen[Side::LEFT].GetResultF();
 	m_rawReading[Side::RIGHT] = m_magSen[Side::RIGHT].GetResultF();
-	m_filteredReading[Side::LEFT] = m_filter[Side::LEFT].Filter(m_rawReading[0]);
-	m_filteredReading[Side::RIGHT] = m_filter[Side::RIGHT].Filter(m_rawReading[1]);
-	m_output = (m_filteredReading[1] - m_filteredReading[0]) / (m_filteredReading[0] + m_filteredReading[1]);
-//	m_output = (m_rawReading[1] - m_rawReading[0]) / (m_rawReading[0] + m_rawReading[1]);
+	m_filteredReading[Side::LEFT] = m_filter[Side::LEFT].Filter(m_rawReading[Side::LEFT]);
+	m_filteredReading[Side::RIGHT] = m_filter[Side::RIGHT].Filter(m_rawReading[Side::RIGHT]);
+	m_output = (m_filteredReading[Side::LEFT] - m_filteredReading[Side::RIGHT]) / (m_filteredReading[Side::LEFT] + m_filteredReading[Side::RIGHT]);
+//	m_output = (m_rawReading[Side::LEFT] - m_rawReading[Side::RIGHT]) / (m_rawReading[Side::LEFT] + m_rawReading[Side::RIGHT]);
+	m_avg = (m_filteredReading[Side::LEFT] + m_filteredReading[Side::RIGHT]) / 2.0f;
 	return m_output;
 }
 
@@ -105,9 +106,9 @@ array<float, 2> &MyMagSen::getFilteredValue(void)
 	return m_filteredReading;
 }
 
-float MyMagSen::getFilteredValueAvg(void)
+float &MyMagSen::getFilteredValueAvg(void)
 {
-	return ((m_filteredReading[Side::LEFT] + m_filteredReading[Side::RIGHT]) / 2);
+	return m_avg;
 }
 
 array<float, 2> &MyMagSen::getRawValue(void)

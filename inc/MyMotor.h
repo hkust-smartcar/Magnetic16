@@ -9,10 +9,10 @@
 #pragma once
 
 #include <libsc/dir_motor.h>
+#include <MyPid.h>
 #include "MyResource.h"
 #include "MyEncoder.h"
 #include "MyLoop.h"
-#include "MyPID.h"
 
 #define MIN_MOTOR_POWER	0
 #define MAX_MOTOR_POWER	500
@@ -29,7 +29,7 @@ public:
 	MyMotor(void);
 
 	void setSpeed(int16_t speed);
-	void updateSpeed(void);
+	static void updateSpeed(const uint32_t &timeDelay);
 	int16_t *getSpeed(void);
 
 	void setEnabled(const bool enabled);
@@ -37,9 +37,7 @@ public:
 
 	void reset(void);
 
-	static void speedControlRoutine(const uint32_t &timeDelay);
-
-	MyPID				m_speedPID;
+	MyPid				m_speedPid;
 
 private:
 

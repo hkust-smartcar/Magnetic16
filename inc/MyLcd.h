@@ -34,6 +34,9 @@ public:
 
 	static void onDraw(const uint32_t &timeDelay);
 
+	void setEnabled(const bool enabled);
+	bool isEnabled(void);
+
 	MyLcd &setRow(const uint8_t &row);
 	MyLcd &operator<<(const char c);
 	MyLcd &operator<<(const char *str);
@@ -45,9 +48,10 @@ public:
 	MyLcd &operator<<(const int16_t &s);
 	MyLcd &operator<<(const int32_t &i);
 
+	St7735r					*m_lcd;
+
 private:
 
-	St7735r					*m_lcd;
 	Timer::TimerInt			m_lastUpdateTime;
 
 	LcdConsole::Config getLcdConsoleConfig(void);
@@ -55,5 +59,9 @@ private:
 
 	static const bool BatteryCharge[];
 	static const uint8_t BatteryOutlook[];
+
+	bool					m_enabled;
+
+	static MyLcd			*m_instance;
 
 };

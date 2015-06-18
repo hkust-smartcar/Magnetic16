@@ -29,7 +29,7 @@ MyMotor::MyMotor(void)
 :
 	DirMotor(getMotorConfig(0)),
 	m_encoder(),
-	m_speedPID(MyResource::ConfigTable::MotorConfig::Reference, MyResource::ConfigTable::MotorConfig::Kp, MyResource::ConfigTable::MotorConfig::Ki, MyResource::ConfigTable::MotorConfig::Kd, MyPID::Motor, -MAX_MOTOR_POWER, MAX_MOTOR_POWER, -1.0f, 1.0f),
+	m_speedPid(MyResource::ConfigTable::MotorConfig::Reference, MyResource::ConfigTable::MotorConfig::Kp, MyResource::ConfigTable::MotorConfig::Ki, MyResource::ConfigTable::MotorConfig::Kd, MyPid::Motor, -MAX_MOTOR_POWER, MAX_MOTOR_POWER, -1.0f, 1.0f),
 	m_speed(0),
 	m_enabled(false)
 {
@@ -54,9 +54,9 @@ void MyMotor::setSpeed(int16_t speed)
 		SetPower(0);
 }
 
-void MyMotor::updateSpeed(void)
+void MyMotor::updateSpeed(const uint32_t &)
 {
-	setSpeed(m_speedPID.update(m_encoder.getEncoderReading()));
+	m_instance->setSpeed(m_instance->m_speedPid.update(m_instance->m_encoder.getEncoderReading()));
 }
 
 int16_t *MyMotor::getSpeed(void)
@@ -68,7 +68,7 @@ void MyMotor::setEnabled(const bool enabled)
 {
 	reset();
 	m_encoder.reset();
-	m_speedPID.reset();
+	m_speedPid.reset();
 	m_enabled = enabled;
 }
 
@@ -82,5 +82,5 @@ void MyMotor::reset(void)
 	m_speed = 0;
 	SetPower(0);
 	SetClockwise(true);
-	m_speedPID.reset();
+	m_speedPid.reset();
 }

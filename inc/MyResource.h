@@ -56,9 +56,21 @@ public:
 		public:
 
 			static float Reference;
-			static float Kp;
-			static float Ki;
-			static float Kd;
+
+			static float TurningKpA;
+			static float TurningKpB;
+			static float TurningKi;
+			static float TurningKd;
+
+			static float NormalKp;
+			static float NormalKi;
+			static float NormalKd;
+
+			static float TurningThresholdSdValue;
+			static float ForceTurningThresholdStartSdOutput;
+			static float ForceTurningThresholdStartFdOutput;
+			static float ForceTurningThresholdStopFdOutput;
+			static float ForceTurningThresholdStopHdOutput;
 
 			static float WeightSD;
 			static float WeightFD;

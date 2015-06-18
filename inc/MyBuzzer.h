@@ -19,21 +19,22 @@ class MyBuzzer
 
 public:
 
-//	struct note
-//	{
-//		char name[5];
-//		float freq;
-//	};
-//
-//	static const note notes[88];
+	struct note
+	{
+		char name[5];
+		float freq;
+	};
+
+	static const note notes[88];
 
 	MyBuzzer(void);
 
-//	void noteDown(const uint8_t note, const uint16_t delayMs, const uint8_t times = 0, const bool allowChange = false);
-//	void noteDown(const char noteName[5], const uint16_t delayMs, const uint8_t times = 0, const bool allowChange = false);
+//	void noteDown(const uint8_t note, const uint16_t delayMs = 0);
+//	void noteDown(const char noteName[5], const uint16_t delayMs = 0);
 
 	void setEnabled(const bool enabled, const bool allowChange = true);
 	void toggle(void);
+	void beep(const uint8_t times = 1, const uint16_t delayMs = 2);
 
 	static void batteryRunningLowChecking(void);
 
@@ -48,12 +49,12 @@ private:
 	Gpo			m_gpo;
 	bool		m_allowChange;
 
-//	FtmPwm		m_pwm;
+//	SoftPwm		m_pwm;
 
-//	FtmPwm::Config getFtmConfig(const uint8_t id);
+//	SoftPwm::Config getSoftFtmConfig(const uint8_t id);
 	Gpo::Config getGpoConfig(void);
 //	uint8_t getNoteIndexByName(const char noteName[5]);
-//
+
 //	uint32_t getPeriod(const float freq);
 //	uint32_t getPosWidth(const uint8_t percentage);
 //

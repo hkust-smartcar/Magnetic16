@@ -1,5 +1,5 @@
 /*
- * MyPID.h
+ * MyPid.h
  *
  * Author: Peter
  * Copyright (c) 2014-2015 HKUST SmartCar Team
@@ -19,18 +19,18 @@
 
 using namespace libsc;
 
-class MyPID
+class MyPid
 {
 public:
 
 	enum Type
 	{
 		Motor = 0,
-		Servo,
-		NonLinear
+		ServoLinear,
+		ServoNonLinear
 	};
 
-	explicit MyPID(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax);
+	explicit MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float nonLinearKp_a = 0.0f, float nonLinearKp_b = 0.0f);
 
 	float update(float val);
 	float updateMotorPID(void);
@@ -59,6 +59,9 @@ private:
 	float &m_Kp;
 	float &m_Ki;
 	float &m_Kd;
+
+	float m_Kp_a;
+	float m_Kp_b;
 
 	Type m_type;
 

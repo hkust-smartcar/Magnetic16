@@ -7,11 +7,11 @@
  */
 
 #include <cstring>
-#include <libbase/k60/ftm_pwm.h>
-#include <libbase/k60/ftm.h>
+#include <libbase/k60/soft_pwm.h>
 #include <libbase/k60/pin.h>
-#include <libbase/k60/pwm_utils.h>
+#include <libbase/k60/pit.h>
 #include "MyBuzzer.h"
+#include "MyLoop.h"
 #include "MyResource.h"
 
 using namespace libbase::k60;
@@ -24,41 +24,54 @@ inline Pin::Name getPwmPin(const uint8_t id)
 	return LIBSC_BUZZER0;
 }
 
+//SoftPwm::Config MyBuzzer::getSoftFtmConfig(const uint8_t id)
+//{
+//	SoftPwm::Config config;
+//	config.pin = getPwmPin(id);
+//	config.period = getPeriod(m_noteIndex);
+//	config.pos_width = getPosWidth(m_loudness);
+//	config.precision = Pwm::Config::Precision::kUs;
+//	config.pit_channel = 0;
+//	return config;
+//}
+
+Gpo::Config MyBuzzer::getGpoConfig(void)
+{
+	Gpo::Config config;
+	config.is_high = false;
+	config.pin = getPwmPin(0);
+	return config;
+}
+
 MyBuzzer::MyBuzzer(void)
 :
 //	m_noteIndex(40),
 //	m_loudness(100),
 	m_gpo(getGpoConfig()),
-	m_allowChange(false)
-//	m_pwm(getFtmConfig(0))
+	m_allowChange(true)
+//	m_pwm(getSoftFtmConfig(0))
 {
 	System::Init();
 }
 
-//void MyBuzzer::noteDown(const uint8_t note, const uint16_t delayMs, uint8_t times)
+//void MyBuzzer::noteDown(const uint8_t note, const uint16_t delayMs)
 //{
-//	assert(times >= 1);
-//
-//	while (times--)
+//	setNote(note);
+//	if (delayMs > 0)
 //	{
-//		setNote(note);
 //		System::DelayMs(delayMs);
+//		setLoudness(0);
 //	}
-//
-//	setLoudness(0);
 //}
 //
-//void MyBuzzer::noteDown(const char noteName[5], const uint16_t delayMs, uint8_t times)
+//void MyBuzzer::noteDown(const char noteName[5], const uint16_t delayMs)
 //{
-//	assert(times >= 1);
-//
-//	while (times--)
+//	setNote(noteName);
+//	if (delayMs > 0)
 //	{
-//		setNote(noteName);
 //		System::DelayMs(delayMs);
+//		setLoudness(0);
 //	}
-//
-//	setLoudness(0);
 //}
 
 void MyBuzzer::setEnabled(const bool enabled, const bool allowChange)
@@ -72,13 +85,26 @@ void MyBuzzer::toggle(void)
 		m_gpo.Turn();
 }
 
+void MyBuzzer::beep(const uint8_t times, const uint16_t delayMs)
+{
+	if (m_allowChange)
+		for (int i = 0; i < times; i++)
+		{
+			if (i)
+				DelayMsByTicks(delayMs / 2);
+			setEnabled(true);
+			DelayMsByTicks(delayMs / 2);
+			setEnabled(false);
+		}
+}
+
 //void MyBuzzer::setLoudness(const uint8_t percentage)
 //{
 //	if (percentage)
 //		m_loudness = percentage;
 //	m_pwm.SetPosWidth(getPosWidth(percentage));
 //}
-
+//
 //uint32_t MyBuzzer::getPeriod(const float freq)
 //{
 //	return (uint32_t)(1000000.0f / freq);
@@ -88,7 +114,7 @@ void MyBuzzer::toggle(void)
 //{
 //	return (uint32_t)(getPeriod(notes[m_noteIndex].freq) * inRange(0, percentage, 100) * 0.003f);
 //}
-
+//
 //void MyBuzzer::setNote(const uint8_t index, const uint8_t percentage)
 //{
 //	m_noteIndex = inRange(0, index, 87);
@@ -101,26 +127,6 @@ void MyBuzzer::toggle(void)
 //	m_loudness = (percentage > 100)? m_loudness : percentage;
 //	m_pwm.SetPeriod(getPeriod(notes[m_noteIndex].freq), getPosWidth((percentage > 100)? m_loudness : percentage));
 //}
-
-//FtmPwm::Config MyBuzzer::getFtmConfig(const uint8_t id)
-//{
-//	FtmPwm::Config config;
-//	config.pin = getPwmPin(id);
-//	config.is_active_high = true;
-//	config.period = getPeriod(m_noteIndex);
-//	config.pos_width = getPosWidth(m_loudness);
-//	config.precision = Pwm::Config::Precision::kUs;
-//	config.alignment = FtmPwm::Config::Alignment::kCenter;
-//	return config;
-//}
-
-Gpo::Config MyBuzzer::getGpoConfig(void)
-{
-	Gpo::Config config;
-	config.is_high = false;
-	config.pin = getPwmPin(0);
-	return config;
-}
 //
 //uint8_t MyBuzzer::getNoteIndexByName(const char noteName[5])
 //{

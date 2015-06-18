@@ -13,6 +13,7 @@
 #include <libbase/k60/gpio.h>
 #include <libsc/system.h>
 #include "MyResource.h"
+#include "MyLcd.h"
 #include "MySmartCar.h"
 
 namespace libbase
@@ -53,7 +54,7 @@ void myListener(const std::vector<Byte>& bytes)
 		break;
 
 	case 'A':
-		MyResource::ConfigTable::ServoConfig::Kp += 10.0f;
+		MyResource::ConfigTable::ServoConfig::NormalKp += 10.0f;
 		break;
 
 	case 'z':
@@ -61,7 +62,7 @@ void myListener(const std::vector<Byte>& bytes)
 		break;
 
 	case 'Z':
-		MyResource::ConfigTable::ServoConfig::Kp = (MyResource::ConfigTable::ServoConfig::Kp - 10.0f < 0.0f)? 0.0f : MyResource::ConfigTable::ServoConfig::Kp - 10.0f;
+		MyResource::ConfigTable::ServoConfig::NormalKp = (MyResource::ConfigTable::ServoConfig::NormalKp - 10.0f < 0.0f)? 0.0f : MyResource::ConfigTable::ServoConfig::NormalKp - 10.0f;
 		break;
 
 	case 's':
@@ -69,7 +70,7 @@ void myListener(const std::vector<Byte>& bytes)
 		break;
 
 	case 'S':
-		MyResource::ConfigTable::ServoConfig::Ki += 0.1f;
+		MyResource::ConfigTable::ServoConfig::NormalKi += 0.1f;
 		break;
 
 	case 'x':
@@ -77,7 +78,7 @@ void myListener(const std::vector<Byte>& bytes)
 		break;
 
 	case 'X':
-		MyResource::ConfigTable::ServoConfig::Ki = (MyResource::ConfigTable::ServoConfig::Ki - 0.1f < 0.0f)? 0.0f : MyResource::ConfigTable::ServoConfig::Ki - 0.1f;
+		MyResource::ConfigTable::ServoConfig::NormalKi = (MyResource::ConfigTable::ServoConfig::NormalKi - 0.1f < 0.0f)? 0.0f : MyResource::ConfigTable::ServoConfig::NormalKi - 0.1f;
 		break;
 
 	case 'd':
@@ -85,7 +86,7 @@ void myListener(const std::vector<Byte>& bytes)
 		break;
 
 	case 'D':
-		MyResource::ConfigTable::ServoConfig::Kd += 1.0f;
+		MyResource::ConfigTable::ServoConfig::NormalKd += 1.0f;
 		break;
 
 	case 'c':
@@ -93,7 +94,7 @@ void myListener(const std::vector<Byte>& bytes)
 		break;
 
 	case 'C':
-		MyResource::ConfigTable::ServoConfig::Kd = (MyResource::ConfigTable::ServoConfig::Kd - 1.0f < 0.0f)? 0.0f : MyResource::ConfigTable::ServoConfig::Kd - 1.0f;
+		MyResource::ConfigTable::ServoConfig::NormalKd = (MyResource::ConfigTable::ServoConfig::NormalKd - 1.0f < 0.0f)? 0.0f : MyResource::ConfigTable::ServoConfig::NormalKd - 1.0f;
 		break;
 
 	case 'f':
@@ -103,9 +104,18 @@ void myListener(const std::vector<Byte>& bytes)
 	case 'v':
 		MyResource::ConfigTable::MotorConfig::Reference = (MyResource::ConfigTable::MotorConfig::Reference - 100.0f < 0.0f)? 0.0f : MyResource::ConfigTable::MotorConfig::Reference - 100.0f;
 		break;
+
+	case 'F':
+		MyResource::ConfigTable::ServoConfig::TurningKpA += 10.0f;
+		break;
+
+	case 'V':
+		MyResource::ConfigTable::ServoConfig::TurningKpA = (MyResource::ConfigTable::ServoConfig::TurningKpA - 10.0f < 0.0f)? 0.0f : MyResource::ConfigTable::ServoConfig::TurningKpA - 10.0f;
+		break;
 	}
 
-	MyResource::smartCar().m_lcdConsole.onDraw(0);
+	if (!MyResource::smartCar().m_mode)
+		MyResource::smartCar().m_lcdConsole.onDraw(99999);
 }
 
 void OnPress(const uint8_t id)
@@ -121,8 +131,9 @@ void OnPress(const uint8_t id)
 		break;
 
 	case 1:
-		myCar.m_servo.setDegree(MID_SERVO_ANGLE);
+//		myCar.m_servo.setDegree(MID_SERVO_ANGLE);
 		myCar.m_servo.setEnabled(!myCar.m_servo.isEnabled());
+//		myCar.m_motor.setEnabled(!myCar.m_motor.isEnabled());
 		break;
 	}
 }
@@ -134,8 +145,11 @@ int main(void)
 	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getOutputValue(), "SD_Output");
 	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getOutputValue(), "FD_Output");
 	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getOutputValue(), "HD_Output");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValueAvg(), "SD_Avg");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getFilteredValueAvg(), "FD_Avg");
+	myCar.m_varMng.addWatchedVar(&MyResource::smartCar().m_servo.m_90DegreeTurningNeed, "90DegreeMode");
 //	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_lastAngle, "IntegratedOutput");
-	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_lastDegree, "Angle");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_lastDegree, "Angle");
 
 //	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[0], "SD_FilteredValueL");
 //	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[1], "SD_FilteredValueR");
@@ -174,9 +188,19 @@ int main(void)
 
 	myCar.m_varMng.Init(&myListener);
 
-	MyResource::smartCar().m_lcdConsole.onDraw(0);
+	MyResource::smartCar().m_lcdConsole.onDraw(99999);
 
-	myCar.m_batteryMeter.checkBattery(0);
+	myCar.m_buzzer.beep(myCar.m_batteryMeter.checkBattery(0), 100);
+
+//	myCar.m_servo.setEnabled(true);
+//	myCar.m_lcdConsole.setEnabled(false);
+//	while (true)
+//		for (uint16_t i = 0; i < 1800; i += 100)
+//		{
+//			myCar.m_servo.setDegree(i);
+//			myCar.m_lcdConsole.setRow(0) << "Angle: " << i << MyLcd::endl;
+			System::DelayMs(500);
+//		}
 
 	myCar.m_loop.start();
 

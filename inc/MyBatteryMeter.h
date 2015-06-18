@@ -1,7 +1,7 @@
 /*
  * MyBatteryMeter.h
  *
- * Author: gowen
+ * Author: Peter
  * Copyright (c) 2014-2015 HKUST SmartCar Team
  * Refer to LICENSE for details
  */
@@ -27,7 +27,7 @@ public:
 
 	uint16_t getColor(void);
 
-	static void checkBattery(const uint32_t &timeDelay);
+	static uint8_t checkBattery(const uint32_t &timeDelay);
 
 private:
 

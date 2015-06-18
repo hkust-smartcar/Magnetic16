@@ -65,15 +65,15 @@ public:
 				m_instance = new TypeId;
 		}
 
-		static std::string getTypeId(uint8_t o) { return "unsigned char"; }
-		static std::string getTypeId(int8_t o) { return "signed char"; }
-		static std::string getTypeId(uint16_t o) { return "unsigned short"; }
-		static std::string getTypeId(int16_t o) { return "short"; }
-		static std::string getTypeId(uint32_t o) { return "unsigned int"; }
-		static std::string getTypeId(int32_t o) { return "int"; }
-		static std::string getTypeId(float o) { return "float"; }
+		static std::string getTypeId(uint8_t ) { return "unsigned char"; }
+		static std::string getTypeId(int8_t ) { return "signed char"; }
+		static std::string getTypeId(uint16_t ) { return "unsigned short"; }
+		static std::string getTypeId(int16_t ) { return "short"; }
+		static std::string getTypeId(uint32_t ) { return "unsigned int"; }
+		static std::string getTypeId(int32_t ) { return "int"; }
+		static std::string getTypeId(float ) { return "float"; }
 		template<typename T>
-		static std::string getTypeId(T o) { return "wtf?"; }
+		static std::string getTypeId(T ) { return "wtf?"; }
 
 	private:
 

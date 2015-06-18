@@ -41,7 +41,7 @@ public:
 	float getValue(void);
 	float &getOutputValue(void);
 	array<float, 2> &getFilteredValue(void);
-	float getFilteredValueAvg(void);
+	float &getFilteredValueAvg(void);
 	array<float, 2> &getRawValue(void);
 
 private:
@@ -50,5 +50,6 @@ private:
 	array<MyKalmanFilter, 2>	m_filter;
 	array<float, 2>				m_rawReading;
 	array<float, 2>				m_filteredReading;
+	float						m_avg;
 	float						m_output;
 };

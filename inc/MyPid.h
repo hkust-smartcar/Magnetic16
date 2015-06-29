@@ -30,7 +30,7 @@ public:
 		ServoNonLinear
 	};
 
-	explicit MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float nonLinearKp_a = 0.0f, float nonLinearKp_b = 0.0f);
+	explicit MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a = *(new float(0.0f)), float &nonLinearKp_b = *(new float(0.0f)));
 
 	float update(float val);
 	float updateMotorPID(void);
@@ -60,8 +60,8 @@ private:
 	float &m_Ki;
 	float &m_Kd;
 
-	float m_Kp_a;
-	float m_Kp_b;
+	float &m_Kp_squ_a;
+	float &m_Kp_b;
 
 	Type m_type;
 

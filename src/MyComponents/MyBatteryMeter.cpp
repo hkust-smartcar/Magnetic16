@@ -55,24 +55,32 @@ uint8_t MyBatteryMeter::checkBattery(const uint32_t &)
 {
 	if (!MyResource::smartCar().m_motor.isEnabled())
 	{
+		bool isEnabled = MyResource::smartCar().m_buzzer.isEnabled();
+		MyResource::smartCar().m_buzzer.setEnabled(true);
+
 		float newPercentage = 0.0f, oldPercentage = m_batteryMeterInstance->getBatteryPercentage();
+
 		while (oldPercentage != newPercentage)
 		{
 			DelayMsByTicks(500);
 			oldPercentage = newPercentage;
 			newPercentage = m_batteryMeterInstance->getBatteryPercentage();
 		}
+
 		if (newPercentage <= 0.0f)
-		{
-			MyResource::smartCar().m_buzzer.setEnabled(true, false);
-			return 0;
-		}
+			MyResource::smartCar().m_buzzer.set(true, false);
 		else
+		{
+			int times = 0;
 			if (newPercentage > 66.67f)
-				return 3;
+				times = 3;
 			else if (newPercentage > 33.33f)
-				return 2;
+				times = 2;
 			else
-				return 1;
+				times = 1;
+			MyResource::smartCar().m_buzzer.beep(times, 100);
+		}
+
+		MyResource::smartCar().m_buzzer.setEnabled(isEnabled);
 	}
 }

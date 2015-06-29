@@ -57,24 +57,32 @@ public:
 
 			static float Reference;
 
-			static float TurningKpA;
-			static float TurningKpB;
-			static float TurningKi;
-			static float TurningKd;
 
 			static float NormalKp;
 			static float NormalKi;
 			static float NormalKd;
 
+			static float NormalWeightSD;
+			static float NormalWeightFD;
+			static float NormalWeightHD;
+
+
+			static float TurningKpA;
+			static float TurningKpB;
+			static float TurningKi;
+			static float TurningKd;
+
+			static float TurningWeightSD;
+			static float TurningWeightFD;
+			static float TurningWeightHD;
+
 			static float TurningThresholdSdValue;
+//			static float TurningThresholdFdValue;
 			static float ForceTurningThresholdStartSdOutput;
 			static float ForceTurningThresholdStartFdOutput;
 			static float ForceTurningThresholdStopFdOutput;
 			static float ForceTurningThresholdStopHdOutput;
 
-			static float WeightSD;
-			static float WeightFD;
-			static float WeightHD;
 
 			static uint32_t UpdateFreq;
 
@@ -89,6 +97,13 @@ public:
 			static float Kp;
 			static float Ki;
 			static float Kd;
+
+			static float TurningSpeedRatio;
+			static float Turning90DegreeSpeedRatio;
+			static float MaxSpeedRatio;
+
+			static uint32_t TimeForReachingMaxSpeed;
+			static int16_t EmergencyStopThreshold;
 
 			static uint32_t UpdateFreq;
 

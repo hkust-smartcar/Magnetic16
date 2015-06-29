@@ -2,7 +2,7 @@
  * MyVarManager.cpp
  *
  * Author: PeterLau
- * Version: 3.0.0
+ * Version: 3.1.0
  *
  * Copyright (c) 2014-2015 HKUST SmartCar Team
  * Refer to LICENSE for details

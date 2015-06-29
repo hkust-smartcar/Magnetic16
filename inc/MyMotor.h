@@ -41,6 +41,7 @@ public:
 
 private:
 
+	uint32_t			m_timePassed;
 	int16_t				m_speed;
 	bool				m_enabled;
 

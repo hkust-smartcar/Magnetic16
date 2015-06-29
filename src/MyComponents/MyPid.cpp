@@ -10,6 +10,7 @@
 
 #include <libsc/system.h>
 #include <libsc/timer.h>
+#include <libutil/math.h>
 #include <MyPid.h>
 
 #include "MySmartCar.h"
@@ -19,7 +20,7 @@ using namespace libsc;
 
 #define abs(v) ((v > 0)? v : -v)
 
-MyPid::MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float nonLinearKp_a, float nonLinearKp_b)
+MyPid::MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a, float &nonLinearKp_b)
 :
 	m_outputMin(outputMin),
 	m_outputMax(outputMax),
@@ -32,7 +33,7 @@ MyPid::MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const
 	m_Ki(ki),
 	m_Kd(kd),
 
-	m_Kp_a(nonLinearKp_a),
+	m_Kp_squ_a(nonLinearKp_squ_a),
 	m_Kp_b(nonLinearKp_b),
 
 	m_type(type),
@@ -78,7 +79,7 @@ float *MyPid::getLastError(void)
 
 void MyPid::reset(void)
 {
-	m_lastTimeUpdate = System::Time();
+	m_lastTimeUpdate = System::Time() - MyResource::ConfigTable::MotorConfig::UpdateFreq;
 	m_output = 0;
 	m_lastError = 0;
 	m_eSum = 0;
@@ -133,8 +134,8 @@ float MyPid::updateServoPID(void)
 
 float MyPid::updateNonLinearPID(void)
 {
-//	m_output = m_Kp * (ABS(m_lastError) / m_errorRange) * m_lastError + m_Ki * m_eSum + m_Kd * m_eDer;
-	m_output = (m_Kp_a * m_lastError * ABS(m_lastError) + m_Kp_b * ABS(m_lastError)) + m_Ki * m_eSum + m_Kd * m_eDer;
+	float p = m_lastError * ABS(m_lastError);
+	m_output = (m_Kp_squ_a * p) + m_Ki * m_eSum + m_Kd * m_eDer;
 
 	return inRange(m_outputMin, m_output, m_outputMax);
 }

@@ -32,9 +32,11 @@ public:
 //	void noteDown(const uint8_t note, const uint16_t delayMs = 0);
 //	void noteDown(const char noteName[5], const uint16_t delayMs = 0);
 
-	void setEnabled(const bool enabled, const bool allowChange = true);
+	void setEnabled(const bool enabled);
+	bool isEnabled(void) const;
+	void set(const bool beep, const bool allowChange = true);
 	void toggle(void);
-	void beep(const uint8_t times = 1, const uint16_t delayMs = 2);
+	void beep(const uint8_t times = 1, const uint16_t delayMs = 10);
 
 	static void batteryRunningLowChecking(void);
 
@@ -48,6 +50,7 @@ private:
 
 	Gpo			m_gpo;
 	bool		m_allowChange;
+	bool		m_enabled;
 
 //	SoftPwm		m_pwm;
 

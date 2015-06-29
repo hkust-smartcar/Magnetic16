@@ -19,6 +19,8 @@
 #include "MyVarManager.h"
 #include "MyBatteryMeter.h"
 
+#define IS_FRONT 1
+
 using namespace libsc;
 
 class MySmartCar
@@ -42,7 +44,7 @@ public:
 	MyMotor			m_motor;
 	MyBuzzer		m_buzzer;
 	MyBatteryMeter	m_batteryMeter;
-	Gpi				m_switch7;
+	array<Gpi, 8>	m_switch;
 
 	Mode			m_mode;
 
@@ -50,7 +52,8 @@ private:
 
 	Gpi::Config getSwitchConfig(const uint8_t id);
 
-	static void switchOnTriggered(Gpi *gpi);
+	void switchInit(void);
+	static void switchOnTriggered(Gpi *target);
 	static void showValue(const uint32_t &timeDelay);
 
 };

@@ -46,19 +46,11 @@ public:
 		Turning
 	};
 
-	struct DataCollector_90degree
+	enum LastServoLockDirection
 	{
-		float				prevSd;
-		float				prevFd;
-		float				prevHd;
-		Direction			turningDirection;
-		bool				isFdReady;
-		bool				isFdReachedLocMax;
-		bool				isFdReachedLocMin;
-		bool				isSdReady;
-		bool				isSdReachedLocMax;
-//		Timer::TimerInt		checkTime;
-		bool				isReset;
+		None = 0,
+		Left,
+		Right
 	};
 
 	MyServo(void);
@@ -74,25 +66,26 @@ public:
 	void setEnabled(const bool enabled);
 	bool isEnabled(void);
 
+	bool					m_allow90DegreeTurning;
 	bool					m_isPidNonLinear;
-	uint8_t					m_90DegreeTurningNeed;
+	bool					m_90DegreeTurningNeed;
 	float					m_lastError;
+	int16_t					m_finalAngle;
 	uint16_t				m_lastDegree;
-	Direction				m_lastTurningDirection;
+	LastServoLockDirection	m_lastTurningDirection;
 	array<MyMagSen, 3>		m_MagSen;
-
-private:
 
 	array<MyPid, 2>			m_servoPid;
 
-	array<float *, 3>		m_weight;
+private:
+
+	array<float *, 3>		m_normal_weight;
+	array<float *, 3>		m_turning_weight;
 
 	bool					m_forceTurningFlag;
 
 	bool					m_enabled;
 	bool					m_pidChangedFlag;
-
-	DataCollector_90degree	m_dataCollector_90;
 
 	static MyServo			*m_instance;
 

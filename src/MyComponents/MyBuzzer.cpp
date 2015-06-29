@@ -48,7 +48,8 @@ MyBuzzer::MyBuzzer(void)
 //	m_noteIndex(40),
 //	m_loudness(100),
 	m_gpo(getGpoConfig()),
-	m_allowChange(true)
+	m_allowChange(true),
+	m_enabled(true)
 //	m_pwm(getSoftFtmConfig(0))
 {
 	System::Init();
@@ -74,27 +75,42 @@ MyBuzzer::MyBuzzer(void)
 //	}
 //}
 
-void MyBuzzer::setEnabled(const bool enabled, const bool allowChange)
+void MyBuzzer::setEnabled(const bool enabled)
 {
-	m_gpo.Set(enabled);
-	m_allowChange = allowChange;
+//	set(false, enabled);
+	m_enabled = enabled;
 }
+
+bool MyBuzzer::isEnabled(void) const
+{
+	return m_enabled;
+}
+
+void MyBuzzer::set(const bool beep, const bool allowChange)
+{
+	if (m_enabled)
+	{
+		m_gpo.Set(beep);
+		m_allowChange = allowChange;
+	}
+}
+
 void MyBuzzer::toggle(void)
 {
-	if (!m_allowChange)
+	if (m_allowChange && m_enabled)
 		m_gpo.Turn();
 }
 
 void MyBuzzer::beep(const uint8_t times, const uint16_t delayMs)
 {
-	if (m_allowChange)
+	if (m_allowChange && m_enabled)
 		for (int i = 0; i < times; i++)
 		{
 			if (i)
 				DelayMsByTicks(delayMs / 2);
-			setEnabled(true);
+			set(true);
 			DelayMsByTicks(delayMs / 2);
-			setEnabled(false);
+			set(false);
 		}
 }
 

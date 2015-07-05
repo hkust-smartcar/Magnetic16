@@ -53,7 +53,7 @@ MySmartCar &MyResource::smartCar(void)
 	float MyResource::ConfigTable::ServoConfig::NormalWeightHD = 0.4615385f;
 
 
-	float MyResource::ConfigTable::ServoConfig::TurningKpA = 2600.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKpA = 1000.0f;
 	float MyResource::ConfigTable::ServoConfig::TurningKpB = 0.0f;
 	float MyResource::ConfigTable::ServoConfig::TurningKi = 0.0f;
 	float MyResource::ConfigTable::ServoConfig::TurningKd = 40.0f;
@@ -62,11 +62,10 @@ MySmartCar &MyResource::smartCar(void)
 	float MyResource::ConfigTable::ServoConfig::TurningWeightFD = 0.325f;
 	float MyResource::ConfigTable::ServoConfig::TurningWeightHD = 0.525f;
 
-	float MyResource::ConfigTable::ServoConfig::TurningThresholdSdValue = 0.8f;
-	float MyResource::ConfigTable::ServoConfig::ForceTurningThresholdStartSdOutput = 0.5f;
-	float MyResource::ConfigTable::ServoConfig::ForceTurningThresholdStartFdOutput = 0.8f;
-	float MyResource::ConfigTable::ServoConfig::ForceTurningThresholdStopFdOutput = 0.6f;
-	float MyResource::ConfigTable::ServoConfig::ForceTurningThresholdStopHdOutput = 0.1f;
+	float MyResource::ConfigTable::ServoConfig::TurningThresholdFdValue = 0.85f;
+	float MyResource::ConfigTable::ServoConfig::TurningThresholdHdValue = 0.2f;
+	float MyResource::ConfigTable::ServoConfig::NoSignalThreshold = 0.12f;
+	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFdAvg = 0.1f;
 
 
 	uint32_t MyResource::ConfigTable::ServoConfig::UpdateFreq = 7;
@@ -77,11 +76,11 @@ MySmartCar &MyResource::smartCar(void)
 	float MyResource::ConfigTable::MotorConfig::Ki = 0.0f;
 	float MyResource::ConfigTable::MotorConfig::Kd = 0.018f;
 
-	float MyResource::ConfigTable::MotorConfig::TurningSpeedRatio = 0.45f;
-	float MyResource::ConfigTable::MotorConfig::Turning90DegreeSpeedRatio = 0.3f;
-	float MyResource::ConfigTable::MotorConfig::MaxSpeedRatio = 1.8f;
+	float MyResource::ConfigTable::MotorConfig::TurningSpeedRatio = 0.8f;
+	float MyResource::ConfigTable::MotorConfig::Turning90DegreeSpeedRatio = 0.65f;
+	float MyResource::ConfigTable::MotorConfig::MaxSpeedRatio = 1.3f;
 
-	uint32_t MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed = 2000;
+	uint32_t MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed = 3000;
 	int16_t MyResource::ConfigTable::MotorConfig::EmergencyStopThreshold = 0;
 
 	uint32_t MyResource::ConfigTable::MotorConfig::UpdateFreq = 20;

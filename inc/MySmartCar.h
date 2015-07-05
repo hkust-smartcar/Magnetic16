@@ -31,7 +31,8 @@ public:
 	enum Mode
 	{
 		Runtime = 0,
-		Debug
+		RawDebug,
+		StandardDebug
 	};
 
 	explicit MySmartCar(void);

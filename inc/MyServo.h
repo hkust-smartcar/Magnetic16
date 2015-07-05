@@ -10,6 +10,7 @@
 
 #include <array>
 #include <libbase/k60/adc.h>
+#include <libsc/timer.h>
 #include <libsc/trs_d05.h>
 #include <MyPid.h>
 #include "MyMagSen.h"
@@ -53,12 +54,22 @@ public:
 		Right
 	};
 
+	struct Turning90DegreeChecker
+	{
+		Timer::TimerInt			lastTime;
+		bool					hasReachThreshold;
+		bool					is90DegreeTurningStarted;
+		LastServoLockDirection	direction;
+	};
+
 	MyServo(void);
 
 	void reset(void);
 
+	void updateMagSen(void);
 	float getFinalAngle(void);
-	bool check90Degree(void);
+	bool turningHandler(float &error);
+	bool check90Degree(float &error);
 	void setAngle(const int16_t degree);
 	void setDegree(const uint16_t degree);
 	static void updateAngle(const uint32_t &timeDelay);
@@ -79,8 +90,10 @@ public:
 
 private:
 
-	array<float *, 3>		m_normal_weight;
-	array<float *, 3>		m_turning_weight;
+//	array<float *, 3>		m_normal_weight;
+//	array<float *, 3>		m_turning_weight;
+
+	Turning90DegreeChecker	m_90DegreeChecker;
 
 	bool					m_forceTurningFlag;
 

@@ -76,12 +76,10 @@ public:
 			static float TurningWeightFD;
 			static float TurningWeightHD;
 
-			static float TurningThresholdSdValue;
-//			static float TurningThresholdFdValue;
-			static float ForceTurningThresholdStartSdOutput;
-			static float ForceTurningThresholdStartFdOutput;
-			static float ForceTurningThresholdStopFdOutput;
-			static float ForceTurningThresholdStopHdOutput;
+			static float TurningThresholdFdValue;
+			static float TurningThresholdHdValue;
+			static float NoSignalThreshold;
+			static float Turning90DegreeThresholdFdAvg;
 
 
 			static uint32_t UpdateFreq;

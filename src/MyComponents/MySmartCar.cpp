@@ -62,7 +62,7 @@ MySmartCar::MySmartCar(void)
 	m_buzzer(),
 	m_batteryMeter(),
 	m_switch(),
-	m_mode(Mode::Debug)
+	m_mode(Mode::StandardDebug)
 {
 	switchInit();
 	m_loop.addFunctionToLoop(&m_motor.updateSpeed, MyResource::ConfigTable::MotorConfig::UpdateFreq);
@@ -77,9 +77,9 @@ void MySmartCar::switchInit(void)
 	for (int i = 0; i < 8; i++)
 		m_switch[i] = Gpi(getSwitchConfig(i));
 	m_mode = (Mode)(!m_switch[7].Get());
-	m_buzzer.setEnabled(m_switch[3].Get());
-	m_servo.setEnabled(!m_switch[5].Get());
-	m_servo.m_allow90DegreeTurning = m_switch[4].Get();
+	m_servo.setEnabled(!m_switch[4].Get());
+	m_servo.m_allow90DegreeTurning = m_switch[3].Get();
+	MyResource::smartCar().m_mode = (Mode)(1 + (uint8_t)m_switch[5].Get());
 }
 
 void MySmartCar::switchOnTriggered(Gpi *target)
@@ -88,30 +88,29 @@ void MySmartCar::switchOnTriggered(Gpi *target)
 	{
 	case LIBSC_SWITCH7:
 		MyResource::smartCar().m_lcdConsole.m_lcd->Clear();
+		MyResource::smartCar().m_lcdConsole.setEnabled(true);
 
 		if (target->Get())
 			MyResource::smartCar().m_mode = Mode::Runtime;
 		else
-			MyResource::smartCar().m_mode = Mode::Debug;
+			MyResource::smartCar().m_mode = Mode::StandardDebug;
 
 		MyResource::smartCar().m_lcdConsole.onDraw(99999);
 		break;
 
 	case LIBSC_SWITCH5:
-		MyResource::smartCar().m_servo.setEnabled(!target->Get());
+		if (target->Get())
+			MyResource::smartCar().m_mode = Mode::StandardDebug;
+		else
+			MyResource::smartCar().m_mode = Mode::RawDebug;
 		break;
 
 	case LIBSC_SWITCH4:
-		MyResource::smartCar().m_servo.m_allow90DegreeTurning = target->Get();
+		MyResource::smartCar().m_servo.setEnabled(!target->Get());
 		break;
 
 	case LIBSC_SWITCH3:
-		MyResource::smartCar().m_buzzer.setEnabled(target->Get());
-		break;
-
-	case LIBSC_SWITCH2:
-		MyResource::ConfigTable::MotorConfig::Reference = 800.0f;
-		MyResource::smartCar().m_motor.setEnabled(!MyResource::smartCar().m_motor.isEnabled());
+		MyResource::smartCar().m_servo.m_allow90DegreeTurning = target->Get();
 		break;
 	}
 }

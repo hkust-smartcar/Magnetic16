@@ -75,11 +75,24 @@ MyLcd::MyLcd(void)
 void MyLcd::onDraw(const uint32_t &timeDelay)
 {
 	if (m_instance->m_enabled)
-		if ((bool)MyResource::smartCar().m_mode)
+		if (MyResource::smartCar().m_mode)
 		{
-			array<float, 2> valueSD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::SD].getRawValue();
-			array<float, 2> valueFD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::FD].getRawValue();
-			array<float, 2> valueHD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::HD].getRawValue();
+//			array<float, 2> valueSD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::SD].getFilteredValue();
+//			array<float, 2> valueFD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::FD].getFilteredValue();
+//			array<float, 2> valueHD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::HD].getFilteredValue();
+			array<float, 2> valueSD, valueFD, valueHD;
+			if (MyResource::smartCar().m_mode == MySmartCar::Mode::RawDebug)
+			{
+				valueSD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::SD].getRawValue();
+				valueFD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::FD].getRawValue();
+				valueHD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::HD].getRawValue();
+			}
+			else
+			{
+				valueSD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::SD].getStandardizedValue();
+				valueFD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::FD].getStandardizedValue();
+				valueHD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::HD].getStandardizedValue();
+			}
 
 			MyResource::smartCar().m_lcdConsole.setRow(0) << "SD:" << valueSD[MyMagSen::LEFT] << " " << valueSD[MyMagSen::RIGHT] << MyLcd::endl
 														  << "FD:" << valueFD[MyMagSen::LEFT] << " " << valueFD[MyMagSen::RIGHT] << MyLcd::endl
@@ -91,11 +104,20 @@ void MyLcd::onDraw(const uint32_t &timeDelay)
 
 														  << "SD Avg: " << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::SD].getFilteredValueAvg() << MyLcd::endl
 														  << "FD Avg: " << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::FD].getFilteredValueAvg() << MyLcd::endl
-														  << "HD Avg: " << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::HD].getFilteredValueAvg() << MyLcd::endl << MyLcd::endl
+														  << "HD Avg: " << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::HD].getFilteredValueAvg() << MyLcd::endl << MyLcd::endl;
 
-														  << "Output: "<< MyResource::smartCar().m_servo.m_lastError << MyLcd::endl
-														  << "Angle: " << (int16_t)(MyResource::smartCar().m_servo.m_lastDegree - MID_SERVO_DEGREE) << "   " << MyLcd::endl
-														  << "NonLinear: " << (uint8_t)MyResource::smartCar().m_servo.m_isPidNonLinear << MyLcd::endl;
+			if (MyResource::smartCar().m_mode == MySmartCar::Mode::RawDebug)
+			{
+				MyResource::smartCar().m_lcdConsole << "SR: "<< MyResource::smartCar().m_servo.m_MagSen[MyMagSen::SD].m_ratio[MyMagSen::LEFT] << " " << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::SD].m_ratio[MyMagSen::RIGHT] << MyLcd::endl
+													<< "FR: "<< MyResource::smartCar().m_servo.m_MagSen[MyMagSen::FD].m_ratio[MyMagSen::LEFT] << " " << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::FD].m_ratio[MyMagSen::RIGHT] << MyLcd::endl
+													<< "HR: "<< MyResource::smartCar().m_servo.m_MagSen[MyMagSen::HD].m_ratio[MyMagSen::LEFT] << " " << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::HD].m_ratio[MyMagSen::RIGHT] << MyLcd::endl;
+			}
+			else
+			{
+				MyResource::smartCar().m_lcdConsole << "Output: "<< MyResource::smartCar().m_servo.m_lastError << MyLcd::endl
+												    << "Angle: " << (int16_t)(MyResource::smartCar().m_servo.m_lastDegree - MID_SERVO_DEGREE) << "   " << MyLcd::endl
+												    << "NonLinear: " << (uint8_t)MyResource::smartCar().m_servo.m_isPidNonLinear << MyLcd::endl;
+			}
 		}
 		else if (timeDelay == 99999)
 		{

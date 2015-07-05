@@ -29,6 +29,7 @@ MyMotor::MyMotor(void)
 :
 	DirMotor(getMotorConfig(0)),
 	m_encoder(),
+//	m_curReference(MyResource::ConfigTable::MotorConfig::Reference),
 	m_speedPid(MyResource::ConfigTable::MotorConfig::Reference,
 			   MyResource::ConfigTable::MotorConfig::Kp,
 			   MyResource::ConfigTable::MotorConfig::Ki,
@@ -65,16 +66,14 @@ void MyMotor::setSpeed(int16_t speed)
 
 void MyMotor::updateSpeed(const uint32_t &)
 {
-	if (MyResource::smartCar().m_servo.m_isPidNonLinear)
+//	if (MyResource::smartCar().m_servo.m_isPidNonLinear)
+//		m_instance->m_timePassed = 0;
+//	else
+//		m_instance->m_timePassed += MyResource::ConfigTable::MotorConfig::UpdateFreq;
+//
+//	m_instance->m_curReference = MyResource::ConfigTable::MotorConfig::Reference * ((!MyResource::smartCar().m_servo.m_isPidNonLinear)? (1 + (float)inRange(0, ABS(m_instance->m_timePassed), MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed) / MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed * MyResource::ConfigTable::MotorConfig::MaxSpeedRatio) : ((MyResource::smartCar().m_servo.m_90DegreeTurningNeed)? MyResource::ConfigTable::MotorConfig::Turning90DegreeSpeedRatio : MyResource::ConfigTable::MotorConfig::TurningSpeedRatio));
 
-
-	int16_t newSpeed = m_instance->m_speedPid.update(m_instance->m_encoder.getEncoderReading());
-	if (MyResource::smartCar().m_servo.m_isPidNonLinear)
-		m_instance->m_timePassed = 0;
-	else
-		m_instance->m_timePassed += MyResource::ConfigTable::MotorConfig::UpdateFreq;
-
-	m_instance->setSpeed(m_instance->m_speedPid.update(m_instance->m_encoder.getEncoderReading()) * ((!MyResource::smartCar().m_servo.m_isPidNonLinear)? (inRange(0, ABS(m_instance->m_timePassed), MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed) / MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed * MyResource::ConfigTable::MotorConfig::MaxSpeedRatio) : ((MyResource::smartCar().m_servo.m_90DegreeTurningNeed)? MyResource::ConfigTable::MotorConfig::Turning90DegreeSpeedRatio : MyResource::ConfigTable::MotorConfig::TurningSpeedRatio)));
+	m_instance->setSpeed(m_instance->m_speedPid.update(m_instance->m_encoder.getEncoderReading()));
 }
 
 int16_t *MyMotor::getSpeed(void)

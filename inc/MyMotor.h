@@ -37,6 +37,7 @@ public:
 
 	void reset(void);
 
+//	float				m_curReference;
 	MyPid				m_speedPid;
 
 private:

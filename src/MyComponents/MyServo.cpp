@@ -34,13 +34,13 @@ MyServo::MyServo(void)
 	m_isPidNonLinear(true),
 	m_lastError(0),
 	m_lastDegree(900),
-	m_lastTurningDirection(LastServoLockDirection::None),
-	m_MagSen({ MyMagSen(MyMagSen::MagSen::SD),
-			   MyMagSen(MyMagSen::MagSen::FD),
-			   MyMagSen(MyMagSen::MagSen::HD) }),
-	m_servoPid({ MyPid(MyResource::ConfigTable::ServoConfig::Reference,
+	m_lastTurningDirection(LastServoLockDirection::Left),
+	m_MagSen({ MyMagSen(MyMagSen::MagSenId::SD),
+			   MyMagSen(MyMagSen::MagSenId::FD),
+			   MyMagSen(MyMagSen::MagSenId::HD) }),
+	m_servoPid({ MyPid(*(new float(0.0f)),
 					   MyResource::ConfigTable::ServoConfig::NormalKp,
-					   MyResource::ConfigTable::ServoConfig::NormalKi,
+					   0.0f,
 					   MyResource::ConfigTable::ServoConfig::NormalKd,
 					   MyPid::ServoLinear,
 					   -MAX_SERVO_ANGLE,
@@ -48,9 +48,9 @@ MyServo::MyServo(void)
 					   -1.0f,
 					   1.0f),
 
-				MyPid(MyResource::ConfigTable::ServoConfig::Reference,
+				MyPid(*(new float(0.0f)),
 					  MyResource::ConfigTable::ServoConfig::TurningKpA,
-					  MyResource::ConfigTable::ServoConfig::TurningKi,
+					  0.0f,
 					  MyResource::ConfigTable::ServoConfig::TurningKd,
 					  MyPid::ServoNonLinear,
 					  -MAX_SERVO_ANGLE,
@@ -62,8 +62,7 @@ MyServo::MyServo(void)
 				}),
 //	m_normal_weight({ &MyResource::ConfigTable::ServoConfig::NormalWeightSD, &MyResource::ConfigTable::ServoConfig::NormalWeightFD, &MyResource::ConfigTable::ServoConfig::NormalWeightHD }),
 //	m_turning_weight({ &MyResource::ConfigTable::ServoConfig::TurningWeightSD, &MyResource::ConfigTable::ServoConfig::TurningWeightFD, &MyResource::ConfigTable::ServoConfig::TurningWeightHD }),
-	m_90DegreeChecker({ 0, false, LastServoLockDirection::None }),
-	m_forceTurningFlag(false),
+	m_90DegreeChecker({ 0, false, false, LastServoLockDirection::Left }),
 	m_enabled(true),
 	m_pidChangedFlag(false)
 {
@@ -81,10 +80,8 @@ void MyServo::reset(void)
 		m_MagSen[i].reset();
 	SetDegree(m_lastDegree);
 
-	DelayMsByTicks(5000);
-
 	float voltageSum[6] = { 0.0f };
-	for (uint8_t i = 0; i < 20; i++)
+	for (uint8_t i = 0; i < 40; i++)
 	{
 		updateMagSen();
 		for (uint8_t j = 0; j < 3; j++)
@@ -93,11 +90,11 @@ void MyServo::reset(void)
 			for (uint8_t k = 0; k < 2; k++)
 				voltageSum[j * 2 + k] += tempVoltage[k];
 		}
-		DelayMsByTicks(10);
+		DelayMsByTicks(7);
 	}
 
 	for (uint8_t i = 0; i < 3; i++)
-		m_MagSen[i].init(new float[2] { 20 / voltageSum[i * 2], 20 / voltageSum[i * 2 + 1] });
+		m_MagSen[i].init(new float[2] { 40 / voltageSum[i * 2], 40 / voltageSum[i * 2 + 1] });
 }
 
 inline float getRealReading(bool triggerCondition, float input, float valueIfTrigger)
@@ -115,11 +112,6 @@ void MyServo::updateMagSen(void)
 {
 	for (uint8_t i = 0; i < m_MagSen.size(); i++)
 		m_MagSen[i].update();
-
-	float tempFdOutput = m_MagSen[MyMagSen::MagSen::FD].getOutputValue();
-
-	if (ABS(tempFdOutput) > MyResource::ConfigTable::ServoConfig::TurningThresholdFdValue)
-
 }
 
 float MyServo::getFinalAngle(void)
@@ -127,14 +119,8 @@ float MyServo::getFinalAngle(void)
 	m_lastError = 0.0f;
 	updateMagSen();
 
-//	if (m_isPidNonLinear = checkIsTurningNeeded())
-//		for (uint8_t i = 0; i < m_MagSen.size(); i++)
-//			m_lastError += m_MagSen[i].getValue() * *m_turning_weight[i];
-//	else
-//		for (uint8_t i = 0; i < m_MagSen.size(); i++)
-//			m_lastError += m_MagSen[i].getValue() * *m_normal_weight[i];
-
 	m_isPidNonLinear = turningHandler(m_lastError);
+//	MyResource::smartCar().m_buzzer.set(m_isPidNonLinear);
 	m_90DegreeTurningNeed = check90Degree(m_lastError);
 
 	m_servoPid[(uint8_t)(!m_isPidNonLinear)].update(m_lastError);
@@ -143,53 +129,19 @@ float MyServo::getFinalAngle(void)
 
 bool MyServo::turningHandler(float &error)
 {
-	float tempSdOutput = m_MagSen[MyMagSen::MagSen::SD].getOutputValue();
-	float tempHdOutput = m_MagSen[MyMagSen::MagSen::HD].getOutputValue();
+	if (m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg() > MyResource::ConfigTable::ServoConfig::CrossRoadThresholdFdValue)
+		error = m_MagSen[MyMagSen::MagSenId::HD].getOutputValue();
+	else
+		error = m_MagSen[MyMagSen::MagSenId::SD].getOutputValue() + m_MagSen[MyMagSen::MagSenId::HD].getOutputValue();
 
-	error = tempSdOutput + tempHdOutput;
-
-	return (ABS(tempHdOutput) >= MyResource::ConfigTable::ServoConfig::TurningThresholdHdValue ||
-		ABS(m_MagSen[MyMagSen::MagSen::FD].getOutputValue()) > MyResource::ConfigTable::ServoConfig::TurningThresholdFdValue);
-
-//	return (ABS(m_MagSen[MyMagSen::MagSen::FD].getOutputValue()) > MyResource::ConfigTable::ServoConfig::TurningThresholdFdValue);
+	return (m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg() < MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold);
 }
 
 bool MyServo::check90Degree(float &error)
 {
-	if (m_MagSen[MyMagSen::MagSen::SD].getFilteredValueAvg() < MyResource::ConfigTable::ServoConfig::NoSignalThreshold)
-	{
-		if (System::Time() - m_90DegreeChecker.lastTime <= 500 || m_90DegreeChecker.is90DegreeTurningStarted) // 0.5second
-		{
-			if (m_90DegreeChecker.hasReachThreshold)
-			{
-				if (m_90DegreeChecker.direction == LastServoLockDirection::Right)
-					error = 10.0f;
-				else if (m_90DegreeChecker.direction == LastServoLockDirection::Left)
-					error = -10.0f;
-				m_90DegreeChecker.is90DegreeTurningStarted = true;
-				return true;
-			}
-		}
-		else
-		{
-			m_90DegreeChecker.hasReachThreshold = false;
-			m_90DegreeChecker.is90DegreeTurningStarted = false;
-			m_90DegreeChecker.direction == LastServoLockDirection::None;
-		}
-	}
-	else if (m_MagSen[MyMagSen::MagSen::FD].getFilteredValueAvg() < MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFdAvg && m_90DegreeChecker.lastTime > 500)
-	{
-		m_90DegreeChecker.hasReachThreshold = true;
-		m_90DegreeChecker.direction = (LastServoLockDirection)((uint8_t)(m_MagSen[MyMagSen::MagSen::FD].getOutputValue() >= 0.0f) + 1);
-		m_90DegreeChecker.is90DegreeTurningStarted = false;
-		m_90DegreeChecker.lastTime = System::Time();
-	}
-	else
-	{
-		m_90DegreeChecker.hasReachThreshold = false;
-		m_90DegreeChecker.is90DegreeTurningStarted = false;
-		m_90DegreeChecker.direction == LastServoLockDirection::None;
-	}
+	if (m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg() < MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold)
+		error = (m_MagSen[MyMagSen::MagSenId::FD].getOutputValue() > 0.0f)? 1.0f : -1.0f;
+
 	return false;
 }
 

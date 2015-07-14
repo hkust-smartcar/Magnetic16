@@ -101,10 +101,10 @@ void MyLcd::onDraw(const uint32_t &timeDelay)
 														  << "SD:" << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::SD].getOutputValue() << MyLcd::endl
 														  << "FD:" << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::FD].getOutputValue() << MyLcd::endl
 														  << "HD:" << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::HD].getOutputValue() << MyLcd::endl << MyLcd::endl
-
 														  << "SD Avg: " << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::SD].getFilteredValueAvg() << MyLcd::endl
 														  << "FD Avg: " << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::FD].getFilteredValueAvg() << MyLcd::endl
-														  << "HD Avg: " << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::HD].getFilteredValueAvg() << MyLcd::endl << MyLcd::endl;
+														  << "HD Avg: " << MyResource::smartCar().m_servo.m_MagSen[MyMagSen::HD].getFilteredValueAvg() << MyLcd::endl
+														  << "TurnDirect: " << (uint8_t)(MyResource::smartCar().m_servo.m_90DegreeChecker.direction) << " " << (uint8_t)(MyResource::smartCar().m_servo.m_90DegreeChecker.is90DegreeTurningStarted) << " " << (uint8_t)(MyResource::smartCar().m_servo.m_90DegreeChecker.isWaitingForSignalAgain) << MyLcd::endl;
 
 			if (MyResource::smartCar().m_mode == MySmartCar::Mode::RawDebug)
 			{
@@ -124,18 +124,19 @@ void MyLcd::onDraw(const uint32_t &timeDelay)
 			MyResource::smartCar().m_lcdConsole.setRow(0) << "Motor" << MyLcd::endl
 														  << "Ref:" << MyResource::ConfigTable::MotorConfig::Reference << MyLcd::endl
 														  << " Kp:" << MyResource::ConfigTable::MotorConfig::Kp << MyLcd::endl
-														  << " Ki:" << MyResource::ConfigTable::MotorConfig::Ki << MyLcd::endl
+//														  << " Ki:" << MyResource::ConfigTable::MotorConfig::Ki << MyLcd::endl
 														  << " Kd:" << MyResource::ConfigTable::MotorConfig::Kd << MyLcd::endl << MyLcd::endl
 
 														  << "Servo" << MyLcd::endl
 														  << "tKpA:" << MyResource::ConfigTable::ServoConfig::TurningKpA << MyLcd::endl
 														  << "tKpB:" << MyResource::ConfigTable::ServoConfig::TurningKpB << MyLcd::endl
-														  << "tKi:" << MyResource::ConfigTable::ServoConfig::TurningKi << MyLcd::endl
+//														  << "tKi:" << MyResource::ConfigTable::ServoConfig::TurningKi << MyLcd::endl
 														  << "tKd:" << MyResource::ConfigTable::ServoConfig::TurningKd << MyLcd::endl << MyLcd::endl
 
 														  << "nKp:" << MyResource::ConfigTable::ServoConfig::NormalKp << MyLcd::endl
-														  << "nKi:" << MyResource::ConfigTable::ServoConfig::NormalKi << MyLcd::endl
-														  << "nKd:" << MyResource::ConfigTable::ServoConfig::NormalKd << MyLcd::endl;
+//														  << "nKi:" << MyResource::ConfigTable::ServoConfig::NormalKi << MyLcd::endl
+														  << "nKd:" << MyResource::ConfigTable::ServoConfig::NormalKd << MyLcd::endl
+														  << "BM:" << MyResource::smartCar().m_batteryMeter.getBatteryVoltage() << "V" << MyLcd::endl;
 		}
 //		array<float, 2> valueSD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::SD].getFilteredValue();
 //		array<float, 2> valueFD = MyResource::smartCar().m_servo.m_MagSen[MyMagSen::FD].getFilteredValue();
@@ -163,74 +164,108 @@ bool MyLcd::isEnabled(void)
 
 MyLcd &MyLcd::setRow(const uint8_t &row)
 {
-	SetCursorRow(row);
+	if (m_enabled)
+		SetCursorRow(row);
+	return *this;
+}
+
+MyLcd &MyLcd::operator<<(const bool b)
+{
+	if (m_enabled)
+		if (b)
+			WriteString("true");
+		else
+			WriteString("false");
 	return *this;
 }
 
 MyLcd &MyLcd::operator<<(const char c)
 {
-	WriteChar(c);
+	if (m_enabled)
+		WriteChar(c);
 	return *this;
 }
 
 MyLcd &MyLcd::operator<<(const char *str)
 {
-	WriteString(str);
+	if (m_enabled)
+		WriteString(str);
 	return *this;
 }
 
 MyLcd &MyLcd::operator<<(const float &f)
 {
-	char buffer[20] = { 0 };
-	size_t n = sprintf(buffer, "%.4f", f);
-	WriteBuffer(buffer, n);
+	if (m_enabled)
+	{
+		char buffer[20] = { 0 };
+		size_t n = sprintf(buffer, "%.4f", f);
+		WriteBuffer(buffer, n);
+	}
 	return *this;
 }
 
 MyLcd &MyLcd::operator<<(const uint8_t &ub)
 {
-	char buffer[20] = { 0 };
-	size_t n = sprintf(buffer, "%d", ub);
-	WriteBuffer(buffer, n);
+	if (m_enabled)
+	{
+		char buffer[20] = { 0 };
+		size_t n = sprintf(buffer, "%d", ub);
+		WriteBuffer(buffer, n);
+	}
 	return *this;
 }
 
 MyLcd &MyLcd::operator<<(const uint16_t &us)
 {
-	char buffer[20] = { 0 };
-	size_t n = sprintf(buffer, "%d", us);
-	WriteBuffer(buffer, n);
+	if (m_enabled)
+	{
+		char buffer[20] = { 0 };
+		size_t n = sprintf(buffer, "%d", us);
+		WriteBuffer(buffer, n);
+	}
 	return *this;
 }
 
 MyLcd &MyLcd::operator<<(const uint32_t &ui)
 {
-	char buffer[20] = { 0 };
-	size_t n = sprintf(buffer, "%ld", ui);
-	WriteBuffer(buffer, n);
+	if (m_enabled)
+	{
+		char buffer[20] = { 0 };
+		size_t n = sprintf(buffer, "%ld", ui);
+		WriteBuffer(buffer, n);
+	}
 	return *this;
 }
 
 MyLcd &MyLcd::operator<<(const int8_t &b)
 {
-	char buffer[20] = { 0 };
-	size_t n = sprintf(buffer, "%d", b);
-	WriteBuffer(buffer, n);
+	if (m_enabled)
+	{
+		char buffer[20] = { 0 };
+		size_t n = sprintf(buffer, "%d", b);
+		WriteBuffer(buffer, n);
+	}
 	return *this;
 }
 
 MyLcd &MyLcd::operator<<(const int16_t &s)
 {
-	char buffer[20] = { 0 };
-	size_t n = sprintf(buffer, "%d", s);
-	WriteBuffer(buffer, n);
+	if (m_enabled)
+	{
+		char buffer[20] = { 0 };
+		size_t n = sprintf(buffer, "%d", s);
+		WriteBuffer(buffer, n);
+	}
 	return *this;
 }
 
 MyLcd &MyLcd::operator<<(const int32_t &i)
 {
-	char buffer[20] = { 0 };
-	size_t n = sprintf(buffer, "%ld", i);
-	WriteBuffer(buffer, n);
+	if (m_enabled)
+	{
+		char buffer[20] = { 0 };
+		size_t n = sprintf(buffer, "%ld", i);
+		WriteBuffer(buffer, n);
+	}
 	return *this;
 }

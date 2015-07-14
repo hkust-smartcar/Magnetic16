@@ -14,12 +14,14 @@
 #include "MyResource.h"
 #include "MySmartCar.h"
 #include "MyBuzzer.h"
+#include "MyMenu.h"
+#include "MyFlash.h"
 
 using namespace libsc;
 
-Gpi::Config MySmartCar::getSwitchConfig(const uint8_t id)
+MySmartCar::MySwitch::Config MySmartCar::getSwitchConfig(const uint8_t id)
 {
-	Gpi::Config config;
+	MySwitch::Config config;
 	switch (id)
 	{
 	case 0:
@@ -53,7 +55,9 @@ Gpi::Config MySmartCar::getSwitchConfig(const uint8_t id)
 
 MySmartCar::MySmartCar(void)
 :
+	m_mode(Mode::StandardDebug),
 	m_res(this),
+	m_flash(),
 	m_lcdConsole(),
 	m_loop(),
 	m_varMng(),
@@ -61,25 +65,29 @@ MySmartCar::MySmartCar(void)
 	m_motor(),
 	m_buzzer(),
 	m_batteryMeter(),
-	m_switch(),
-	m_mode(Mode::StandardDebug)
+	m_switch({ MySwitch(getSwitchConfig(0)),
+			   MySwitch(getSwitchConfig(1)),
+			   MySwitch(getSwitchConfig(2)),
+			   MySwitch(getSwitchConfig(3)),
+			   MySwitch(getSwitchConfig(4)),
+			   MySwitch(getSwitchConfig(5)),
+			   MySwitch(getSwitchConfig(6)),
+			   MySwitch(getSwitchConfig(7)) })
+//	m_menu(m_lcdConsole)
 {
+	m_varMng.SetOnChangedListener(&m_flash.writeConfig);
 	switchInit();
 	m_loop.addFunctionToLoop(&m_motor.updateSpeed, MyResource::ConfigTable::MotorConfig::UpdateFreq);
 	m_loop.addFunctionToLoop(&m_servo.updateAngle, MyResource::ConfigTable::ServoConfig::UpdateFreq);
 	m_loop.addFunctionToLoop(&showValue, MyResource::ConfigTable::VarMngConfig::UpdateFreq);
 	m_loop.addFunctionToLoop(&m_lcdConsole.onDraw, MyResource::ConfigTable::LcdConfig::UpdateFreq);
-//	m_loop.addFunctionToLoop(&m_batteryMeter.checkBattery, MyResource::ConfigTable::BatteryMeterConfig::UpdateFreq);
 }
 
 void MySmartCar::switchInit(void)
 {
-	for (int i = 0; i < 8; i++)
-		m_switch[i] = Gpi(getSwitchConfig(i));
-	m_mode = (Mode)(!m_switch[7].Get());
+	m_mode = (Mode)((uint8_t)(!m_switch[7].Get()) + ((uint8_t)m_switch[7].Get() * (uint8_t)(!m_switch[5].Get())));
 	m_servo.setEnabled(!m_switch[4].Get());
 	m_servo.m_allow90DegreeTurning = m_switch[3].Get();
-	MyResource::smartCar().m_mode = (Mode)(1 + (uint8_t)m_switch[5].Get());
 }
 
 void MySmartCar::switchOnTriggered(Gpi *target)
@@ -99,7 +107,7 @@ void MySmartCar::switchOnTriggered(Gpi *target)
 		break;
 
 	case LIBSC_SWITCH5:
-		if (target->Get())
+		if (target->Get() && !MyResource::smartCar().m_switch[7].Get())
 			MyResource::smartCar().m_mode = Mode::StandardDebug;
 		else
 			MyResource::smartCar().m_mode = Mode::RawDebug;

@@ -31,6 +31,7 @@ public:
 	};
 
 	explicit MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a = *(new float(0.0f)), float &nonLinearKp_b = *(new float(0.0f)));
+	explicit MyPid(float &ref, float &kp, float ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a = *(new float(0.0f)), float &nonLinearKp_b = *(new float(0.0f)));
 
 	float update(float val);
 	float updateMotorPID(void);

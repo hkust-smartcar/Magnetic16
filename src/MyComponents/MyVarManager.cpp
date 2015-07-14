@@ -67,8 +67,8 @@ FtdiFt232r::Config MyVarManager::get232UartConfig(const uint8_t id)
 
 MyVarManager::MyVarManager(void)
 :
-	rx_threshold(7),
 	isStarted(false),
+	rx_threshold(7),
 	m_uart(get106UartConfig(0))
 {
 	m_pd_instance = this;
@@ -82,8 +82,9 @@ MyVarManager::~MyVarManager()
 	watchedObjMng.clear();
 }
 
-bool MyVarManager::listener(const std::vector<Byte> &bytes)
+bool MyVarManager::listener(const Byte *data, const size_t size)
 {
+	vector<Byte> bytes(data, data + size);
 	m_pd_instance->rx_buffer.insert(m_pd_instance->rx_buffer.end(), bytes.begin(), bytes.end());
 
 	if (m_pd_instance->rx_buffer.size() < m_pd_instance->rx_threshold)
@@ -167,27 +168,38 @@ void MyVarManager::changeSharedVars(const std::vector<Byte> &msg)
 	int objIndex = inRangeWithAssert(0, msg[2], sharedObjMng.size());
 	for (int i = 0; i < sharedObjMng[objIndex].len; i++)
 		((Byte *)(sharedObjMng[objIndex].obj))[i] = msg[3 + i];
+
+	if (m_onChanged_listener)
+		m_onChanged_listener();
 }
 
-void MyVarManager::Init(void)
+void MyVarManager::SetOnReceiveListener(const OnReceiveListener &oriListener)
 {
 	if (!isStarted)
-	{
 		if (!m_origin_listener)
-			m_origin_listener = nullptr;
-	}
+			m_origin_listener = oriListener;
 }
 
-void MyVarManager::Init(const OnReceiveListener &oriListener)
+void MyVarManager::SetOnChangedListener(const OnChangedListener &changedlistener)
 {
 	if (!isStarted)
-	{
-		m_origin_listener = oriListener;
-	}
+		if (!m_onChanged_listener)
+			m_onChanged_listener = changedlistener;
 }
 
-void MyVarManager::UnInit(void)
+void MyVarManager::RemoveOnReceiveListener(void)
 {
+	m_origin_listener = nullptr;
+}
+
+void MyVarManager::RemoveOnChangedListener(void)
+{
+	m_origin_listener = nullptr;
+}
+
+void MyVarManager::RemoveAllListeners(void)
+{
+	m_origin_listener = nullptr;
 	m_origin_listener = nullptr;
 }
 

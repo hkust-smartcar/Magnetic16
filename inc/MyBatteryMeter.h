@@ -25,7 +25,7 @@ public:
 
 	float getBatteryPercentage(void);
 
-	uint16_t getColor(void);
+//	uint16_t getColor(void);
 
 	static uint8_t checkBattery(const uint32_t &timeDelay);
 

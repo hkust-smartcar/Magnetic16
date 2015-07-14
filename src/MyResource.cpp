@@ -33,55 +33,56 @@ MySmartCar &MyResource::smartCar(void)
 #if IS_FRONT == 1
 
 	// Buzzer
-	int MyResource::ConfigTable::BuzzerConfig::WarningPitch = 70;
-	int MyResource::ConfigTable::BuzzerConfig::WarningTimes = 3;
+//	uint8_t MyResource::ConfigTable::BuzzerConfig::WarningPitch = 70;
+//	uint8_t MyResource::ConfigTable::BuzzerConfig::WarningTimes = 3;
 
 	// MagSen
 	float MyResource::ConfigTable::MagSenConfig::Kq = 0.6;
 	float MyResource::ConfigTable::MagSenConfig::Kr = 0.5;
 
 	// Servo
-	float MyResource::ConfigTable::ServoConfig::Reference = 0.0f;
+//	float MyResource::ConfigTable::ServoConfig::Reference = 0.0f;
 
 
-	float MyResource::ConfigTable::ServoConfig::NormalKp = 300.0f;
-	float MyResource::ConfigTable::ServoConfig::NormalKi = 0.0f;
+	float MyResource::ConfigTable::ServoConfig::NormalKp = 200.0f;
+//	float MyResource::ConfigTable::ServoConfig::NormalKi = 0.0f;
 	float MyResource::ConfigTable::ServoConfig::NormalKd = 10.0f;
 
-	float MyResource::ConfigTable::ServoConfig::NormalWeightSD = 0.3589743f;
-	float MyResource::ConfigTable::ServoConfig::NormalWeightFD = 0.1794872f;
-	float MyResource::ConfigTable::ServoConfig::NormalWeightHD = 0.4615385f;
+//	float MyResource::ConfigTable::ServoConfig::NormalWeightSD = 0.3589743f;
+//	float MyResource::ConfigTable::ServoConfig::NormalWeightFD = 0.1794872f;
+//	float MyResource::ConfigTable::ServoConfig::NormalWeightHD = 0.4615385f;
 
 
-	float MyResource::ConfigTable::ServoConfig::TurningKpA = 1000.0f;
-	float MyResource::ConfigTable::ServoConfig::TurningKpB = 0.0f;
-	float MyResource::ConfigTable::ServoConfig::TurningKi = 0.0f;
-	float MyResource::ConfigTable::ServoConfig::TurningKd = 40.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKpA =  325.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKpB = 65.0f;
+//	float MyResource::ConfigTable::ServoConfig::TurningKi = 0.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKd = 13.0f;
 
-	float MyResource::ConfigTable::ServoConfig::TurningWeightSD = 0.1f;
-	float MyResource::ConfigTable::ServoConfig::TurningWeightFD = 0.325f;
-	float MyResource::ConfigTable::ServoConfig::TurningWeightHD = 0.525f;
+//	float MyResource::ConfigTable::ServoConfig::TurningWeightSD = 0.1f;
+//	float MyResource::ConfigTable::ServoConfig::TurningWeightFD = 0.325f;
+//	float MyResource::ConfigTable::ServoConfig::TurningWeightHD = 0.525f;
 
-	float MyResource::ConfigTable::ServoConfig::TurningThresholdFdValue = 0.85f;
-	float MyResource::ConfigTable::ServoConfig::TurningThresholdHdValue = 0.2f;
-	float MyResource::ConfigTable::ServoConfig::NoSignalThreshold = 0.12f;
-	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFdAvg = 0.1f;
+	float MyResource::ConfigTable::ServoConfig::CrossRoadThresholdFdValue = 2.25f;
+	float MyResource::ConfigTable::ServoConfig::TurningThresholdHdValue = 0.3f;
+	float MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold = 0.73f;
+	float MyResource::ConfigTable::ServoConfig::FdNoSignalThreshold = 0.38f;
+	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFdAvg = 0.635;
 
 
 	uint32_t MyResource::ConfigTable::ServoConfig::UpdateFreq = 7;
 
 	// Motor
-	float MyResource::ConfigTable::MotorConfig::Reference = 1200.0f;
+	float MyResource::ConfigTable::MotorConfig::Reference = 1500.0f;
 	float MyResource::ConfigTable::MotorConfig::Kp = 0.025f;
-	float MyResource::ConfigTable::MotorConfig::Ki = 0.0f;
+//	float MyResource::ConfigTable::MotorConfig::Ki = 0.0f;
 	float MyResource::ConfigTable::MotorConfig::Kd = 0.018f;
 
-	float MyResource::ConfigTable::MotorConfig::TurningSpeedRatio = 0.8f;
-	float MyResource::ConfigTable::MotorConfig::Turning90DegreeSpeedRatio = 0.65f;
-	float MyResource::ConfigTable::MotorConfig::MaxSpeedRatio = 1.3f;
-
-	uint32_t MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed = 3000;
-	int16_t MyResource::ConfigTable::MotorConfig::EmergencyStopThreshold = 0;
+//	float MyResource::ConfigTable::MotorConfig::TurningSpeedRatio = 0.8f;
+//	float MyResource::ConfigTable::MotorConfig::Turning90DegreeSpeedRatio = 0.65f;
+//	float MyResource::ConfigTable::MotorConfig::MaxSpeedRatio = 1.3f;
+//
+//	uint32_t MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed = 3000;
+//	int16_t MyResource::ConfigTable::MotorConfig::EmergencyStopThreshold = 0;
 
 	uint32_t MyResource::ConfigTable::MotorConfig::UpdateFreq = 20;
 
@@ -98,9 +99,9 @@ MySmartCar &MyResource::smartCar(void)
 	uint8_t MyResource::ConfigTable::LcdConfig::Fps = 60;
 	uint16_t MyResource::ConfigTable::LcdConfig::LcdConfig::BgColor = 0;
 	uint16_t MyResource::ConfigTable::LcdConfig::TxtColor = -1;
-	uint16_t MyResource::ConfigTable::LcdConfig::HighPowerColor = 0x063F;
-	uint16_t MyResource::ConfigTable::LcdConfig::NormalPowerColor = 0x07E0;
-	uint16_t MyResource::ConfigTable::LcdConfig::LowPowerColor = 0xF800;
+//	uint16_t MyResource::ConfigTable::LcdConfig::HighPowerColor = 0x063F;
+//	uint16_t MyResource::ConfigTable::LcdConfig::NormalPowerColor = 0x07E0;
+//	uint16_t MyResource::ConfigTable::LcdConfig::LowPowerColor = 0xF800;
 	uint16_t MyResource::ConfigTable::LcdConfig::UpdateFreq = 80;
 
 #else

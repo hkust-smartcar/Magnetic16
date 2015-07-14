@@ -29,10 +29,10 @@ MyMotor::MyMotor(void)
 :
 	DirMotor(getMotorConfig(0)),
 	m_encoder(),
-//	m_curReference(MyResource::ConfigTable::MotorConfig::Reference),
+	m_curReference(MyResource::ConfigTable::MotorConfig::Reference),
 	m_speedPid(MyResource::ConfigTable::MotorConfig::Reference,
 			   MyResource::ConfigTable::MotorConfig::Kp,
-			   MyResource::ConfigTable::MotorConfig::Ki,
+			   0.0f,
 			   MyResource::ConfigTable::MotorConfig::Kd,
 			   MyPid::Motor,
 			   -MAX_MOTOR_POWER,
@@ -40,7 +40,8 @@ MyMotor::MyMotor(void)
 			   -1.0f,
 			   1.0f),
 	m_timePassed(0),
-	m_speed(0),
+	m_power(0),
+	m_speed(0.0f),
 	m_enabled(false)
 {
 	if (!m_instance)
@@ -57,8 +58,8 @@ void MyMotor::setSpeed(int16_t speed)
 		else
 			SetClockwise(false);
 
-		m_speed = inRange(-MAX_MOTOR_POWER, speed, MAX_MOTOR_POWER);
-		SetPower(ABS(m_speed));
+		m_power = inRange(-MAX_MOTOR_POWER, speed, MAX_MOTOR_POWER);
+		SetPower(ABS(m_power));
 	}
 	else
 		SetPower(0);
@@ -76,17 +77,25 @@ void MyMotor::updateSpeed(const uint32_t &)
 	m_instance->setSpeed(m_instance->m_speedPid.update(m_instance->m_encoder.getEncoderReading()));
 }
 
-int16_t *MyMotor::getSpeed(void)
+int16_t *MyMotor::getPower(void)
 {
-	return &m_speed;
+	return &m_power;
+}
+
+float &MyMotor::getSpeed(void)
+{
+	return m_speed;
 }
 
 void MyMotor::setEnabled(const bool enabled)
 {
-	reset();
-	m_encoder.reset();
-	m_speedPid.reset();
-	m_enabled = enabled;
+	if (!MyResource::smartCar().m_lcdConsole.isEnabled() || !MyResource::smartCar().m_mode)
+	{
+		reset();
+		m_encoder.reset();
+		m_speedPid.reset();
+		m_enabled = enabled;
+	}
 }
 
 bool MyMotor::isEnabled(void)

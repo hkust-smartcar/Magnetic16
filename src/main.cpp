@@ -15,6 +15,7 @@
 #include "MyResource.h"
 #include "MyLcd.h"
 #include "MySmartCar.h"
+#include <libbase/k60/flash.h>
 
 namespace libbase
 {
@@ -105,13 +106,13 @@ void myListener(const std::vector<Byte>& bytes)
 //		MyResource::ConfigTable::ServoConfig::NormalKd = (MyResource::ConfigTable::ServoConfig::NormalKd - 1.0f < 0.0f)? 0.0f : MyResource::ConfigTable::ServoConfig::NormalKd - 1.0f;
 //		break;
 //
-//	case 'f':
-//		MyResource::ConfigTable::MotorConfig::Reference += 100.0f;
-//		break;
-//
-//	case 'v':
-//		MyResource::ConfigTable::MotorConfig::Reference = (MyResource::ConfigTable::MotorConfig::Reference - 100.0f < 0.0f)? 0.0f : MyResource::ConfigTable::MotorConfig::Reference - 100.0f;
-//		break;
+	case 'f':
+		MyResource::ConfigTable::MotorConfig::Reference += 100.0f;
+		break;
+
+	case 'v':
+		MyResource::ConfigTable::MotorConfig::Reference = (MyResource::ConfigTable::MotorConfig::Reference - 100.0f < 0.0f)? 0.0f : MyResource::ConfigTable::MotorConfig::Reference - 100.0f;
+		break;
 //
 //	case 'F':
 //		MyResource::ConfigTable::ServoConfig::TurningKpA += 10.0f;
@@ -136,15 +137,14 @@ void OnPress(const uint8_t id)
 
 	case 0:
 //		myCar.m_batteryMeter.checkBattery(0);
-		System::DelayS(2);
-		MyResource::smartCar().m_motor.setEnabled(true);
+		MyResource::smartCar().m_motor.setEnabled(!MyResource::smartCar().m_motor.isEnabled());
 		break;
 
 	case 1:
 //		myCar.m_servo.setDegree(MID_SERVO_ANGLE);
 //		myCar.m_servo.setEnabled(!myCar.m_servo.isEnabled());
 //		myCar.m_motor.setEnabled(!myCar.m_motor.isEnabled());
-		MyResource::smartCar().m_buzzer.setEnabled(!MyResource::smartCar().m_buzzer.isEnabled());
+		MyResource::smartCar().m_flash.eraseAll();
 		break;
 	}
 }
@@ -162,9 +162,9 @@ int main(void)
 //	myCar.m_varMng.addWatchedVar((uint8_t *)&MyResource::smartCar().m_servo.m_90DegreeTurningNeed, "90DegreeMode");
 //	myCar.m_varMng.addWatchedVar((uint8_t *)&MyResource::smartCar().m_servo.m_isPidNonLinear, "PidNonLinear");
 
-	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_lastError, "IntegratedOutput");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_lastError, "IntegratedOutput");
 //	myCar.m_varMng.addWatchedVar(myCar.m_servo.m_servoPid[MyServo::Normal].getLastError(), "LastError");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_finalAngle, "Angle");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_finalAngle, "Angle");
 
 //	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[0], "SD_FilteredValueL");
 //	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[1], "SD_FilteredValueR");
@@ -174,23 +174,24 @@ int main(void)
 //	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getFilteredValue()[1], "HD_FValueR");
 
 //	myCar.m_varMng.addWatchedVar(myCar.m_motor.m_encoder.getEncoderCountPointer(), "EncoderCount");
-//	myCar.m_varMng.addWatchedVar(myCar.m_motor.getSpeed(), "Speed");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_motor.getSpeed(), "Speed");
 //	myCar.m_varMng.addWatchedVar(&MyResource::smartCar().m_motor.m_curReference, "EncoderTaget");
-//	myCar.m_varMng.addWatchedVar(&MyResource::ConfigTable::MotorConfig::Reference, "EncoderTaget");
 //	myCar.m_varMng.addWatchedVar((uint8_t *)&MyResource::smartCar().m_servo.m_lastTurningDirection, "LastDirection");
 //	myCar.m_varMng.addWatchedVar(myCar.m_motor.m_speedPid.getLastError(), "Error");
 
+	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Reference, "Motor_Ref");
 	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::NormalKp, "Servo_nKp");
 	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::NormalKd, "Servo_nKd");
 	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::TurningKpA, "Servo_tKpA");
-//	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::TurningKpB, "Servo_tKpB");
+	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::TurningKpB, "Servo_tKpB");
 	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::TurningKd, "Servo_tKd");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::WeightSD, "Weight_SD");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::WeightFD, "Weight_FD");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::WeightHD, "Weight_HD");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Kp, "Kp");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Kd, "Kd");
-	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Reference, "Motor_Ref");
+	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold, "Sd_TurningTH");
+//	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::TurningThresholdHdValue, "Hd_TH");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MagSenConfig::Kq, "Kq");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MagSenConfig::Kr, "Kr");
 
@@ -204,22 +205,14 @@ int main(void)
 	buttonConfig.id = 1;
 	Button bnt1(buttonConfig);
 
-	myCar.m_varMng.Init(&myListener);
+	myCar.m_varMng.SetOnReceiveListener(&myListener);
+//	myCar.m_varMng.Init(&myListener);
 
 	MyResource::smartCar().m_lcdConsole.onDraw(99999);
 
 	myCar.m_batteryMeter.checkBattery(0);
 
-//	myCar.m_servo.setEnabled(true);
-//	myCar.m_lcdConsole.setEnabled(false);
-//	while (true)
-//		for (uint16_t i = 0; i < 1800; i += 100)
-//		{
-//			myCar.m_servo.setDegree(i);
-//			myCar.m_lcdConsole.setRow(0) << "Angle: " << i << MyLcd::endl;
-			System::DelayMs(500);
-//		}
-//	myCar.m_motor.setSpeed(200);
+	System::DelayMs(500);
 
 	myCar.m_loop.start();
 

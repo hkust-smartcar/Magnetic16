@@ -38,6 +38,7 @@ public:
 	bool isEnabled(void);
 
 	MyLcd &setRow(const uint8_t &row);
+	MyLcd &operator<<(const bool b);
 	MyLcd &operator<<(const char c);
 	MyLcd &operator<<(const char *str);
 	MyLcd &operator<<(const float &f);

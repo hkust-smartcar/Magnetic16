@@ -49,15 +49,14 @@ public:
 
 	enum LastServoLockDirection
 	{
-		None = 0,
-		Left,
+		Left = 0,
 		Right
 	};
 
 	struct Turning90DegreeChecker
 	{
 		Timer::TimerInt			lastTime;
-		bool					hasReachThreshold;
+		bool					isWaitingForSignalAgain;
 		bool					is90DegreeTurningStarted;
 		LastServoLockDirection	direction;
 	};
@@ -88,14 +87,12 @@ public:
 
 	array<MyPid, 2>			m_servoPid;
 
+	Turning90DegreeChecker	m_90DegreeChecker;
+
 private:
 
 //	array<float *, 3>		m_normal_weight;
 //	array<float *, 3>		m_turning_weight;
-
-	Turning90DegreeChecker	m_90DegreeChecker;
-
-	bool					m_forceTurningFlag;
 
 	bool					m_enabled;
 	bool					m_pidChangedFlag;

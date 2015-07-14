@@ -30,84 +30,69 @@ public:
 
 	public:
 
-		class BuzzerConfig
+		struct BuzzerConfig
 		{
-
-		public:
-
-			static int WarningPitch;
-			static int WarningTimes;
-
+//			static uint8_t WarningPitch;
+//			static uint8_t WarningTimes;
 		};
 
-		class MagSenConfig
+		struct MagSenConfig
 		{
-
-		public:
-
 			static float Kq;
 			static float Kr;
-
 		};
 
-		class ServoConfig
+		struct ServoConfig
 		{
-
-		public:
-
 			static float Reference;
 
 
 			static float NormalKp;
-			static float NormalKi;
+//			static float NormalKi;
 			static float NormalKd;
 
-			static float NormalWeightSD;
-			static float NormalWeightFD;
-			static float NormalWeightHD;
+//			static float NormalWeightSD;
+//			static float NormalWeightFD;
+//			static float NormalWeightHD;
 
 
 			static float TurningKpA;
 			static float TurningKpB;
-			static float TurningKi;
+//			static float TurningKi;
 			static float TurningKd;
 
-			static float TurningWeightSD;
-			static float TurningWeightFD;
-			static float TurningWeightHD;
+//			static float TurningWeightSD;
+//			static float TurningWeightFD;
+//			static float TurningWeightHD;
 
-			static float TurningThresholdFdValue;
+			static float CrossRoadThresholdFdValue;
 			static float TurningThresholdHdValue;
-			static float NoSignalThreshold;
+			static float SdNoSignalThreshold;
+			static float FdNoSignalThreshold;
 			static float Turning90DegreeThresholdFdAvg;
 
 
 			static uint32_t UpdateFreq;
-
 		};
 
-		class MotorConfig
+		struct MotorConfig
 		{
-
-		public:
-
 			static float Reference;
 			static float Kp;
-			static float Ki;
+//			static float Ki;
 			static float Kd;
 
-			static float TurningSpeedRatio;
-			static float Turning90DegreeSpeedRatio;
-			static float MaxSpeedRatio;
-
-			static uint32_t TimeForReachingMaxSpeed;
-			static int16_t EmergencyStopThreshold;
+//			static float TurningSpeedRatio;
+//			static float Turning90DegreeSpeedRatio;
+//			static float MaxSpeedRatio;
+//
+//			static uint32_t TimeForReachingMaxSpeed;
+//			static int16_t EmergencyStopThreshold;
 
 			static uint32_t UpdateFreq;
-
 		};
 
-		class VarMngConfig
+		struct VarMngConfig
 		{
 
 		public:
@@ -116,7 +101,7 @@ public:
 
 		};
 
-		class BatteryMeterConfig
+		struct BatteryMeterConfig
 		{
 
 		public:
@@ -128,7 +113,7 @@ public:
 
 		};
 
-		class LcdConfig
+		struct LcdConfig
 		{
 
 		public:
@@ -137,9 +122,9 @@ public:
 			static uint16_t BgColor;
 			static uint16_t TxtColor;
 
-			static uint16_t HighPowerColor;
-			static uint16_t NormalPowerColor;
-			static uint16_t LowPowerColor;
+//			static uint16_t HighPowerColor;
+//			static uint16_t NormalPowerColor;
+//			static uint16_t LowPowerColor;
 
 			static uint16_t UpdateFreq;
 
@@ -150,6 +135,7 @@ public:
 	MyResource(MySmartCar *sc);
 
 	static MySmartCar &smartCar(void);
+	void init(void);
 
 private:
 

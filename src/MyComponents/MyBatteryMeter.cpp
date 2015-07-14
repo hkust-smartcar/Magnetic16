@@ -39,17 +39,17 @@ float MyBatteryMeter::getBatteryPercentage(void)
 	return ((getBatteryVoltage() - MyResource::ConfigTable::BatteryMeterConfig::MinVoltage) / (MyResource::ConfigTable::BatteryMeterConfig::MaxVoltage - MyResource::ConfigTable::BatteryMeterConfig::MinVoltage) * 100.0f);
 }
 
-uint16_t MyBatteryMeter::getColor(void)
-{
-	float volt = getBatteryPercentage();
-	if (volt < 25.0f)
-		return MyResource::ConfigTable::LcdConfig::HighPowerColor;
-	else if (volt < 75.0f)
-		return MyResource::ConfigTable::LcdConfig::NormalPowerColor;
-	else if (volt < 100.0f)
-		return MyResource::ConfigTable::LcdConfig::LowPowerColor;
-	return 0xFFFF;
-}
+//uint16_t MyBatteryMeter::getColor(void)
+//{
+//	float volt = getBatteryPercentage();
+//	if (volt < 25.0f)
+//		return MyResource::ConfigTable::LcdConfig::HighPowerColor;
+//	else if (volt < 75.0f)
+//		return MyResource::ConfigTable::LcdConfig::NormalPowerColor;
+//	else if (volt < 100.0f)
+//		return MyResource::ConfigTable::LcdConfig::LowPowerColor;
+//	return 0xFFFF;
+//}
 
 uint8_t MyBatteryMeter::checkBattery(const uint32_t &)
 {

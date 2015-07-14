@@ -18,6 +18,8 @@
 #include "MyLoop.h"
 #include "MyVarManager.h"
 #include "MyBatteryMeter.h"
+#include "MyMenu.h"
+#include "MyFlash.h"
 
 #define IS_FRONT 1
 
@@ -35,9 +37,14 @@ public:
 		StandardDebug
 	};
 
+	typedef Gpi		MySwitch;
+
 	explicit MySmartCar(void);
 
+	Mode			m_mode;
+
 	MyResource		m_res;
+	MyFlash			m_flash;
 	MyLcd			m_lcdConsole;
 	MyLoop			m_loop;
 	MyVarManager	m_varMng;
@@ -45,13 +52,13 @@ public:
 	MyMotor			m_motor;
 	MyBuzzer		m_buzzer;
 	MyBatteryMeter	m_batteryMeter;
-	array<Gpi, 8>	m_switch;
+	array<MySwitch, 8> m_switch;
+//	MyMenu			m_menu;
 
-	Mode			m_mode;
 
 private:
 
-	Gpi::Config getSwitchConfig(const uint8_t id);
+	MySwitch::Config getSwitchConfig(const uint8_t id);
 
 	void switchInit(void);
 	static void switchOnTriggered(Gpi *target);

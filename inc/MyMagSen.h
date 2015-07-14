@@ -8,20 +8,23 @@
 
 #pragma once
 
+#include <cassert>
 #include <array>
 #include <libbase/k60/adc.h>
+#include <libsc/timer.h>
 #include "MyResource.h"
 #include "MyKalmanFilter.h"
 
 using namespace std;
 using namespace libbase::k60;
+using namespace libsc;
 
 class MyMagSen
 {
 
 public:
 
-	enum MagSen
+	enum MagSenId
 	{
 		SD = 0,
 		FD,
@@ -34,7 +37,7 @@ public:
 		RIGHT
 	};
 
-	MyMagSen(MagSen type);
+	MyMagSen(MagSenId type);
 
 	void reset(void);
 
@@ -42,7 +45,7 @@ public:
 
 	float update(void);
 	float &getOutputValue(void);
-	void setOutputValue(float newOutput);
+	void setOutputSign(bool isSigned);
 	array<float, 2> &getFilteredValue(void);
 	float &getFilteredValueAvg(void);
 	array<float, 2> &getRawValue(void);
@@ -52,7 +55,7 @@ public:
 
 private:
 	
-	uint8_t						m_magSenId;
+	MagSenId					m_magSenId;
 	array<Adc, 2>				m_magSen;
 	array<MyKalmanFilter, 2>	m_filter;
 	array<float, 2>				m_rawReading;
@@ -62,6 +65,6 @@ private:
 	float						m_output;
 	bool						m_isInit;
 
-	Adc::Config getAdcConfig(MyMagSen::MagSen type, MyMagSen::Side which);
+	Adc::Config getAdcConfig(MyMagSen::MagSenId type, MyMagSen::Side which);
 
 };

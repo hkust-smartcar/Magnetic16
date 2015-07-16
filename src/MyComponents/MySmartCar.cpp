@@ -88,6 +88,7 @@ void MySmartCar::switchInit(void)
 	m_mode = (Mode)((uint8_t)(!m_switch[7].Get()) + ((uint8_t)m_switch[7].Get() * (uint8_t)(!m_switch[5].Get())));
 	m_servo.setEnabled(!m_switch[4].Get());
 	m_servo.m_allow90DegreeTurning = m_switch[3].Get();
+	m_buzzer.setEnabled(m_switch[3].Get());
 }
 
 void MySmartCar::switchOnTriggered(Gpi *target)
@@ -118,7 +119,7 @@ void MySmartCar::switchOnTriggered(Gpi *target)
 		break;
 
 	case LIBSC_SWITCH3:
-		MyResource::smartCar().m_servo.m_allow90DegreeTurning = target->Get();
+		MyResource::smartCar().m_buzzer.setEnabled(target->Get());
 		break;
 	}
 }

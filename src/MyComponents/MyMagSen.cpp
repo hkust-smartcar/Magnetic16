@@ -121,18 +121,18 @@ float MyMagSen::update(void)
 
 	m_avg = (m_standardizedReading[Side::LEFT] + m_standardizedReading[Side::RIGHT]) / 2.0f;
 
-	switch (m_magSenId)
-	{
-	case MagSenId::SD:
-		if (m_avg < MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold)
-			return m_output;
-
-	case MagSenId::HD:
-	case MagSenId::FD:
+//	switch (m_magSenId)
+//	{
+//	case MagSenId::SD:
+//		if (m_avg < MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold)
+//			return m_output;
+//
+//	case MagSenId::HD:
+//	case MagSenId::FD:
 		m_output = (m_standardizedReading[Side::LEFT] - m_standardizedReading[Side::RIGHT]) / (m_standardizedReading[Side::LEFT] + m_standardizedReading[Side::RIGHT]);
 		return m_output;
-
-	}
+//
+//	}
 
 }
 

@@ -49,5 +49,5 @@ void MyFlash::readConfig(void)
 
 void MyFlash::writeConfig(void)
 {
-	assert(m_instance->Write(&MyResource::ConfigTable::MagSenConfig::Kq, m_instance->m_sizeNeeded) == FlashStatus::kSuccess);
+	m_instance->Write(&MyResource::ConfigTable::MagSenConfig::Kq, m_instance->m_sizeNeeded);
 }

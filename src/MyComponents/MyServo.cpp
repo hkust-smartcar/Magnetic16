@@ -64,7 +64,8 @@ MyServo::MyServo(void)
 //	m_turning_weight({ &MyResource::ConfigTable::ServoConfig::TurningWeightSD, &MyResource::ConfigTable::ServoConfig::TurningWeightFD, &MyResource::ConfigTable::ServoConfig::TurningWeightHD }),
 	m_90DegreeChecker({ 0, false, false, LastServoLockDirection::Left }),
 	m_enabled(true),
-	m_pidChangedFlag(false)
+	m_pidChangedFlag(false),
+	m_isTurning90Degree(false)
 {
 	if (!m_instance)
 		m_instance = this;
@@ -122,6 +123,7 @@ float MyServo::getFinalAngle(void)
 	m_isPidNonLinear = turningHandler(m_lastError);
 //	MyResource::smartCar().m_buzzer.set(m_isPidNonLinear);
 	m_90DegreeTurningNeed = check90Degree(m_lastError);
+//	checkSmallS(m_lastError);
 
 	m_servoPid[(uint8_t)(!m_isPidNonLinear)].update(m_lastError);
 	return m_servoPid[(uint8_t)(m_isPidNonLinear)].update(m_lastError);
@@ -129,18 +131,42 @@ float MyServo::getFinalAngle(void)
 
 bool MyServo::turningHandler(float &error)
 {
-	if (m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg() > MyResource::ConfigTable::ServoConfig::CrossRoadThresholdFdValue)
-		error = m_MagSen[MyMagSen::MagSenId::HD].getOutputValue();
-	else
-		error = m_MagSen[MyMagSen::MagSenId::SD].getOutputValue() + m_MagSen[MyMagSen::MagSenId::HD].getOutputValue();
+	error = m_MagSen[MyMagSen::MagSenId::SD].getOutputValue() + m_MagSen[MyMagSen::MagSenId::HD].getOutputValue();
 
 	return (m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg() < MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold);
 }
 
 bool MyServo::check90Degree(float &error)
 {
-	if (m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg() < MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold)
-		error = (m_MagSen[MyMagSen::MagSenId::FD].getOutputValue() > 0.0f)? 1.0f : -1.0f;
+	if (m_MagSen[MyMagSen::MagSenId::FD].getFilteredValueAvg() > MyResource::ConfigTable::ServoConfig::CrossRoadThresholdFdValue)
+	{
+		m_isTurning90Degree = false;
+		error = m_MagSen[MyMagSen::MagSenId::SD].getOutputValue();
+	}
+	else if (m_isTurning90Degree && ABS(m_MagSen[MyMagSen::MagSenId::SD].getOutputValue()) >= MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdSdOutput)
+	{
+		m_isTurning90Degree = false;
+		MyResource::smartCar().m_buzzer.set(false);
+	}
+	else if (m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[0] > 1.45f && m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[1] < 1.0f ||
+			  m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[1] > 1.45f && m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[0] < 1.0f)
+	{
+		MyResource::smartCar().m_buzzer.set(true);
+		m_isTurning90Degree = true;
+		m_lastTurningDirection = (LastServoLockDirection)(m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[1] > m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[0]);
+		return true;
+	}
+
+	if (m_isTurning90Degree)
+		error = (m_MagSen[MyMagSen::MagSenId::FD].getOutputValue() > 0.0f)? 5.0f : -5.0f;
+
+	return false;
+}
+
+bool MyServo::checkSmallS(float &error)
+{
+	if (isAround(m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg(), 1.0f, 0.3f) && m_MagSen[MyMagSen::MagSenId::SD].getOutputValue() > 0.3f)
+		error = m_MagSen[MyMagSen::MagSenId::FD].getOutputValue();
 
 	return false;
 }
@@ -150,6 +176,7 @@ void MyServo::setAngle(const int16_t angle)
 	if (m_enabled)
 	{
 		m_lastDegree = inRange(-MAX_SERVO_ANGLE, angle, MAX_SERVO_ANGLE) + MID_SERVO_ANGLE;
+		m_lastTurningDirection = (LastServoLockDirection)(m_lastDegree >= MID_SERVO_ANGLE);
 		SetDegree(m_lastDegree);
 	}
 }
@@ -159,6 +186,7 @@ void MyServo::setDegree(const uint16_t degree)
 	if (m_enabled)
 	{
 		m_lastDegree = inRange(MIN_SERVO_DEGREE, degree, MAX_SERVO_DEGREE);
+		m_lastTurningDirection = (LastServoLockDirection)(m_lastDegree >= MID_SERVO_ANGLE);
 		SetDegree(m_lastDegree);
 	}
 }

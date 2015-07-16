@@ -38,7 +38,9 @@ MyPid::MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const
 
 	m_type(type),
 
+	m_eDer(0),
 	m_eSum(0),
+
 	m_lastError(0),
 	m_epsilon(m_reference * EPSILON_RATIO),
 	m_output(0)
@@ -65,7 +67,9 @@ MyPid::MyPid(float &ref, float &kp, float ki, float &kd, const Type type, const 
 
 	m_type(type),
 
+	m_eDer(0),
 	m_eSum(0),
+
 	m_lastError(0),
 	m_epsilon(m_reference * EPSILON_RATIO),
 	m_output(0)

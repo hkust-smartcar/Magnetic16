@@ -15,7 +15,7 @@
 #include "MyLoop.h"
 
 #define MIN_MOTOR_POWER	0
-#define MAX_MOTOR_POWER	500
+#define MAX_MOTOR_POWER	675
 
 #define WHEEL_RADIUS					0.17592918860f
 #define ENCODER_COUNT_PER_REVOLUTION	500
@@ -46,6 +46,7 @@ public:
 
 private:
 
+	Timer::TimerInt		m_startTime;
 	uint32_t			m_timePassed;
 	int16_t				m_power;
 	float				m_speed;

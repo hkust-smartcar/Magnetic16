@@ -44,32 +44,32 @@ MySmartCar &MyResource::smartCar(void)
 //	float MyResource::ConfigTable::ServoConfig::Reference = 0.0f;
 
 
-	float MyResource::ConfigTable::ServoConfig::NormalKp = 200.0f;
+	float MyResource::ConfigTable::ServoConfig::NormalKp = 174.0f;
 //	float MyResource::ConfigTable::ServoConfig::NormalKi = 0.0f;
-	float MyResource::ConfigTable::ServoConfig::NormalKd = 10.0f;
+	float MyResource::ConfigTable::ServoConfig::NormalKd = 9.0f;
 
 //	float MyResource::ConfigTable::ServoConfig::NormalWeightSD = 0.3589743f;
 //	float MyResource::ConfigTable::ServoConfig::NormalWeightFD = 0.1794872f;
 //	float MyResource::ConfigTable::ServoConfig::NormalWeightHD = 0.4615385f;
 
 
-	float MyResource::ConfigTable::ServoConfig::TurningKpA =  325.0f;
-	float MyResource::ConfigTable::ServoConfig::TurningKpB = 65.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKpA =  350.0f; //250.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKpB = 540.0f; //120.0f;
 //	float MyResource::ConfigTable::ServoConfig::TurningKi = 0.0f;
-	float MyResource::ConfigTable::ServoConfig::TurningKd = 13.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKd = 15.0f;
 
 //	float MyResource::ConfigTable::ServoConfig::TurningWeightSD = 0.1f;
 //	float MyResource::ConfigTable::ServoConfig::TurningWeightFD = 0.325f;
 //	float MyResource::ConfigTable::ServoConfig::TurningWeightHD = 0.525f;
 
-	float MyResource::ConfigTable::ServoConfig::CrossRoadThresholdFdValue = 2.25f;
+	float MyResource::ConfigTable::ServoConfig::CrossRoadThresholdFdValue = 2.0f;
 	float MyResource::ConfigTable::ServoConfig::TurningThresholdHdValue = 0.3f;
-	float MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold = 0.73f;
-	float MyResource::ConfigTable::ServoConfig::FdNoSignalThreshold = 0.38f;
-	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFdAvg = 0.635;
+	float MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold = 0.675f;
+	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdSdOutput = 0.7f;
+	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFdAvg = 1.0f;
 
 
-	uint32_t MyResource::ConfigTable::ServoConfig::UpdateFreq = 7;
+	uint32_t MyResource::ConfigTable::ServoConfig::UpdateFreq = 4;
 
 	// Motor
 	float MyResource::ConfigTable::MotorConfig::Reference = 1500.0f;

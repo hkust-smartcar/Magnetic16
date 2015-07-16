@@ -19,12 +19,14 @@
 #define MID_SERVO_ANGLE 900
 #define MID_SERVO_DEGREE 900
 
-#define MAX_SERVO_ANGLE 500
+#define MAX_SERVO_ANGLE 750
 
-#define MAX_SERVO_DEGREE 1400
-#define MIN_SERVO_DEGREE 400
+#define MAX_SERVO_DEGREE 1650
+#define MIN_SERVO_DEGREE 150
 
 #define isInRange(n, v, x) ((v >= n) && (v <= x))
+#define isSignedF(v) (v < 0.0f)
+#define isAround(v, t, o) (ABS(v - t) <= o)
 
 using namespace libsc;
 using namespace libbase::k60;
@@ -67,8 +69,11 @@ public:
 
 	void updateMagSen(void);
 	float getFinalAngle(void);
+
 	bool turningHandler(float &error);
 	bool check90Degree(float &error);
+	bool checkSmallS(float &error);
+
 	void setAngle(const int16_t degree);
 	void setDegree(const uint16_t degree);
 	static void updateAngle(const uint32_t &timeDelay);
@@ -96,6 +101,8 @@ private:
 
 	bool					m_enabled;
 	bool					m_pidChangedFlag;
+
+	bool					m_isTurning90Degree;
 
 	static MyServo			*m_instance;
 

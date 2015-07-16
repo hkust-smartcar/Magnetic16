@@ -68,7 +68,7 @@ public:
 			static float CrossRoadThresholdFdValue;
 			static float TurningThresholdHdValue;
 			static float SdNoSignalThreshold;
-			static float FdNoSignalThreshold;
+			static float Turning90DegreeThresholdSdOutput;
 			static float Turning90DegreeThresholdFdAvg;
 
 

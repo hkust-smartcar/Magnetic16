@@ -39,6 +39,7 @@ MyMotor::MyMotor(void)
 			   MAX_MOTOR_POWER,
 			   -1.0f,
 			   1.0f),
+	m_startTime(0),
 	m_timePassed(0),
 	m_power(0),
 	m_speed(0.0f),
@@ -74,7 +75,16 @@ void MyMotor::updateSpeed(const uint32_t &)
 //
 //	m_instance->m_curReference = MyResource::ConfigTable::MotorConfig::Reference * ((!MyResource::smartCar().m_servo.m_isPidNonLinear)? (1 + (float)inRange(0, ABS(m_instance->m_timePassed), MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed) / MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed * MyResource::ConfigTable::MotorConfig::MaxSpeedRatio) : ((MyResource::smartCar().m_servo.m_90DegreeTurningNeed)? MyResource::ConfigTable::MotorConfig::Turning90DegreeSpeedRatio : MyResource::ConfigTable::MotorConfig::TurningSpeedRatio));
 
-	m_instance->setSpeed(m_instance->m_speedPid.update(m_instance->m_encoder.getEncoderReading()));
+	float output = m_instance->m_speedPid.update(m_instance->m_encoder.getEncoderReading());
+
+//	if (output == MAX_MOTOR_POWER && System::Time() - m_instance->m_startTime > 1000)
+//	{
+//		m_instance->setEnabled(false);
+//		m_instance->setSpeed(0);
+//	}
+
+	m_instance->setSpeed(output);
+//	m_instance->setSpeed(500);
 }
 
 int16_t *MyMotor::getPower(void)
@@ -94,7 +104,8 @@ void MyMotor::setEnabled(const bool enabled)
 		reset();
 		m_encoder.reset();
 		m_speedPid.reset();
-		m_enabled = enabled;
+		if (m_enabled = enabled)
+			m_startTime = System::Time();
 	}
 }
 

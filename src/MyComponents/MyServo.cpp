@@ -49,6 +49,7 @@ MyServo::MyServo(void)
 	m_lastError(0),
 	m_lastDegree(900),
 	m_lastTurningDirection(LastServoLockDirection::None),
+	m_last90TurningDirection(LastServoLockDirection::None),
 	m_MagSen({ MyMagSen(MyMagSen::MagSenId::SD),
 			   MyMagSen(MyMagSen::MagSenId::FD),
 			   MyMagSen(MyMagSen::MagSenId::HD) }),
@@ -152,6 +153,12 @@ bool MyServo::turningHandler(float &error)
 {
 	error = m_MagSen[MyMagSen::MagSenId::SD].getOutputValue() + m_MagSen[MyMagSen::MagSenId::HD].getOutputValue();
 
+	if (m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg() < 0.03f)
+	{
+		error = (m_MagSen[MyMagSen::MagSenId::HD].getOutputValue() > 0.0f)? -5.0 : 5.0f;
+		return true;
+	}
+
 	return (m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg() < MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold);
 }
 
@@ -164,6 +171,7 @@ bool MyServo::check90Degree(float &error)
 //	}
 	if (m_isTurning90Degree && ABS(m_MagSen[MyMagSen::MagSenId::SD].getOutputValue()) >= 0.6f)
 	{
+		m_last90TurningDirection = LastServoLockDirection::None;
 		m_isTurning90Degree = false;
 		MyResource::smartCar().m_buzzer.set(false);
 	}
@@ -180,7 +188,7 @@ bool MyServo::check90Degree(float &error)
 //		m_isTurning90Degree = true;
 //		error = (m_MagSen[MyMagSen::MagSenId::FD].getOutputValue() > 0.0f)? 5.0f : -5.0f;
 //	}
-	else if (!m_isTurning90Degree && m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg() <= 0.7f && ABS(m_MagSen[MyMagSen::MagSenId::SD].getOutputValue()) <= 0.2f && ABS(m_MagSen[MyMagSen::MagSenId::FD].getOutputValue()) >= 0.4f/* && ABS(m_MagSen[MyMagSen::MagSenId::FD].getOutputValue()) > m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg()*/)
+	else if (!m_isTurning90Degree && m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg() <= MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdSdAvg && ABS(m_MagSen[MyMagSen::MagSenId::SD].getOutputValue()) <= MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdSd && ABS(m_MagSen[MyMagSen::MagSenId::FD].getOutputValue()) >= MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFd/* && ABS(m_MagSen[MyMagSen::MagSenId::FD].getOutputValue()) > m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg()*/)
 	{
 		m_isTurning90Degree = true;
 		MyResource::smartCar().m_buzzer.set(true);

@@ -53,19 +53,20 @@ MySmartCar &MyResource::smartCar(void)
 //	float MyResource::ConfigTable::ServoConfig::NormalWeightHD = 0.4615385f;
 
 
-	float MyResource::ConfigTable::ServoConfig::TurningKpA =  345.0f; //250.0f;
-	float MyResource::ConfigTable::ServoConfig::TurningKpB = 330.0f; //120.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKpA =  338.0f; //250.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKpB = 308.0f; //120.0f;
 //	float MyResource::ConfigTable::ServoConfig::TurningKi = 0.0f;
-	float MyResource::ConfigTable::ServoConfig::TurningKd = 20.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKd = 22.0f;
 
 //	float MyResource::ConfigTable::ServoConfig::TurningWeightSD = 0.1f;
 //	float MyResource::ConfigTable::ServoConfig::TurningWeightFD = 0.325f;
 //	float MyResource::ConfigTable::ServoConfig::TurningWeightHD = 0.525f;
 
-	float MyResource::ConfigTable::ServoConfig::CrossRoadThresholdFdValue = 2.0f;
-	float MyResource::ConfigTable::ServoConfig::TurningThresholdHdValue = 0.3f;
+	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdSdAvg = 0.7f;
+	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdSd = 0.2f;
 	float MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold = 0.675f;
-	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFd = 0.3f;
+	float MyResource::ConfigTable::ServoConfig::FdNoSignalThreshold = 0.3f;
+	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFd = 0.4f;
 	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFdAvg = 1.0f;
 
 

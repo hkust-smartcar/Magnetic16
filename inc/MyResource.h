@@ -65,9 +65,10 @@ public:
 //			static float TurningWeightFD;
 //			static float TurningWeightHD;
 
-			static float CrossRoadThresholdFdValue;
-			static float TurningThresholdHdValue;
+			static float Turning90DegreeThresholdSdAvg;
+			static float Turning90DegreeThresholdSd;
 			static float SdNoSignalThreshold;
+			static float FdNoSignalThreshold;
 			static float Turning90DegreeThresholdFd;
 			static float Turning90DegreeThresholdFdAvg;
 

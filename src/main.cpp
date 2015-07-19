@@ -153,13 +153,13 @@ int main(void)
 {
 	System::Init();
 
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getOutputValue(), "SD_Output");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getOutputValue(), "FD_Output");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getOutputValue(), "HD_Output");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValueAvg(), "SD_Avg");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getFilteredValueAvg(), "FD_Avg");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getFilteredValueAvg(), "HD_Avg");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_finalAngle, "Angle");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getOutputValue(), "SD_Output");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getOutputValue(), "FD_Output");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getOutputValue(), "HD_Output");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValueAvg(), "SD_Avg");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getFilteredValueAvg(), "FD_Avg");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getFilteredValueAvg(), "HD_Avg");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_finalAngle, "Angle");
 
 //	myCar.m_varMng.addWatchedVar((uint8_t *)&MyResource::smartCar().m_servo.m_90DegreeTurningNeed, "90DegreeMode");
 //	myCar.m_varMng.addWatchedVar((uint8_t *)&MyResource::smartCar().m_servo.m_isPidNonLinear, "PidNonLinear");
@@ -168,13 +168,13 @@ int main(void)
 //	myCar.m_varMng.addWatchedVar(myCar.m_servo.m_servoPid[MyServo::Normal].getLastError(), "LastError");
 //	myCar.m_varMng.addWatchedVar(myCar.m_servo.m_servoPid[MyServo::PidType::Turning].getLastError(), "LastError");
 
-	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[0], "SD_FilteredValueL");
-	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[1], "SD_FilteredValueR");
-	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getFilteredValue()[0], "FD_FilteredValueL");
-	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getFilteredValue()[1], "FD_FilteredValueR");
-	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getFilteredValue()[0], "HD_FilteredValueL");
-	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getFilteredValue()[1], "HD_FilteredValueR");
-	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_finalAngle, "Angle");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[0], "SD_FilteredValueL");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[1], "SD_FilteredValueR");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getFilteredValue()[0], "FD_FilteredValueL");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getFilteredValue()[1], "FD_FilteredValueR");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getFilteredValue()[0], "HD_FilteredValueL");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getFilteredValue()[1], "HD_FilteredValueR");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_finalAngle, "Angle");
 //	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_deiffChangeL, "<sup>d</sup>/dt(Fd_L)");
 //	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_deiffChangeR, "<sup>d</sup>/dt(Fd_R)");
 //	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_FdDiffChangingRateChangingRate, "FdDiffRate");
@@ -197,10 +197,10 @@ int main(void)
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::WeightHD, "Weight_HD");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Kp, "Kp");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Kd, "Kd");
-//	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold, "Sd_TurningTH");
+	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold, "Sd_TurningTH");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFd, "Fd_90");
-	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MagSenConfig::Kq, "Kq");
-	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MagSenConfig::Kr, "Kr");
+//	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MagSenConfig::Kq, "Kq");
+//	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MagSenConfig::Kr, "Kr");
 
 	Button::Config buttonConfig;
 	buttonConfig.listener_trigger = Button::Config::Trigger::kDown;

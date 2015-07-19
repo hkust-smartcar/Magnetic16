@@ -53,6 +53,7 @@ public:
 	MyBuzzer		m_buzzer;
 	MyBatteryMeter	m_batteryMeter;
 	array<MySwitch, 8> m_switch;
+	MyHallSensor	m_hallSensor;
 //	MyMenu			m_menu;
 
 

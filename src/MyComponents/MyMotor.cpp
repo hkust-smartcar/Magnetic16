@@ -37,8 +37,8 @@ MyMotor::MyMotor(void)
 			   MyPid::Motor,
 			   -MAX_MOTOR_POWER,
 			   MAX_MOTOR_POWER,
-			   -1.0f,
-			   1.0f),
+			   0.0f,
+			   MyResource::ConfigTable::MotorConfig::Reference * 2),
 	m_startTime(0),
 	m_timePassed(0),
 	m_power(0),
@@ -77,14 +77,14 @@ void MyMotor::updateSpeed(const uint32_t &)
 
 	float output = m_instance->m_speedPid.update(m_instance->m_encoder.getEncoderReading());
 
-//	if (output == MAX_MOTOR_POWER && System::Time() - m_instance->m_startTime > 1000)
-//	{
-//		m_instance->setEnabled(false);
-//		m_instance->setSpeed(0);
-//	}
+	if (output == MAX_MOTOR_POWER && System::Time() - m_instance->m_startTime > 1000)
+	{
+		m_instance->setEnabled(false);
+		m_instance->setSpeed(0);
+	}
 
 	m_instance->setSpeed(output);
-//	m_instance->setSpeed(500);
+//	m_instance->setSpeed(200);
 }
 
 int16_t *MyMotor::getPower(void)
@@ -105,7 +105,7 @@ void MyMotor::setEnabled(const bool enabled)
 		m_encoder.reset();
 		m_speedPid.reset();
 		if (m_enabled = enabled)
-			m_startTime = System::Time();
+			m_startTime = System::Time() - MyResource::ConfigTable::MotorConfig::UpdateFreq;
 	}
 }
 

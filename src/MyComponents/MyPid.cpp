@@ -20,7 +20,7 @@ using namespace libsc;
 
 #define abs(v) ((v > 0)? v : -v)
 
-MyPid::MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a, float &nonLinearKp_b)
+MyPid::MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a, float &nonLinearKp_b, float base)
 :
 	m_outputMin(outputMin),
 	m_outputMax(outputMax),
@@ -35,6 +35,7 @@ MyPid::MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const
 
 	m_Kp_squ_a(nonLinearKp_squ_a),
 	m_Kp_b(nonLinearKp_b),
+	m_base(base),
 
 	m_type(type),
 
@@ -49,7 +50,7 @@ MyPid::MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const
 	reset();
 }
 
-MyPid::MyPid(float &ref, float &kp, float ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a, float &nonLinearKp_b)
+MyPid::MyPid(float &ref, float &kp, float ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a, float &nonLinearKp_b, float base)
 :
 	m_outputMin(outputMin),
 	m_outputMax(outputMax),
@@ -64,6 +65,7 @@ MyPid::MyPid(float &ref, float &kp, float ki, float &kd, const Type type, const 
 
 	m_Kp_squ_a(nonLinearKp_squ_a),
 	m_Kp_b(nonLinearKp_b),
+	m_base(base),
 
 	m_type(type),
 
@@ -119,6 +121,7 @@ void MyPid::reset(void)
 float MyPid::update(float val)
 {
 	float error = m_reference - val;
+
 	uint32_t dt = System::Time() - m_lastTimeUpdate;
 
 	if (dt < MyResource::ConfigTable::MotorConfig::UpdateFreq)
@@ -169,7 +172,7 @@ float MyPid::updateServoPID(void)
 
 float MyPid::updateNonLinearPID(void)
 {
-	m_output = m_lastError * (m_Kp_squ_a * ABS(m_lastError) + m_Kp_b) + m_Ki * m_eSum + m_Kd * m_eDer;
+	m_output = m_lastError * (m_Kp_squ_a * ABS(m_lastError) + m_Kp_b + m_base) + m_Ki * m_eSum + m_Kd * m_eDer * ABS(m_eSum / inRange(m_errorMin, m_lastError, m_errorMax));
 
 	return inRange(m_outputMin, m_output, m_outputMax);
 }

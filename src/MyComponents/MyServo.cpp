@@ -27,6 +27,20 @@ using namespace std;
 
 MyServo *MyServo::m_instance = nullptr;
 
+inline float diff(float &oldN, float newN)
+{
+	float ret = newN - oldN;
+	oldN = newN;
+	return ret;
+}
+
+inline float diff(Timer::TimerInt &oldN, Timer::TimerInt newN)
+{
+	float ret = newN - oldN;
+	oldN = newN;
+	return ret;
+}
+
 MyServo::MyServo(void)
 :
 	TrsD05({ 0 }),
@@ -34,7 +48,7 @@ MyServo::MyServo(void)
 	m_isPidNonLinear(true),
 	m_lastError(0),
 	m_lastDegree(900),
-	m_lastTurningDirection(LastServoLockDirection::Left),
+	m_lastTurningDirection(LastServoLockDirection::None),
 	m_MagSen({ MyMagSen(MyMagSen::MagSenId::SD),
 			   MyMagSen(MyMagSen::MagSenId::FD),
 			   MyMagSen(MyMagSen::MagSenId::HD) }),
@@ -45,8 +59,8 @@ MyServo::MyServo(void)
 					   MyPid::ServoLinear,
 					   -MAX_SERVO_ANGLE,
 					   MAX_SERVO_ANGLE,
-					   -1.0f,
-					   1.0f),
+					   -2.0f,
+					   2.0f),
 
 				MyPid(*(new float(0.0f)),
 					  MyResource::ConfigTable::ServoConfig::TurningKpA,
@@ -55,10 +69,11 @@ MyServo::MyServo(void)
 					  MyPid::ServoNonLinear,
 					  -MAX_SERVO_ANGLE,
 					  MAX_SERVO_ANGLE,
-					  -1.0f,
-					  1.0f,
+					  -2.0f,
+					  2.0f,
 					  MyResource::ConfigTable::ServoConfig::TurningKpA,
-					  MyResource::ConfigTable::ServoConfig::TurningKpB)
+					  MyResource::ConfigTable::ServoConfig::TurningKpB,
+					  MyResource::ConfigTable::ServoConfig::NormalKp)
 				}),
 //	m_normal_weight({ &MyResource::ConfigTable::ServoConfig::NormalWeightSD, &MyResource::ConfigTable::ServoConfig::NormalWeightFD, &MyResource::ConfigTable::ServoConfig::NormalWeightHD }),
 //	m_turning_weight({ &MyResource::ConfigTable::ServoConfig::TurningWeightSD, &MyResource::ConfigTable::ServoConfig::TurningWeightFD, &MyResource::ConfigTable::ServoConfig::TurningWeightHD }),
@@ -120,6 +135,10 @@ float MyServo::getFinalAngle(void)
 	m_lastError = 0.0f;
 	updateMagSen();
 
+//	m_dt = diff(m_lastCheckTime, System::Time());
+//	m_deiffChangeL = diff(m_lastFdDiffL, m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[0]) / m_dt;
+//	m_deiffChangeR = diff(m_lastFdDiffR, m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[1]) / m_dt;
+
 	m_isPidNonLinear = turningHandler(m_lastError);
 //	MyResource::smartCar().m_buzzer.set(m_isPidNonLinear);
 	m_90DegreeTurningNeed = check90Degree(m_lastError);
@@ -138,29 +157,40 @@ bool MyServo::turningHandler(float &error)
 
 bool MyServo::check90Degree(float &error)
 {
-	if (m_MagSen[MyMagSen::MagSenId::FD].getFilteredValueAvg() > MyResource::ConfigTable::ServoConfig::CrossRoadThresholdFdValue)
-	{
-		m_isTurning90Degree = false;
-		error = m_MagSen[MyMagSen::MagSenId::SD].getOutputValue();
-	}
-	else if (m_isTurning90Degree && ABS(m_MagSen[MyMagSen::MagSenId::SD].getOutputValue()) >= MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdSdOutput)
+//	if (m_MagSen[MyMagSen::MagSenId::FD].getFilteredValueAvg() > MyResource::ConfigTable::ServoConfig::CrossRoadThresholdFdValue)
+//	{
+//		m_isTurning90Degree = false;
+//		error = m_MagSen[MyMagSen::MagSenId::SD].getOutputValue();
+//	}
+	if (m_isTurning90Degree && ABS(m_MagSen[MyMagSen::MagSenId::SD].getOutputValue()) >= 0.6f)
 	{
 		m_isTurning90Degree = false;
 		MyResource::smartCar().m_buzzer.set(false);
 	}
-	else if (m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[0] > 1.45f && m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[1] < 1.0f ||
-			  m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[1] > 1.45f && m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[0] < 1.0f)
+//	else if (m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[0] > 1.45f && m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[1] < 1.0f ||
+//			  m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[1] > 1.45f && m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[0] < 1.0f)
+//	{
+//		m_isTurning90Degree = true;
+//		m_lastTurningDirection = (LastServoLockDirection)(m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[1] > m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[0]);
+//		return true;
+//	}
+//	if (ABS(m_MagSen[MyMagSen::MagSenId::FD].getFilteredValueAvg()[0]) >= MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFd || ABS(m_MagSen[MyMagSen::MagSenId::FD].getFilteredValueAvg()) >= MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFd)
+//	{
+//		MyResource::smartCar().m_buzzer.set(true);
+//		m_isTurning90Degree = true;
+//		error = (m_MagSen[MyMagSen::MagSenId::FD].getOutputValue() > 0.0f)? 5.0f : -5.0f;
+//	}
+	else if (!m_isTurning90Degree && m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg() <= 0.7f && ABS(m_MagSen[MyMagSen::MagSenId::SD].getOutputValue()) <= 0.2f && ABS(m_MagSen[MyMagSen::MagSenId::FD].getOutputValue()) >= 0.4f/* && ABS(m_MagSen[MyMagSen::MagSenId::FD].getOutputValue()) > m_MagSen[MyMagSen::MagSenId::SD].getFilteredValueAvg()*/)
 	{
-		MyResource::smartCar().m_buzzer.set(true);
 		m_isTurning90Degree = true;
-		m_lastTurningDirection = (LastServoLockDirection)(m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[1] > m_MagSen[MyMagSen::MagSenId::FD].getFilteredValue()[0]);
-		return true;
+		MyResource::smartCar().m_buzzer.set(true);
+		m_last90TurningDirection = (m_MagSen[MyMagSen::MagSenId::FD].getOutputValue() > 0.0f)? LastServoLockDirection::Left : LastServoLockDirection::Right;
 	}
 
 	if (m_isTurning90Degree)
-		error = (m_MagSen[MyMagSen::MagSenId::FD].getOutputValue() > 0.0f)? 5.0f : -5.0f;
+		error = (m_last90TurningDirection - 1)? -5.0f : 5.0f;
 
-	return false;
+	return m_last90TurningDirection;
 }
 
 bool MyServo::checkSmallS(float &error)
@@ -176,7 +206,7 @@ void MyServo::setAngle(const int16_t angle)
 	if (m_enabled)
 	{
 		m_lastDegree = inRange(-MAX_SERVO_ANGLE, angle, MAX_SERVO_ANGLE) + MID_SERVO_ANGLE;
-		m_lastTurningDirection = (LastServoLockDirection)(m_lastDegree >= MID_SERVO_ANGLE);
+		m_lastTurningDirection = (LastServoLockDirection)((m_lastDegree >= MID_SERVO_ANGLE) + 1);
 		SetDegree(m_lastDegree);
 	}
 }
@@ -186,7 +216,7 @@ void MyServo::setDegree(const uint16_t degree)
 	if (m_enabled)
 	{
 		m_lastDegree = inRange(MIN_SERVO_DEGREE, degree, MAX_SERVO_DEGREE);
-		m_lastTurningDirection = (LastServoLockDirection)(m_lastDegree >= MID_SERVO_ANGLE);
+		m_lastTurningDirection = (LastServoLockDirection)((m_lastDegree >= MID_SERVO_ANGLE) + 1);
 		SetDegree(m_lastDegree);
 	}
 }

@@ -30,8 +30,8 @@ public:
 		ServoNonLinear
 	};
 
-	explicit MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a = *(new float(0.0f)), float &nonLinearKp_b = *(new float(0.0f)));
-	explicit MyPid(float &ref, float &kp, float ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a = *(new float(0.0f)), float &nonLinearKp_b = *(new float(0.0f)));
+	explicit MyPid(float &ref, float &kp, float &ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a = *(new float(0.0f)), float &nonLinearKp_b = *(new float(0.0f)), float base = 0.0f);
+	explicit MyPid(float &ref, float &kp, float ki, float &kd, const Type type, const float outputMin, const float outputMax, const float errorMin, const float errorMax, float &nonLinearKp_squ_a = *(new float(0.0f)), float &nonLinearKp_b = *(new float(0.0f)), float base = 0.0f);
 
 	float update(float val);
 	float updateMotorPID(void);
@@ -48,6 +48,8 @@ public:
 
 	void reset(void);
 
+	float m_output;
+
 private:
 
 	float m_outputMin;
@@ -63,6 +65,7 @@ private:
 
 	float &m_Kp_squ_a;
 	float &m_Kp_b;
+	float m_base;
 
 	Type m_type;
 
@@ -72,7 +75,5 @@ private:
 	float m_lastError;
 	float m_epsilon;
 	Timer::TimerInt m_lastTimeUpdate;
-
-	float m_output;
 
 };

@@ -19,10 +19,10 @@
 #define MID_SERVO_ANGLE 900
 #define MID_SERVO_DEGREE 900
 
-#define MAX_SERVO_ANGLE 750
+#define MAX_SERVO_ANGLE 500
 
-#define MAX_SERVO_DEGREE 1650
-#define MIN_SERVO_DEGREE 150
+#define MAX_SERVO_DEGREE MID_SERVO_DEGREE + MAX_SERVO_ANGLE
+#define MIN_SERVO_DEGREE MID_SERVO_DEGREE - MAX_SERVO_ANGLE
 
 #define isInRange(n, v, x) ((v >= n) && (v <= x))
 #define isSignedF(v) (v < 0.0f)
@@ -51,7 +51,8 @@ public:
 
 	enum LastServoLockDirection
 	{
-		Left = 0,
+		None = 0,
+		Left,
 		Right
 	};
 
@@ -88,7 +89,15 @@ public:
 	int16_t					m_finalAngle;
 	uint16_t				m_lastDegree;
 	LastServoLockDirection	m_lastTurningDirection;
+	LastServoLockDirection	m_last90TurningDirection;
 	array<MyMagSen, 3>		m_MagSen;
+
+	Timer::TimerInt			m_dt;
+	Timer::TimerInt			m_lastCheckTime;
+	float					m_lastFdDiffL;
+	float					m_lastFdDiffR;
+	float					m_deiffChangeL;
+	float					m_deiffChangeR;
 
 	array<MyPid, 2>			m_servoPid;
 

@@ -166,21 +166,25 @@ int main(void)
 
 //	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_lastError, "IntegratedOutput");
 //	myCar.m_varMng.addWatchedVar(myCar.m_servo.m_servoPid[MyServo::Normal].getLastError(), "LastError");
-	myCar.m_varMng.addWatchedVar(myCar.m_servo.m_servoPid[MyServo::PidType::Turning].getLastError(), "LastError");
+//	myCar.m_varMng.addWatchedVar(myCar.m_servo.m_servoPid[MyServo::PidType::Turning].getLastError(), "LastError");
 
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[0], "SD_FilteredValueL");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[1], "SD_FilteredValueR");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getFilteredValue()[0], "FD_FilteredValueL");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getFilteredValue()[1], "FD_FilteredValueR");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getFilteredValue()[0], "HD_FValueL");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getFilteredValue()[1], "HD_FValueR");
-//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_finalAngle, "Angle");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[0], "SD_FilteredValueL");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[0].getFilteredValue()[1], "SD_FilteredValueR");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getFilteredValue()[0], "FD_FilteredValueL");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[1].getFilteredValue()[1], "FD_FilteredValueR");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getFilteredValue()[0], "HD_FilteredValueL");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_MagSen[2].getFilteredValue()[1], "HD_FilteredValueR");
+	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_finalAngle, "Angle");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_deiffChangeL, "<sup>d</sup>/dt(Fd_L)");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_deiffChangeR, "<sup>d</sup>/dt(Fd_R)");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_servo.m_FdDiffChangingRateChangingRate, "FdDiffRate");
 
 //	myCar.m_varMng.addWatchedVar(myCar.m_motor.m_encoder.getEncoderCountPointer(), "EncoderCount");
 //	myCar.m_varMng.addWatchedVar(myCar.m_motor.getPower(), "Speed");
 //	myCar.m_varMng.addWatchedVar(&MyResource::smartCar().m_motor.m_curReference, "EncoderTaget");
 //	myCar.m_varMng.addWatchedVar((uint8_t *)&MyResource::smartCar().m_servo.m_lastTurningDirection, "LastDirection");
 //	myCar.m_varMng.addWatchedVar(myCar.m_motor.m_speedPid.getLastError(), "Error");
+//	myCar.m_varMng.addWatchedVar(&myCar.m_motor.m_speedPid.m_output, "Output");
 
 	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Reference, "Motor_Ref");
 	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::NormalKp, "Servo_nKp");
@@ -193,10 +197,10 @@ int main(void)
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::WeightHD, "Weight_HD");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Kp, "Kp");
 //	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MotorConfig::Kd, "Kd");
-	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold, "Sd_TurningTH");
-	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFdAvg, "Fd_90");
-//	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MagSenConfig::Kq, "Kq");
-//	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MagSenConfig::Kr, "Kr");
+//	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold, "Sd_TurningTH");
+//	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFd, "Fd_90");
+	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MagSenConfig::Kq, "Kq");
+	myCar.m_varMng.addSharedVar(&MyResource::ConfigTable::MagSenConfig::Kr, "Kr");
 
 	Button::Config buttonConfig;
 	buttonConfig.listener_trigger = Button::Config::Trigger::kDown;
@@ -216,6 +220,8 @@ int main(void)
 	myCar.m_batteryMeter.checkBattery(0);
 
 	System::DelayMs(500);
+
+//	myCar.m_servo.setAngle(0);
 
 	myCar.m_loop.start();
 

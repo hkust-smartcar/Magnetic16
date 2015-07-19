@@ -28,5 +28,6 @@ public:
 private:
 
 	int32_t			m_lastCount;
+	Timer::TimerInt	m_lastTime;
 
 };

@@ -37,8 +37,8 @@ MySmartCar &MyResource::smartCar(void)
 //	uint8_t MyResource::ConfigTable::BuzzerConfig::WarningTimes = 3;
 
 	// MagSen
-	float MyResource::ConfigTable::MagSenConfig::Kq = 0.6;
-	float MyResource::ConfigTable::MagSenConfig::Kr = 0.5;
+	float MyResource::ConfigTable::MagSenConfig::Kq = 0.00015f;
+	float MyResource::ConfigTable::MagSenConfig::Kr = 1.70f;
 
 	// Servo
 //	float MyResource::ConfigTable::ServoConfig::Reference = 0.0f;
@@ -53,10 +53,10 @@ MySmartCar &MyResource::smartCar(void)
 //	float MyResource::ConfigTable::ServoConfig::NormalWeightHD = 0.4615385f;
 
 
-	float MyResource::ConfigTable::ServoConfig::TurningKpA =  350.0f; //250.0f;
-	float MyResource::ConfigTable::ServoConfig::TurningKpB = 540.0f; //120.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKpA =  345.0f; //250.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKpB = 330.0f; //120.0f;
 //	float MyResource::ConfigTable::ServoConfig::TurningKi = 0.0f;
-	float MyResource::ConfigTable::ServoConfig::TurningKd = 15.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKd = 20.0f;
 
 //	float MyResource::ConfigTable::ServoConfig::TurningWeightSD = 0.1f;
 //	float MyResource::ConfigTable::ServoConfig::TurningWeightFD = 0.325f;
@@ -65,14 +65,14 @@ MySmartCar &MyResource::smartCar(void)
 	float MyResource::ConfigTable::ServoConfig::CrossRoadThresholdFdValue = 2.0f;
 	float MyResource::ConfigTable::ServoConfig::TurningThresholdHdValue = 0.3f;
 	float MyResource::ConfigTable::ServoConfig::SdNoSignalThreshold = 0.675f;
-	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdSdOutput = 0.7f;
+	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFd = 0.3f;
 	float MyResource::ConfigTable::ServoConfig::Turning90DegreeThresholdFdAvg = 1.0f;
 
 
-	uint32_t MyResource::ConfigTable::ServoConfig::UpdateFreq = 4;
+	uint32_t MyResource::ConfigTable::ServoConfig::UpdateFreq = 2;
 
 	// Motor
-	float MyResource::ConfigTable::MotorConfig::Reference = 1500.0f;
+	float MyResource::ConfigTable::MotorConfig::Reference = 1300.0f;
 	float MyResource::ConfigTable::MotorConfig::Kp = 0.025f;
 //	float MyResource::ConfigTable::MotorConfig::Ki = 0.0f;
 	float MyResource::ConfigTable::MotorConfig::Kd = 0.018f;
@@ -92,8 +92,11 @@ MySmartCar &MyResource::smartCar(void)
 	// BatteryMeter
 	float MyResource::ConfigTable::BatteryMeterConfig::Ratio = 0.32591351983096153012896110238026f;
 	float MyResource::ConfigTable::BatteryMeterConfig::MaxVoltage = 8.2f;
-	float MyResource::ConfigTable::BatteryMeterConfig::MinVoltage = 7.6f;
+	float MyResource::ConfigTable::BatteryMeterConfig::MinVoltage = 7.55f;
 	uint16_t MyResource::ConfigTable::BatteryMeterConfig::UpdateFreq = 30000;
+
+	// Encoder
+	float MyResource::ConfigTable::EncoderConfig::UpdateFreq = 15;
 
 	// Lcd
 	uint8_t MyResource::ConfigTable::LcdConfig::Fps = 60;

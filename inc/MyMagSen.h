@@ -51,6 +51,7 @@ public:
 	array<float, 2> &getRawValue(void);
 	array<float, 2> &getStandardizedValue(void);
 
+	float						m_output;
 	array<float, 2>				m_ratio;
 
 private:
@@ -62,7 +63,6 @@ private:
 	array<float, 2>				m_standardizedReading;
 	array<float, 2>				m_filteredReading;
 	float						m_avg;
-	float						m_output;
 	bool						m_isInit;
 
 	Adc::Config getAdcConfig(MyMagSen::MagSenId type, MyMagSen::Side which);

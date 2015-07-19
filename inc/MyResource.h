@@ -68,7 +68,7 @@ public:
 			static float CrossRoadThresholdFdValue;
 			static float TurningThresholdHdValue;
 			static float SdNoSignalThreshold;
-			static float Turning90DegreeThresholdSdOutput;
+			static float Turning90DegreeThresholdFd;
 			static float Turning90DegreeThresholdFdAvg;
 
 
@@ -110,6 +110,15 @@ public:
 			static float MaxVoltage;
 			static float Ratio;
 			static uint16_t UpdateFreq;
+
+		};
+
+		struct EncoderConfig
+		{
+
+		public:
+
+			static float UpdateFreq;
 
 		};
 

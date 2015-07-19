@@ -77,7 +77,7 @@ void MyMotor::updateSpeed(const uint32_t &)
 
 	float output = m_instance->m_speedPid.update(m_instance->m_encoder.getEncoderReading());
 
-	if (output == MAX_MOTOR_POWER && System::Time() - m_instance->m_startTime > 1000)
+	if (MyResource::smartCar().m_hallSensor.isTheEnd()/* || (output == MAX_MOTOR_POWER && System::Time() - m_instance->m_startTime > 2000)*/)
 	{
 		m_instance->setEnabled(false);
 		m_instance->setSpeed(0);
@@ -104,8 +104,10 @@ void MyMotor::setEnabled(const bool enabled)
 		reset();
 		m_encoder.reset();
 		m_speedPid.reset();
-		if (m_enabled = enabled)
-			m_startTime = System::Time() - MyResource::ConfigTable::MotorConfig::UpdateFreq;
+		MyResource::smartCar().m_hallSensor.reset();
+//		if (m_enabled = enabled)
+//			m_startTime = System::Time() - MyResource::ConfigTable::MotorConfig::UpdateFreq;
+		m_enabled = enabled;
 	}
 }
 

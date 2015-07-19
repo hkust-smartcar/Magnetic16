@@ -16,6 +16,7 @@
 #include "MyBuzzer.h"
 #include "MyMenu.h"
 #include "MyFlash.h"
+#include "MyHallSensor.h"
 
 using namespace libsc;
 
@@ -76,6 +77,7 @@ MySmartCar::MySmartCar(void)
 	m_hallSensor()
 //	m_menu(m_lcdConsole)
 {
+	m_hallSensor.reset();
 	m_varMng.SetOnChangedListener(&m_flash.writeConfig);
 	switchInit();
 	m_loop.addFunctionToLoop(&m_motor.updateSpeed, MyResource::ConfigTable::MotorConfig::UpdateFreq);
@@ -90,7 +92,6 @@ void MySmartCar::switchInit(void)
 	m_servo.setEnabled(!m_switch[4].Get());
 //	m_servo.m_allow90DegreeTurning = m_switch[3].Get();
 	m_buzzer.setEnabled(m_switch[3].Get());
-
 }
 
 void MySmartCar::switchOnTriggered(Gpi *target)

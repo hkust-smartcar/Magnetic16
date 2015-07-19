@@ -137,6 +137,7 @@ void OnPress(const uint8_t id)
 
 	case 0:
 //		myCar.m_batteryMeter.checkBattery(0);
+		DelayMsByTicks(2000);
 		MyResource::smartCar().m_motor.setEnabled(!MyResource::smartCar().m_motor.isEnabled());
 		break;
 

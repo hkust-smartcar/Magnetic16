@@ -20,6 +20,7 @@
 #include "MyBatteryMeter.h"
 #include "MyMenu.h"
 #include "MyFlash.h"
+#include "MyHallSensor.h"
 
 #define IS_FRONT 1
 

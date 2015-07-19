@@ -17,7 +17,7 @@ Gpi::Config MyHallSensor::getGpiConfig(void)
 {
 	Gpi::Config config;
 	config.pin = LIBSC_I2C0_SCL;
-	config.interrupt = Pin::Config::Interrupt::kFalling;
+	config.interrupt = Pin::Config::Interrupt::kRising;
 	config.isr = &onDetect;
 	return config;
 }

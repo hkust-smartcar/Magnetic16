@@ -57,6 +57,7 @@ public:
 	MyHallSensor	m_hallSensor;
 //	MyMenu			m_menu;
 
+	static int 		m_lastTimeUpdateKey;
 
 private:
 

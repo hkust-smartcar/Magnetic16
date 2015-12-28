@@ -58,6 +58,26 @@ void myListener(const std::vector<Byte>& bytes)
 		MyResource::smartCar().m_lcdConsole.onDraw(99999);
 		break;
 
+	case 'w':
+		MyResource::smartCar().m_motor.setSpeed(400);
+		MyResource::smartCar().m_motor.setEnabled(true);
+		break;
+
+	case 's':
+		MyResource::smartCar().m_motor.setSpeed(-100);
+		MyResource::smartCar().m_motor.setEnabled(false);
+		break;
+
+	case 'a':
+		MyResource::smartCar().m_servo.setEnabled(true);
+		MyResource::smartCar().m_servo.setAngle(450);
+		break;
+
+	case 'd':
+		MyResource::smartCar().m_servo.setEnabled(true);
+		MyResource::smartCar().m_servo.setAngle(-450);
+		break;
+
 //	case 'a':
 //		MyResource::ConfigTable::MotorConfig::Kp += 0.005f;
 //		break;
@@ -125,6 +145,7 @@ void myListener(const std::vector<Byte>& bytes)
 
 //	if (!MyResource::smartCar().m_mode)
 //		MyResource::smartCar().m_lcdConsole.onDraw(99999);
+	myCar.m_lastTimeUpdateKey = System::Time();
 }
 
 void OnPress(const uint8_t id)
@@ -137,7 +158,7 @@ void OnPress(const uint8_t id)
 
 	case 0:
 //		myCar.m_batteryMeter.checkBattery(0);
-		DelayMsByTicks(2000);
+		DelayMsByTicks(500);
 		MyResource::smartCar().m_motor.setEnabled(!MyResource::smartCar().m_motor.isEnabled());
 		break;
 

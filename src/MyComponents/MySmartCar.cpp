@@ -74,7 +74,8 @@ MySmartCar::MySmartCar(void)
 			   MySwitch(getSwitchConfig(5)),
 			   MySwitch(getSwitchConfig(6)),
 			   MySwitch(getSwitchConfig(7)) }),
-	m_hallSensor()
+	m_hallSensor(),
+	m_lastTimeUpdateKey(0)
 //	m_menu(m_lcdConsole)
 {
 	m_hallSensor.reset();
@@ -92,6 +93,7 @@ void MySmartCar::switchInit(void)
 	m_servo.setEnabled(!m_switch[4].Get());
 //	m_servo.m_allow90DegreeTurning = m_switch[3].Get();
 	m_buzzer.setEnabled(m_switch[3].Get());
+	MyResource::ConfigTable::MotorConfig::Reference = (m_switch[0].Get())? 1300.0f : 1000.0f;
 }
 
 void MySmartCar::switchOnTriggered(Gpi *target)
@@ -123,6 +125,10 @@ void MySmartCar::switchOnTriggered(Gpi *target)
 
 	case LIBSC_SWITCH3:
 		MyResource::smartCar().m_buzzer.setEnabled(target->Get());
+		break;
+
+	case LIBSC_SWITCH0:
+		MyResource::ConfigTable::MotorConfig::Reference = (target->Get())? 1300.0f : 1000.0f;
 		break;
 	}
 }

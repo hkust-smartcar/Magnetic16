@@ -83,8 +83,8 @@ public:
 //			static float Ki;
 			static float Kd;
 
-//			static float TurningSpeedRatio;
-//			static float Turning90DegreeSpeedRatio;
+			static float TurningSpeedRatio;
+			static float Turning90DegreeSpeedRatio;
 //			static float MaxSpeedRatio;
 //
 //			static uint32_t TimeForReachingMaxSpeed;

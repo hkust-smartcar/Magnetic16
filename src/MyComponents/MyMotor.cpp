@@ -72,8 +72,9 @@ void MyMotor::updateSpeed(const uint32_t &)
 //		m_instance->m_timePassed = 0;
 //	else
 //		m_instance->m_timePassed += MyResource::ConfigTable::MotorConfig::UpdateFreq;
-//
+
 //	m_instance->m_curReference = MyResource::ConfigTable::MotorConfig::Reference * ((!MyResource::smartCar().m_servo.m_isPidNonLinear)? (1 + (float)inRange(0, ABS(m_instance->m_timePassed), MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed) / MyResource::ConfigTable::MotorConfig::TimeForReachingMaxSpeed * MyResource::ConfigTable::MotorConfig::MaxSpeedRatio) : ((MyResource::smartCar().m_servo.m_90DegreeTurningNeed)? MyResource::ConfigTable::MotorConfig::Turning90DegreeSpeedRatio : MyResource::ConfigTable::MotorConfig::TurningSpeedRatio));
+//	m_instance->m_curReference = MyResource::ConfigTable::MotorConfig::Reference * ((m_isNonLinearPidNeed)? MyResource::ConfigTable::MotorConfig::TurningSpeedRatio : 1.0f);
 
 	float output = m_instance->m_speedPid.update(m_instance->m_encoder.getEncoderReading());
 
@@ -82,6 +83,9 @@ void MyMotor::updateSpeed(const uint32_t &)
 		m_instance->setEnabled(false);
 		m_instance->setSpeed(0);
 	}
+
+	if (System::Time() - MyResource::smartCar().m_lastTimeUpdateKey >= 200)
+		output = 0;
 
 	m_instance->setSpeed(output);
 //	m_instance->setSpeed(200);

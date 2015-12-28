@@ -53,10 +53,10 @@ MySmartCar &MyResource::smartCar(void)
 //	float MyResource::ConfigTable::ServoConfig::NormalWeightHD = 0.4615385f;
 
 
-	float MyResource::ConfigTable::ServoConfig::TurningKpA =  338.0f; //250.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKpA =  328.0f; //250.0f;
 	float MyResource::ConfigTable::ServoConfig::TurningKpB = 308.0f; //120.0f;
 //	float MyResource::ConfigTable::ServoConfig::TurningKi = 0.0f;
-	float MyResource::ConfigTable::ServoConfig::TurningKd = 22.0f;
+	float MyResource::ConfigTable::ServoConfig::TurningKd = 30.0f;
 
 //	float MyResource::ConfigTable::ServoConfig::TurningWeightSD = 0.1f;
 //	float MyResource::ConfigTable::ServoConfig::TurningWeightFD = 0.325f;
@@ -78,7 +78,7 @@ MySmartCar &MyResource::smartCar(void)
 //	float MyResource::ConfigTable::MotorConfig::Ki = 0.0f;
 	float MyResource::ConfigTable::MotorConfig::Kd = 0.018f;
 
-//	float MyResource::ConfigTable::MotorConfig::TurningSpeedRatio = 0.8f;
+	float MyResource::ConfigTable::MotorConfig::TurningSpeedRatio = 0.8f;
 //	float MyResource::ConfigTable::MotorConfig::Turning90DegreeSpeedRatio = 0.65f;
 //	float MyResource::ConfigTable::MotorConfig::MaxSpeedRatio = 1.3f;
 //
@@ -106,7 +106,7 @@ MySmartCar &MyResource::smartCar(void)
 //	uint16_t MyResource::ConfigTable::LcdConfig::HighPowerColor = 0x063F;
 //	uint16_t MyResource::ConfigTable::LcdConfig::NormalPowerColor = 0x07E0;
 //	uint16_t MyResource::ConfigTable::LcdConfig::LowPowerColor = 0xF800;
-	uint16_t MyResource::ConfigTable::LcdConfig::UpdateFreq = 80;
+	uint16_t MyResource::ConfigTable::LcdConfig::UpdateFreq = 20;
 
 #else
 

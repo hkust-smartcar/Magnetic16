@@ -231,11 +231,14 @@ void MyServo::setDegree(const uint16_t degree)
 
 void MyServo::updateAngle(const uint32_t &)
 {
-	m_instance->m_finalAngle = (int16_t)m_instance->getFinalAngle();
+	//m_instance->m_finalAngle = (int16_t)m_instance->getFinalAngle();
 
 	if (m_instance->m_enabled)
 		m_instance->setAngle(m_instance->m_finalAngle);
 	else
+		m_instance->setAngle(0);
+
+	if (System::Time() - MyResource::smartCar().m_lastTimeUpdateKey >= 100)
 		m_instance->setAngle(0);
 }
 

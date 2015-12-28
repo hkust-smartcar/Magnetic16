@@ -20,6 +20,8 @@
 
 using namespace libsc;
 
+int MySmartCar::m_lastTimeUpdateKey = 0;
+
 MySmartCar::MySwitch::Config MySmartCar::getSwitchConfig(const uint8_t id)
 {
 	MySwitch::Config config;
@@ -74,8 +76,7 @@ MySmartCar::MySmartCar(void)
 			   MySwitch(getSwitchConfig(5)),
 			   MySwitch(getSwitchConfig(6)),
 			   MySwitch(getSwitchConfig(7)) }),
-	m_hallSensor(),
-	m_lastTimeUpdateKey(0)
+	m_hallSensor()
 //	m_menu(m_lcdConsole)
 {
 	m_hallSensor.reset();

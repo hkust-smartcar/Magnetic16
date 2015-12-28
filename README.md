@@ -1,6 +1,4 @@
-# Magnetic15-T1
-HKUST SmartCar 2015 - Magnetic Team 1
+# Magnetic16-T1
+HKUST SmartCar 2016 - Magnetic Team 1
 
 By PeterLau
-
-Please use "8451debug" branch in libsccc.

@@ -11,6 +11,7 @@
 #include <array>
 #include <libbase/k60/mcg.h>
 #include <libsc/button.h>
+#include <libsc/joystick.h>
 #include <libbase/k60/gpio.h>
 #include <libsc/system.h>
 #include "MyResource.h"
@@ -223,16 +224,33 @@ int main(void)
 
 	array<Led, 4> leds{ Led({ 0, true }), Led({ 1, true }), Led({ 2, true }), Led({ 3, true }) };
 
-	function<void (const uint8_t)> dispatcher = [&](const uint8_t id)
-													{
-														leds[id].Switch();
-													};
+	function<void (const uint8_t)> buttonsDispatcher = [&](const uint8_t id)
+															{
+																leds[id].Switch();
+															};
+	function<void (const uint8_t)> joystickDispatcher = [&](const uint8_t id)
+															{
+																if (id + 1 < 5)
+																	leds[id].Switch();
+																else
+																{
+																	leds[0].Switch();
+																	leds[3].Switch();
+																}
+															};
 
 	Button::Config butConfig;
-	butConfig.id = 0; butConfig.is_active_low = true; butConfig.listener = dispatcher; butConfig.listener_trigger = Button::Config::Trigger::kBoth;
+	butConfig.id = 0; butConfig.is_active_low = true; butConfig.listener = buttonsDispatcher; butConfig.listener_trigger = Button::Config::Trigger::kBoth;
 	Button but0(butConfig); butConfig.id++;
 	Button but1(butConfig); butConfig.id++;
 	Button but2(butConfig);
+
+	Joystick::Config jsConfig({ 0, true, { joystickDispatcher, joystickDispatcher, joystickDispatcher, joystickDispatcher, joystickDispatcher }, { Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth } });
+//	jsConfig.id = 0;
+//	jsConfig.is_active_low = true;
+//	jsConfig.listeners = (Joystick::Listener *)array<function<void (const uint8_t id)>, 5>{ joystickDispatcher, joystickDispatcher, joystickDispatcher, joystickDispatcher, joystickDispatcher }.data();
+//	jsConfig.listener_triggers = (Joystick::Config::Trigger *)array<Joystick::Config::Trigger, 5>{ Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth }.data();
+	Joystick joystick(jsConfig);
 
 //	for (uint8_t i = 0; i < leds.size(); i++)
 //		leds[i] = Led({ i, true });

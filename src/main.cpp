@@ -228,10 +228,10 @@ int main(void)
 															{
 																leds[id].Switch();
 															};
-	function<void (const uint8_t)> joystickDispatcher = [&](const uint8_t id)
+	function<void (const uint8_t, const Joystick::State which)> joystickDispatcher = [&](const uint8_t id, const Joystick::State which)
 															{
-																if (id + 1 < 5)
-																	leds[id].Switch();
+																if ((uint8_t)which + 1 < 5)
+																	leds[(uint8_t)which].Switch();
 																else
 																{
 																	leds[0].Switch();
@@ -245,7 +245,7 @@ int main(void)
 	Button but1(butConfig); butConfig.id++;
 	Button but2(butConfig);
 
-	Joystick::Config jsConfig({ 0, true, { joystickDispatcher, joystickDispatcher, joystickDispatcher, joystickDispatcher, joystickDispatcher }, { Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth } });
+	Joystick::Config jsConfig({ 0, true, joystickDispatcher, { 0 }, { Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth } });
 //	jsConfig.id = 0;
 //	jsConfig.is_active_low = true;
 //	jsConfig.listeners = (Joystick::Listener *)array<function<void (const uint8_t id)>, 5>{ joystickDispatcher, joystickDispatcher, joystickDispatcher, joystickDispatcher, joystickDispatcher }.data();

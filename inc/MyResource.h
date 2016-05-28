@@ -12,13 +12,13 @@
 #include <cassert>
 #include <stdint.h>
 #include <libsc/system.h>
-#include <libsc/k60/config/2015_magnetic.h>
+#include <libsc/k60/config/2016_magnetic.h>
 
 #define MAX(a, b) ((a > b)? a : b)
 #define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
 #define ABS(v) ((v > 0)? v : -v)
 
-class MySmartCar;
+//class MySmartCar;
 
 class MyResource
 {
@@ -142,13 +142,13 @@ public:
 
 	};
 
-	MyResource(MySmartCar *sc);
+	MyResource(/*MySmartCar *sc*/);
 
-	static MySmartCar &smartCar(void);
+//	static MySmartCar &smartCar(void);
 	void init(void);
 
 private:
 
-	MySmartCar *m_smartCar;
+//	MySmartCar *m_smartCar;
 
 };

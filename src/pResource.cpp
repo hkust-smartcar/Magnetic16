@@ -8,24 +8,25 @@
 
 #include <libsc/system.h>
 #include "MyResource.h"
-#include "MySmartCar.h"
+
+using namespace libsc;
 
 MyResource *m_resInstance = nullptr;
 
-MyResource::MyResource(MySmartCar *sc)
+MyResource::MyResource(/*MySmartCar *sc*/)
 {
 	System::Init();
-	if (!m_resInstance && sc)
+	if (!m_resInstance /*&& sc*/)
 	{
 		m_resInstance = this;
-		m_smartCar = sc;
+//		m_smartCar = sc;
 	}
 }
 
-MySmartCar &MyResource::smartCar(void)
-{
-	return *m_resInstance->m_smartCar;
-}
+//MySmartCar &MyResource::smartCar(void)
+//{
+//	return *m_resInstance->m_smartCar;
+//}
 
 
 #ifdef IS_FRONT

@@ -4,6 +4,7 @@
 !src/*
 !Makefile
 !MakeConfig.inc
+!build/*
 
 # Ignore additional files in root dir
 # Eclipse

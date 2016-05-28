@@ -1,4 +1,6 @@
-# Magnetic16-T1
-HKUST SmartCar 2016 - Magnetic Team 1
+# Magnetic16
+HKUST SmartCar 2016 - Magnetic Group
 
-By PeterLau
+See the power of C++// Son of the bitch
+
+By PeterLau/Petel__

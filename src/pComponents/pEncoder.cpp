@@ -8,15 +8,14 @@
  */
 
 #include "pEncoder.h"
-#include ""
+#include "pResource.h"
 
 using namespace libsc;
-
-const uint32_t pEncoder::m_encoderCountToMs = 0;
 
 pEncoder::pEncoder(const uint8_t id)
 :
 	AbEncoder({ 0 }),
+	m_encoderCountToMs(pResource::)
 	m_averageCountPerS(0),
 	m_lastTime(0)
 {

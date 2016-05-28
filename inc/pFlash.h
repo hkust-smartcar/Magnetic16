@@ -14,12 +14,14 @@
 
 using namespace libbase::k60;
 
-class MyFlash : Flash
+class pFlash : public Flash
 {
 
 public:
 
-	MyFlash(void);
+
+
+	pFlash(void);
 
 	void eraseAll(void);
 	static void writeConfig(void);
@@ -27,7 +29,7 @@ public:
 private:
 
 	size_t			m_sizeNeeded;
-	static MyFlash	*m_instance;
+	static pFlash	*m_instance;
 
 	void readConfig(void);
 

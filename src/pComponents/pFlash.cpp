@@ -7,12 +7,12 @@
  */
 
 #include <libbase/k60/flash.h>
-#include "MyFlash.h"
-#include "MyResource.h"
+#include <pFlash.h>
+#include <pResource.h>
 
 using namespace libbase::k60;
 
-MyFlash			*MyFlash::m_instance = nullptr;
+pFlash			*pFlash::m_instance = nullptr;
 
 Flash::Config getFlashConfig(void)
 {
@@ -20,7 +20,7 @@ Flash::Config getFlashConfig(void)
 	return config;
 }
 
-MyFlash::MyFlash(void)
+pFlash::pFlash(void)
 :
 	Flash(getFlashConfig()),
 	m_sizeNeeded(0)
@@ -34,12 +34,12 @@ MyFlash::MyFlash(void)
 	readConfig();
 }
 
-void MyFlash::eraseAll(void)
+void pFlash::eraseAll(void)
 {
 	EraseSector(GetStartAddr());
 }
 
-void MyFlash::readConfig(void)
+void pFlash::readConfig(void)
 {
 	if (*((uint8_t *)(GetStartAddr() + m_sizeNeeded - 1)) == 0xFF || *((uint8_t *)GetStartAddr()) == 0xFF || *((uint8_t *)(GetStartAddr() + m_sizeNeeded)) != 0xFF)
 		return ;
@@ -47,7 +47,7 @@ void MyFlash::readConfig(void)
 	assert(Read(&MyResource::ConfigTable::MagSenConfig::Kq, m_sizeNeeded) == FlashStatus::kSuccess);
 }
 
-void MyFlash::writeConfig(void)
+void pFlash::writeConfig(void)
 {
 	m_instance->Write(&MyResource::ConfigTable::MagSenConfig::Kq, m_instance->m_sizeNeeded);
 }

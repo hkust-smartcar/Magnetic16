@@ -8,6 +8,9 @@
  */
 
 #include <libsc/system.h>
+#include "pFlash.h"
+
+using namespace libsc;
 
 #pragma once
 
@@ -18,8 +21,8 @@ public:
 
 	pSmartCar(void);
 
-private:
+protected:
 
-
+	pFlash				m_flash;
 
 };

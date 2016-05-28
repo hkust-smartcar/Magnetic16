@@ -20,9 +20,9 @@
 #include <libsc/led.h>
 #include <libsc/ab_encoder.h>
 #include <libsc/system.h>
-#include "MyResource.h"
 #include <libbase/k60/flash.h>
 #include <libsc/mini_lcd.h>
+#include <pResource.h>
 
 namespace libbase
 {

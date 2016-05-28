@@ -11,7 +11,8 @@
 
 using namespace libsc;
 
-pResource::ConfigTable *pResource::configTable = nullptr;
+pResource::ConfigTable	*pResource::configTable = nullptr;
+pResource				*pResource::m_instance = nullptr;
 
 pResource::pResource(void)
 :
@@ -19,6 +20,11 @@ pResource::pResource(void)
 	m_flash(pFlash::Config(sizeof(pResource::ConfigTable)))
 {
 	System::Init();
+
+	if (m_instance)
+		assert(false);
+	else
+		m_instance = this;
 
 	if (!(configTable = (ConfigTable *)m_flash.getConfigTablePtr()))
 		assert(false);
@@ -30,7 +36,7 @@ void pResource::setInitialConfigTable(void)
 {
 	configTable->kIsExist = true;
 
-	configTable->kEncoderCountToMs = 0; // TODO: find const
+	configTable->kEncoderCountToCm = 0; // TODO: find const
 
 	// Save
 	m_flash.writeConfig();

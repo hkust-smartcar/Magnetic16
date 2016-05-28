@@ -1,5 +1,5 @@
 /*
- * MyLoop.cpp
+ * pLoop.cpp
  *
  * Author: Peter
  * Copyright (c) 2014-2015 HKUST SmartCar Team
@@ -11,7 +11,7 @@
 
 #include <libsc/system.h>
 
-#include "MyLoop.h"
+#include <pLoop.h>
 
 using namespace std;
 
@@ -22,14 +22,14 @@ void DelayMsByTicks(Timer::TimerInt delay)
 	while (System::Time() - startTime < delay);
 }
 
-MyLoop::MyLoop(void)
+pLoop::pLoop(void)
 :
 	m_start_time(0)
 {
 	System::Init();
 }
 
-void MyLoop::addFunctionToLoop(const LoopFunction &func, TimeInterval delay)
+void pLoop::addFunctionToLoop(const LoopFunction &func, TimeInterval delay)
 {
 	for (uint8_t i = 0; i < m_timer_list.size(); i++)
 		if (m_timer_list[i].interval > delay)
@@ -41,7 +41,7 @@ void MyLoop::addFunctionToLoop(const LoopFunction &func, TimeInterval delay)
 	m_timer_list.emplace_back((TimerInfo) {func, delay, 0});
 }
 
-void MyLoop::start(void)
+void pLoop::start(void)
 {
 	if (m_timer_list.size() == 0)
 		return ;

@@ -1,5 +1,5 @@
 /*
- * MyLoop.h
+ * pLoop.h
  *
  *  Created on: Feb 28, 2015
  *      Author: Peter
@@ -22,7 +22,7 @@ using namespace std;
 
 void DelayMsByTicks(Timer::TimerInt delay);
 
-class MyLoop
+class pLoop
 {
 public:
 
@@ -36,7 +36,7 @@ public:
 		Timer::TimerInt	lastRunTime;
 	};
 
-	MyLoop();
+	pLoop();
 
 	void start(void);
 

@@ -24,15 +24,14 @@ public:
 
 	static void updateEncoder(void);
 
-	// Ms: 1024 => 1.0 (m/s)
+	// 1000000 => 1 (m/s)
 	uint32_t getSpeedMs(void) const;
 	uint32_t getSpeedCount(void) const;
 
 private:
 
-	// Ms: 1024 => 1.0 (m/s) / 100 count
-	const uint32_t		m_encoderCountToMs;
-	// CountPerS: 1024 -> 100 count/s
+	// 1000000 => 1 (cm / count)
+	const uint32_t				m_encoderCountToCm;
 	uint32_t 					m_averageCountPerS;
 	Timer::TimerInt				m_lastTime;
 

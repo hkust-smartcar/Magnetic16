@@ -27,14 +27,16 @@ public:
 
 	struct ConfigTable
 	{
-		bool kIsExist;
+		bool			kIsExist;
+		uint16_t		kTableSize;
 
-		uint32_t kEncoderCountToMs;
+		uint32_t		kEncoderCountToCm;
 	};
 
 	pResource(void);
 
 	static ConfigTable			*configTable;
+	static pResource			*m_instance;
 
 private:
 

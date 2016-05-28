@@ -86,7 +86,8 @@ int main(void)
 	Mma8451q::Config accelConfig;
 	accelConfig.id = 0;
 	accelConfig.power_mode = Mma8451q::Config::PowerMode::kHighResolution;
-	accelConfig.sensitivity = Mma8451q::Config::Sensitivity::kMid;
+	accelConfig.sensitivity = Mma8451q::Config::Sensitivity::kLow;
+	accelConfig.output_data_rate = Mma8451q::Config::OutputDataRate::k800Hz;
 	Mma8451q accel(accelConfig);
 
 	Mpu6050::Config gyroConfig;
@@ -108,11 +109,11 @@ int main(void)
 	{
 		if (System::Time() - lastTime >= 100)
 		{
-			lcd.setRow(0);;
-			if (gyro.Update())
+			lcd.setRow(0);
+			if (gyro.Update() && accel.Update())
 			{
-				array<float, 3> tempAccel = gyro.GetAccel();
-				array<float, 3> tempOmega = gyro.GetOmega();
+				array<int16_t, 3> tempAccel = accel.GetAccel();//gyro.GetAccel();
+				array<int32_t, 3> tempOmega = gyro.GetOmega();
 				encoders[0].Update(); encoders[1].Update();
 				lcd /*<< tempAccel[0] << ", " << (float)tempAccel[1] << ", " << (float)tempAccel[2] << endl
 					<< tempOmega[0] << ", " << tempOmega[1] << ", " << tempOmega[2] << endl*/

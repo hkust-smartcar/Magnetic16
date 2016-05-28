@@ -17,7 +17,7 @@ pEncoder *pEncoder::m_instance = nullptr;
 pEncoder::pEncoder(const uint8_t id)
 :
 	AbEncoder({ 0 }),
-	m_encoderCountToMs(pResource::configTable->kEncoderCountToMs),
+	m_encoderCountToCm(pResource::configTable->kEncoderCountToCm),
 	m_averageCountPerS(0),
 	m_lastTime(0)
 {
@@ -29,12 +29,16 @@ pEncoder::pEncoder(const uint8_t id)
 
 void pEncoder::updateEncoder(void)
 {
-	// m_averageCountPerS = Count * ms * 1024 / 1000 = Count * ms * 125 / 128
-	m_instance->m_averageCountPerS = (m_instance->GetCount() * (System::Time() - m_instance->m_lastTime) * 125) >> 7;
+	m_instance->m_averageCountPerS = m_instance->GetCount() * (System::Time() - m_instance->m_lastTime) / 1000;
 }
 
 uint32_t pEncoder::getSpeedMs(void) const
 {
-	// ret = averageCountPerS / 1024 * encoderCountToMs / 1024 * 1024 = averageCountPerS * encoderCountToMs / 1024
-	return (m_averageCountPerS * m_encoderCountToMs) >> 10;
+	// m_averageCountPerS * m_encoderCountToCm / 100 = SpeedMs
+	return m_averageCountPerS * m_encoderCountToCm / 100;
+}
+
+uint32_t pEncoder::getSpeedCount(void) const
+{
+	return GetCount();
 }

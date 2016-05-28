@@ -24,7 +24,7 @@ pMotor::pMotor(const uint8_t id)
 	m_encoder(id)
 {}
 
-uint32_t pMotor::getSpeedMs(void)
+int32_t pMotor::getSpeedMs(void) const
 {
 	return m_encoder.getSpeedMs();
 }

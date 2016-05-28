@@ -12,6 +12,5 @@
 using namespace libsc;
 
 pSmartCar::pSmartCar(void)
-
 {
 }

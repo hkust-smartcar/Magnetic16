@@ -12,25 +12,17 @@
 
 using namespace libbase::k60;
 
-pFlash			*pFlash::m_instance = nullptr;
-
 Flash::Config getFlashConfig(void)
 {
 	Flash::Config config;
 	return config;
 }
 
-pFlash::pFlash(void)
+pFlash::pFlash(Config config)
 :
 	Flash(getFlashConfig()),
-	m_sizeNeeded(0)
+	m_sizeNeeded(config.tableSize)
 {
-	if (!m_instance)
-		m_instance = this;
-
-	m_sizeNeeded = (uint32_t)&MyResource::ConfigTable::LcdConfig::UpdateFreq + sizeof(MyResource::ConfigTable::LcdConfig::UpdateFreq) -
-						(uint32_t)&MyResource::ConfigTable::MagSenConfig::Kq;
-
 	readConfig();
 }
 
@@ -41,13 +33,15 @@ void pFlash::eraseAll(void)
 
 void pFlash::readConfig(void)
 {
-	if (*((uint8_t *)(GetStartAddr() + m_sizeNeeded - 1)) == 0xFF || *((uint8_t *)GetStartAddr()) == 0xFF || *((uint8_t *)(GetStartAddr() + m_sizeNeeded)) != 0xFF)
-		return ;
-
-	assert(Read(&MyResource::ConfigTable::MagSenConfig::Kq, m_sizeNeeded) == FlashStatus::kSuccess);
+	m_tablePtr = (void *)GetStartAddr();
 }
 
 void pFlash::writeConfig(void)
 {
-	m_instance->Write(&MyResource::ConfigTable::MagSenConfig::Kq, m_instance->m_sizeNeeded);
+	Write(m_tablePtr, m_sizeNeeded);
+}
+
+void *pFlash::getConfigTablePtr(void) const
+{
+	return m_tablePtr;
 }

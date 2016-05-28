@@ -23,6 +23,4 @@ public:
 
 protected:
 
-	pFlash				m_flash;
-
 };

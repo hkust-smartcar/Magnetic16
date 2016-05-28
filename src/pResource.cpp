@@ -7,22 +7,31 @@
  */
 
 #include <libsc/system.h>
-#include <pResource.h>
+#include "pResource.h"
 
 using namespace libsc;
 
+pResource::ConfigTable *pResource::configTable = nullptr;
+
 pResource::pResource(void)
 :
-	pSmartCar()
+	pSmartCar(),
+	m_flash(pFlash::Config(sizeof(pResource::ConfigTable)))
 {
 	System::Init();
 
-	if (pFlash.)
+	if (!(configTable = (ConfigTable *)m_flash.getConfigTablePtr()))
+		assert(false);
+	else if (!configTable->kIsExist)
+		setInitialConfigTable();
 }
 
-ConfigTable pResource::getInitialConfigTable(void)
+void pResource::setInitialConfigTable(void)
 {
-	ConfigTable config;
+	configTable->kIsExist = true;
 
-	config.isExist = true;
+	configTable->kEncoderCountToMs = 0; // TODO: find const
+
+	// Save
+	m_flash.writeConfig();
 }

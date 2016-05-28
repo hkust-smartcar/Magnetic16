@@ -19,17 +19,27 @@ class pFlash : public Flash
 
 public:
 
+	struct Config
+	{
+		uint16_t tableSize;
 
+		Config(uint16_t _tableSize)
+		:
+			tableSize(_tableSize)
+		{}
+	};
 
-	pFlash(void);
+	pFlash(Config config);
 
 	void eraseAll(void);
-	static void writeConfig(void);
+	void writeConfig(void);
+
+	void *getConfigTablePtr(void) const;
 
 private:
 
+	void				*m_tablePtr;
 	size_t			m_sizeNeeded;
-	static pFlash	*m_instance;
 
 	void readConfig(void);
 

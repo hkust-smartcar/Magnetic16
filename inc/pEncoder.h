@@ -36,4 +36,6 @@ private:
 	uint32_t 					m_averageCountPerS;
 	Timer::TimerInt				m_lastTime;
 
+	static pEncoder	*m_instance;
+
 };

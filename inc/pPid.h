@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <stdint.h>
 #include <libsc/system.h>
 #include <libsc/timer.h>
@@ -36,6 +37,7 @@ public:
 		int32_t min;
 
 		uint32_t updatePeriod;
+		bool useStrict = true;
 
 		PidParam(int32_t &_kP, int32_t &_kI, int32_t &_kD, int32_t &_setPoint, int32_t _max, int32_t _min, uint32_t _updatePeriod)
 		:
@@ -52,7 +54,7 @@ public:
 	pPid(PidParam param);
 
 	void reset(void);
-	bool isTime(void);
+	bool isReady(void);
 
 	// val: 10000 => 1.0
 	int32_t getOutput(const int32_t val);

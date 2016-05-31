@@ -27,18 +27,18 @@ pEncoder::pEncoder(const uint8_t id)
 		m_instance = this;
 }
 
-void pEncoder::updateEncoder(void)
+void pEncoder::update(void)
 {
 	m_instance->m_averageCountPerS = m_instance->GetCount() * (System::Time() - m_instance->m_lastTime) / 1000;
 }
 
-uint32_t pEncoder::getSpeedMs(void) const
+float pEncoder::getSpeedMs(void) const
 {
 	// m_averageCountPerS * m_encoderCountToCm / 100 = SpeedMs
 	return m_averageCountPerS * m_encoderCountToCm / 100;
 }
 
-uint32_t pEncoder::getSpeedCount(void) const
+float pEncoder::getSpeedCount(void) const
 {
 	return GetCount();
 }

@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cstring>
 #include <array>
+#include <cmath>
 #include <libbase/k60/mcg.h>
 #include <libsc/button.h>
 #include <libsc/joystick.h>
@@ -23,6 +24,7 @@
 #include <libbase/k60/flash.h>
 #include <libsc/mini_lcd.h>
 #include <pResource.h>
+#include <pAngle.h>
 
 namespace libbase
 {
@@ -40,10 +42,13 @@ namespace libbase
 	}
 }
 
+#define PI 3.14159265359f
+
 using namespace std;
 using namespace libsc;
 using namespace libbase::k60;
 using namespace libsc::k60;
+using namespace libutil;
 
 //MySmartCar myCar;
 
@@ -83,49 +88,59 @@ int main(void)
 	Joystick::Config jsConfig({ 0, true, joystickDispatcher, { 0 }, { Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth, Joystick::Config::Trigger::kBoth } });
 	Joystick joystick(jsConfig);
 
-	Mma8451q::Config accelConfig;
-	accelConfig.id = 0;
-	accelConfig.power_mode = Mma8451q::Config::PowerMode::kHighResolution;
-	accelConfig.sensitivity = Mma8451q::Config::Sensitivity::kLow;
-	accelConfig.output_data_rate = Mma8451q::Config::OutputDataRate::k800Hz;
-	Mma8451q accel(accelConfig);
-
-	Mpu6050::Config gyroConfig;
-	gyroConfig.cal_drift = true;
-	gyroConfig.gyro_range = Mpu6050::Config::Range::kMid;
-	Mpu6050 gyro(gyroConfig);
-
-	MiniLcd lcd(MiniLcd::Config(0, -1, 30, 2));
+//	Mma8451q::Config accelConfig;
+//	accelConfig.id = 0;
+//	accelConfig.power_mode = Mma8451q::Config::PowerMode::kHighResolution;
+//	accelConfig.sensitivity = Mma8451q::Config::Sensitivity::kLow;
+//	accelConfig.output_data_rate = Mma8451q::Config::OutputDataRate::k800Hz;
+//	Mma8451q accel(accelConfig);
+//
+//	Mpu6050::Config gyroConfig;
+//	gyroConfig.cal_drift = true;
+//	gyroConfig.gyro_range = Mpu6050::Config::Range::kMid;
+//	Mpu6050 gyro(gyroConfig);
+//
+	MiniLcd lcd(MiniLcd::Config(0, -1, 30, 3));
+	pAngle angle(pAngle::Config(20, 0.02));
 
 	array<AbEncoder, 2> encoders{ AbEncoder({ 0 }), AbEncoder({ 1 }) };
 
 //	uint8_t index = 0;
 
-	Timer::TimerInt lastTime = System::Time();
+	Timer::TimerInt lastTimeLcd = System::Time(), lastTimeAngle = System::Time(), start = 0, end = 0;
 
 	lcd.clear();
 
 	while (true)
 	{
-		if (System::Time() - lastTime >= 100)
+		if (System::Time() - lastTimeLcd >= 100)
 		{
 			lcd.setRow(0);
-			if (gyro.Update() && accel.Update())
-			{
-				array<int16_t, 3> tempAccel = accel.GetAccel();//gyro.GetAccel();
-				array<int32_t, 3> tempOmega = gyro.GetOmega();
+//			if (gyro.UpdateF() && accel.UpdateF())
+//			{
+//				array<int16_t, 3> tempAccel = accel.GetAccel();//gyro.GetAccel();
+//				array<int32_t, 3> tempOmega = gyro.GetOmega();
+//				array<float, 3> tempAccel = accel.GetAccelF();
+//				array<float, 3> tempOmega = gyro.GetOmegaF();
 				encoders[0].Update(); encoders[1].Update();
 				lcd /*<< tempAccel[0] << ", " << (float)tempAccel[1] << ", " << (float)tempAccel[2] << endl
 					<< tempOmega[0] << ", " << tempOmega[1] << ", " << tempOmega[2] << endl*/
 					<< encoders[0].GetCount() << '\t' << encoders[1].GetCount() << '\t' << endl
 					<< motors[0].GetPower() << '\t' << motors[1].GetPower() << '\t' << endl
-					<< tempAccel[0] << '\t' << tempAccel[1] << '\t' << tempAccel[2] << '\t' << endl
-					<< tempOmega[0] << '\t' << tempOmega[1] << '\t' << tempOmega[2] << '\t';
-			}
-			else
-				lcd << "Get Accel Failed!" << endl;
+//					<< tempAccel[0] << '\t' << tempAccel[1] << '\t' << tempAccel[2] << '\t' << endl
+//					<< tempOmega[0] << '\t' << tempOmega[1] << '\t' << tempOmega[2] << '\t' << endl
+					<< (angle.getAngle()) << '\t' << endl << (end - start) << endl;
+//			}
+//			else
+//				lcd << "Get Accel Failed!" << endl;
 
-			lastTime = System::Time();
+			lastTimeLcd = System::Time();
+		}
+		else if (System::Time() - lastTimeAngle >= 20)
+		{
+			start = System::Time();
+			angle.update();
+			lastTimeAngle = end = System::Time();
 		}
 //		leds[index].Switch();
 //		index = ++index % leds.size();

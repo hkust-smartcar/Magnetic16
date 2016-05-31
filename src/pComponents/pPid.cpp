@@ -28,9 +28,13 @@ void pPid::reset(void)
 	m_lastTime = 0;
 }
 
-bool pPid::isTime(void)
+bool pPid::isReady(void)
 {
-	return ((System::Time() - m_lastTime) >= m_param.updatePeriod);
+	int32_t dt = System::Time() - m_lastTime - m_param.updatePeriod;
+
+	assert(dt <= 0);
+
+	return (dt == 0); // TODO: check if this works
 }
 
 int32_t pPid::getOutput(const int32_t val)

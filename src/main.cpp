@@ -62,7 +62,7 @@ int main(void)
 	dir0Config.id = 0; dir1Config.id = 1;
 	array<DirMotor, 2> motors{ DirMotor(dir0Config), DirMotor(dir1Config) };
 
-//	motors[0].SetPower(250); motors[1].SetPower(250);
+	motors[0].SetPower(150); motors[1].SetPower(150);
 
 	function<void (const uint8_t)> buttonsDispatcher = [&](const uint8_t id)
 															{
@@ -113,34 +113,34 @@ int main(void)
 
 	while (true)
 	{
-		if (System::Time() - lastTimeLcd >= 100)
+		if (System::Time() - lastTimeAngle >= 20)
+		{
+			start = System::Time();
+			angle.update();
+			lastTimeAngle = end = System::Time();
+		}
+		else if (System::Time() - lastTimeLcd >= 100)
 		{
 			lcd.setRow(0);
 //			if (gyro.UpdateF() && accel.UpdateF())
 //			{
 //				array<int16_t, 3> tempAccel = accel.GetAccel();//gyro.GetAccel();
 //				array<int32_t, 3> tempOmega = gyro.GetOmega();
-//				array<float, 3> tempAccel = accel.GetAccelF();
-//				array<float, 3> tempOmega = gyro.GetOmegaF();
+				array<float, 3> tempAccel = angle.getAccel();//accel.GetAccelF();
+				array<float, 3> tempOmega = angle.getOmega();//gyro.GetOmegaF();
 				encoders[0].Update(); encoders[1].Update();
 				lcd /*<< tempAccel[0] << ", " << (float)tempAccel[1] << ", " << (float)tempAccel[2] << endl
 					<< tempOmega[0] << ", " << tempOmega[1] << ", " << tempOmega[2] << endl*/
 					<< encoders[0].GetCount() << '\t' << encoders[1].GetCount() << '\t' << endl
 					<< motors[0].GetPower() << '\t' << motors[1].GetPower() << '\t' << endl
-//					<< tempAccel[0] << '\t' << tempAccel[1] << '\t' << tempAccel[2] << '\t' << endl
-//					<< tempOmega[0] << '\t' << tempOmega[1] << '\t' << tempOmega[2] << '\t' << endl;
-					<< (angle.getAngle()) << '\t' << endl << (end - start) << endl;
+					<< tempAccel[0] << '\t' << tempAccel[1] << '\t' << tempAccel[2] << '\t' << endl
+					<< tempOmega[0] << '\t' << tempOmega[1] << '\t' << tempOmega[2] << '\t' << endl
+					<< (angle.getAngle()) << '\t' << endl;
 //			}
 //			else
 //				lcd << "Get Accel Failed!" << endl;
 
 			lastTimeLcd = System::Time();
-		}
-		else if (System::Time() - lastTimeAngle >= 20)
-		{
-			start = System::Time();
-			angle.update();
-			lastTimeAngle = end = System::Time();
 		}
 //		leds[index].Switch();
 //		index = ++index % leds.size();

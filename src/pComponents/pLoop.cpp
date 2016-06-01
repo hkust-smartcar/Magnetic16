@@ -14,6 +14,7 @@
 #include <pLoop.h>
 
 using namespace std;
+using namespace libsc;
 
 void DelayMsByTicks(Timer::TimerInt delay)
 {
@@ -23,41 +24,48 @@ void DelayMsByTicks(Timer::TimerInt delay)
 }
 
 pLoop::pLoop(void)
-:
-	m_start_time(0)
 {
 	System::Init();
 }
 
 void pLoop::addFunctionToLoop(const LoopFunction &func, TimeInterval delay)
 {
-	for (uint8_t i = 0; i < m_timer_list.size(); i++)
-		if (m_timer_list[i].interval > delay)
-		{
-			m_timer_list.emplace(m_timer_list.begin() + i, (TimerInfo) {func, delay, 0});
-			return;
-		}
-
-	m_timer_list.emplace_back((TimerInfo) {func, delay, 0});
+	m_task_list.emplace_back((TaskInfo) {func, delay});
 }
 
 void pLoop::start(void)
 {
-	if (m_timer_list.size() == 0)
+	if (m_task_list.size() == 0)
 		return ;
 
-	m_start_time = System::Time();
+//	sort
+//	(
+//		m_task_list.begin(),
+//		m_task_list.end(),
+//		[] (TaskInfo a, TaskInfo b)
+//		{
+//			return (a.interval < b.interval);
+//		}
+//	);
 
-	for (uint8_t i = 0; i < m_timer_list.size(); i++)
-		m_timer_list[i].lastRunTime = m_start_time;
+	Timer::TimerInt lastTime = System::Time();
+
+//	TimeInterval prevTime = 0;
+//	for (uint8_t i = 0; i < m_task_list.size(); i++)
+//	{
+//		m_task_list[i].interval -= prevTime;
+//		prevTime = m_task_list[i].interval;
+//	}
 
 	while (true)
 	{
-		for (uint8_t i = 0; i < m_timer_list.size(); i++)
-			if (System::Time() - m_timer_list[i].lastRunTime >= m_timer_list[i].interval)
-			{
-				((LoopFunction)m_timer_list[i].func)(System::Time() - m_timer_list[i].lastRunTime - m_timer_list[i].interval);
-				m_timer_list[i].lastRunTime = System::Time();
-			}
+		for (uint8_t i = 0; i < m_task_list.size(); i++)
+		{
+			assert(lastTime <= System::Time());
+//			while (System::Time() - lastTime < m_task_list[i].interval);
+			while (System::Time() - lastTime < m_task_list[i].delay);
+			lastTime = System::Time();
+			((LoopFunction)m_task_list[i].func)();
+		}
 	}
 }

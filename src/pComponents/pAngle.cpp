@@ -42,16 +42,6 @@ pAngle::pAngle(pAngle::Config config)
 	System::Init();
 }
 
-bool pAngle::isReady(void) const
-{
-	int32_t dt = System::Time() - m_lastTime - m_param.updatePeriod;
-
-	if (m_param.useStrict)
-		assert(dt <= 0);
-
-	return (dt == 0); // TODO: check if this works
-}
-
 void pAngle::update(void)
 {
 	if (m_lastTime)
@@ -59,14 +49,18 @@ void pAngle::update(void)
 		this->Mma8451q::UpdateF();
 		this->Mpu6050::UpdateF();
 
-		m_gyroAngle -= GetOmegaF()[0] * (System::Time() - m_lastTime) / 1000;
-		m_gyroOffset += m_param.accelTrustValue * (asin(inRange(-1.0f, this->Mma8451q::GetAccelF()[0], 1.0f)) * RadToDeg - m_lastAngle);
+		m_lastAccel = this->Mma8451q::GetAccelF();
+		m_lastOmega = GetOmegaF();
+
+		m_gyroAngle -= m_lastOmega[0] * (System::Time() - m_lastTime) / 1000;
+		m_gyroOffset += m_param.accelTrustValue * (asin(inRange(-1.0f, m_lastAccel[0], 1.0f)) * RadToDeg - m_lastAngle);
 		m_lastAngle = m_gyroAngle + m_gyroOffset;
 	}
 	else
 	{
 		this->Mma8451q::UpdateF();
-		m_lastAngle = m_gyroOffset = asin(inRange(-1.0f, this->Mma8451q::GetAccelF()[0], 1.0f)) * RadToDeg;
+		m_lastAccel = this->Mma8451q::GetAccelF();
+		m_lastAngle = m_gyroOffset = asin(inRange(-1.0f, m_lastAccel[0], 1.0f)) * RadToDeg;
 	}
 
 	m_lastTime = System::Time();
@@ -75,4 +69,24 @@ void pAngle::update(void)
 float pAngle::getAngle(void) const
 {
 	return m_lastAngle;
+}
+
+array<float, 3> pAngle::getAccel(void) const
+{
+	return m_lastAccel;
+}
+
+array<float, 3> pAngle::getOmega(void) const
+{
+	return m_lastOmega;
+}
+
+float pAngle::getAccel(const uint8_t index) const
+{
+	return m_lastAccel[index];
+}
+
+float pAngle::getOmega(const uint8_t index) const
+{
+	return m_lastOmega[index];
 }

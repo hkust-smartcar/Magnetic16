@@ -38,6 +38,8 @@ void pResource::setInitialConfigTable(void)
 
 	configTable->kEncoderCountToCm = 0; // TODO: find const
 
+	configTable->kIdealAngle = 63.5f;
+
 	// Save
 	m_flash.writeConfig();
 }

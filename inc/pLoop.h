@@ -7,7 +7,9 @@
 
 #pragma once
 
+#include <cassert>
 #include <functional>
+#include <algorithm>
 #include <vector>
 
 #include <libsc/system.h>
@@ -26,14 +28,14 @@ class pLoop
 {
 public:
 
-	typedef function<void (const uint32_t &)> LoopFunction;
+	typedef function<void (void)> LoopFunction;
 	typedef Timer::TimerInt TimeInterval;
 
-	struct TimerInfo
+	struct TaskInfo
 	{
 		LoopFunction	func;
-		TimeInterval	interval;
-		Timer::TimerInt	lastRunTime;
+
+		TimeInterval	delay;
 	};
 
 	pLoop();
@@ -44,8 +46,6 @@ public:
 
 private:
 
-	vector<TimerInfo>			m_timer_list;
-
-	Timer::TimerInt				m_start_time;
+	vector<pLoop::TaskInfo>	m_task_list;
 
 };

@@ -12,8 +12,6 @@
 
 using namespace libsc;
 
-pEncoder *pEncoder::m_instance = nullptr;
-
 pEncoder::pEncoder(const uint8_t id)
 :
 	AbEncoder({ 0 }),
@@ -22,14 +20,11 @@ pEncoder::pEncoder(const uint8_t id)
 	m_lastTime(0)
 {
 	System::Init();
-
-	if (!m_instance)
-		m_instance = this;
 }
 
 void pEncoder::update(void)
 {
-	m_instance->m_averageCountPerS = m_instance->GetCount() * (System::Time() - m_instance->m_lastTime) / 1000;
+	m_averageCountPerS = GetCount() * (System::Time() - m_lastTime) / 1000;
 }
 
 float pEncoder::getSpeedMs(void) const

@@ -28,23 +28,14 @@ void pPid::reset(void)
 	m_lastTime = 0;
 }
 
-bool pPid::isReady(void)
-{
-	int32_t dt = System::Time() - m_lastTime - m_param.updatePeriod;
-
-	assert(dt <= 0);
-
-	return (dt == 0); // TODO: check if this works
-}
-
-int32_t pPid::getOutput(const int32_t val)
+float pPid::getOutput(const float val)
 {
 	int32_t tempOutput = 0;
 
 	if (m_lastTime)
 	{
 
-		int32_t error = m_param.setPoint - val;
+		float error = m_param.setPoint - val;
 		uint32_t dt = System::Time() - m_lastTime;
 
 		tempOutput += error * m_param.kP;
@@ -53,7 +44,7 @@ int32_t pPid::getOutput(const int32_t val)
 
 		if (error > m_epsilon)
 		{
-			m_sum += ((error + m_lastError) * dt) >> 1;
+			m_sum += ((error + m_lastError) * dt) * 0.5f;
 			tempOutput += m_sum * m_param.kI;
 		}
 

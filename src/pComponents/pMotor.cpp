@@ -18,13 +18,22 @@ DirMotor::Config getMotorConfig(const uint8_t id)
 	return config;
 }
 
-pMotor::pMotor(const uint8_t id)
+pMotor::pMotor(const uint8_t id, MappingFunc mapingFunction, float &kP, float &kI, float &kD)
 :
 	DirMotor(getMotorConfig(id)),
-	m_encoder(id)
+	m_encoder(id),
+	m_pid(pPid::PidParam(kP, kI, kD, m_setPoint, 500, -500))
 {}
 
-int32_t pMotor::getSpeedMs(void) const
+void pMotor::update(void)
+{
+	m_encoder.update();
+	float tempPower = m_pid.getOutput(m_encoder.getSpeedCount());
+	SetClockwise(tempPower > 0.0f);
+	SetPower((uint16_t)ABS(tempPower));
+}
+
+float pMotor::getSpeedMs(void) const
 {
 	return m_encoder.getSpeedMs();
 }
@@ -34,7 +43,7 @@ void pMotor::setSpeedMs(const int32_t speed)
 
 }
 
-int32_t pMotor::getSpeedCount(void) const
+float pMotor::getSpeedCount(void) const
 {
 	return m_encoder.getSpeedCount();
 }

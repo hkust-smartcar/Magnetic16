@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <cassert>
 #include <stdint.h>
 #include <libsc/system.h>
 #include <libsc/timer.h>
@@ -25,39 +24,34 @@ class pPid
 
 public:
 
-	// 10000 => 1.0
 	struct PidParam
 	{
-		int32_t &kP;
-		int32_t &kI;
-		int32_t &kD;
-		int32_t &setPoint;
+		float &kP;
+		float &kI;
+		float &kD;
+		float &setPoint;
 
-		int32_t max;
-		int32_t min;
+		float max;
+		float min;
 
-		uint32_t updatePeriod;
 		bool useStrict = true;
 
-		PidParam(int32_t &_kP, int32_t &_kI, int32_t &_kD, int32_t &_setPoint, int32_t _max, int32_t _min, uint32_t _updatePeriod)
+		PidParam(float &_kP, float &_kI, float &_kD, float &_setPoint, float _max, float _min)
 		:
-			kP(_kP), kI(_kI), kD(_kD), setPoint(_setPoint), max(_max), min(_min), updatePeriod(_updatePeriod)
+			kP(_kP), kI(_kI), kD(_kD), setPoint(_setPoint), max(_max), min(_min)
 		{}
 
 		PidParam(const PidParam &other)
 		:
-			kP(other.kP), kI(other.kI), kD(other.kD), setPoint(other.setPoint), max(other.max), min(other.min), updatePeriod(other.updatePeriod)
+			kP(other.kP), kI(other.kI), kD(other.kD), setPoint(other.setPoint), max(other.max), min(other.min)
 		{}
 	};
 
-	pPid(void) = delete;
 	pPid(PidParam param);
 
 	void reset(void);
-	bool isReady(void);
 
-	// val: 10000 => 1.0
-	int32_t getOutput(const int32_t val);
+	float getOutput(const float val);
 
 private:
 
@@ -67,6 +61,6 @@ private:
 	int32_t				m_lastError;
 	int32_t				m_sum;
 
-	const int32_t		m_epsilon;
+	const float		m_epsilon;
 
 };

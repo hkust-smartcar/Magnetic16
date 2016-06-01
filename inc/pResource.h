@@ -20,7 +20,7 @@
 #define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
 #define ABS(v) ((v > 0)? v : -v)
 
-class pResource : private pSmartCar
+class pResource : public pSmartCar
 {
 
 public:
@@ -30,7 +30,17 @@ public:
 		bool			kIsExist;
 		uint16_t		kTableSize;
 
-		uint32_t		kEncoderCountToCm;
+		float			kEncoderCountToCm;
+
+		float			kIdealAngle;
+
+		float			kLeftMotorKp;
+		float			kLeftMotorKd;
+		float			kLeftMotorKi;
+
+		float			kRightMotorKp;
+		float			kRightMotorKd;
+		float			kRightMotorKi;
 	};
 
 	pResource(void);

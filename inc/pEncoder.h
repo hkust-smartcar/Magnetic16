@@ -22,7 +22,7 @@ public:
 
 	pEncoder(const uint8_t id);
 
-	static void update(void);
+	void update(void);
 
 	float getSpeedMs(void) const;
 	float getSpeedCount(void) const;
@@ -30,9 +30,7 @@ public:
 private:
 
 	const float					m_encoderCountToCm;
-	float 					m_averageCountPerS;
+	float 						m_averageCountPerS;
 	Timer::TimerInt				m_lastTime;
-
-	static pEncoder	*m_instance;
 
 };

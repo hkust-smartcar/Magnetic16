@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <cassert>
 #include <array>
 #include <cmath>
 #include <libsc/mma8451q.h>
@@ -18,6 +17,7 @@
 #include <libsc/system.h>
 
 using namespace libsc;
+using namespace std;
 
 #define RadToDeg 57.29577951f
 #define inRange(n, v, x) ((v > x)? x : ((v < n)? n : v))
@@ -51,11 +51,14 @@ public:
 
 	pAngle(Config config);
 
-	bool isReady(void) const;
-
 	void update(void);
 
 	float getAngle(void) const;
+
+	array<float, 3> getAccel(void) const;
+	array<float, 3> getOmega(void) const;
+	float getAccel(const uint8_t index) const;
+	float getOmega(const uint8_t index) const;
 
 private:
 
@@ -63,6 +66,8 @@ private:
 	float			m_lastAngle;
 	float			m_gyroAngle;
 	float			m_gyroOffset;
+	array<float, 3>	m_lastAccel;
+	array<float, 3>	m_lastOmega;
 
 	Timer::TimerInt	m_lastTime;
 

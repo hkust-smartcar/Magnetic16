@@ -99,7 +99,7 @@ int main(void)
 //	gyroConfig.cal_drift = true;
 //	gyroConfig.gyro_range = Mpu6050::Config::Range::kMid;
 //	Mpu6050 gyro(gyroConfig);
-//
+
 	MiniLcd lcd(MiniLcd::Config(0, -1, 30, 3));
 	pAngle angle(pAngle::Config(20, 0.02));
 
@@ -128,7 +128,7 @@ int main(void)
 					<< encoders[0].GetCount() << '\t' << encoders[1].GetCount() << '\t' << endl
 					<< motors[0].GetPower() << '\t' << motors[1].GetPower() << '\t' << endl
 //					<< tempAccel[0] << '\t' << tempAccel[1] << '\t' << tempAccel[2] << '\t' << endl
-//					<< tempOmega[0] << '\t' << tempOmega[1] << '\t' << tempOmega[2] << '\t' << endl
+//					<< tempOmega[0] << '\t' << tempOmega[1] << '\t' << tempOmega[2] << '\t' << endl;
 					<< (angle.getAngle()) << '\t' << endl << (end - start) << endl;
 //			}
 //			else

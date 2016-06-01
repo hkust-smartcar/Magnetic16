@@ -34,18 +34,20 @@ public:
 	struct TaskInfo
 	{
 		LoopFunction	func;
-
-		TimeInterval	delay;
+		TimeInterval	interval;
+		Timer::TimerInt	lastRunTime;
 	};
 
 	pLoop();
 
 	void start(void);
 
-	void addFunctionToLoop(const LoopFunction &func, TimeInterval delay);
+	void addFunctionToLoop(const LoopFunction &func, TimeInterval interval);
 
 private:
 
-	vector<pLoop::TaskInfo>	m_task_list;
+	vector<TaskInfo>			m_task_list;
+
+	Timer::TimerInt				m_start_time;
 
 };

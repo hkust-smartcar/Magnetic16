@@ -20,7 +20,7 @@ class pEncoder : private AbEncoder
 
 public:
 
-	pEncoder(const uint8_t id);
+	pEncoder(const uint8_t id, bool isClockwise);
 
 	void update(void);
 
@@ -29,8 +29,11 @@ public:
 
 private:
 
-	const float					m_encoderCountToCm;
+	int32_t						m_lastCount;
+	const int32_t				m_encoderCountToCm;
 	float 						m_averageCountPerS;
 	Timer::TimerInt				m_lastTime;
+
+	bool						m_isInverse;
 
 };

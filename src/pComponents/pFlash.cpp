@@ -40,6 +40,10 @@ void pFlash::writeConfig(void)
 {
 	Write(m_tablePtr, m_sizeNeeded);
 }
+void pFlash::writeConfig(void *addr)
+{
+	Write(addr, m_sizeNeeded);
+}
 
 void *pFlash::getConfigTablePtr(void) const
 {

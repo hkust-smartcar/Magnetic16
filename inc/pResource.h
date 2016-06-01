@@ -30,7 +30,7 @@ public:
 		bool			kIsExist;
 		uint16_t		kTableSize;
 
-		float			kEncoderCountToCm;
+		int32_t			kEncoderCountToCm;
 
 		float			kIdealAngle;
 

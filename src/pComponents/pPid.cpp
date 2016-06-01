@@ -30,7 +30,7 @@ void pPid::reset(void)
 
 float pPid::getOutput(const float val)
 {
-	int32_t tempOutput = 0;
+	float tempOutput = 0;
 
 	if (m_lastTime)
 	{

@@ -11,7 +11,7 @@
 
 using namespace libsc;
 
-pResource::ConfigTable	*pResource::configTable = nullptr;
+pResource::ConfigTable	*pResource::configTable = (pResource::ConfigTable *)0x7f800; // hard code due to the structure
 pResource				*pResource::m_instance = nullptr;
 
 pResource::pResource(void)
@@ -26,20 +26,30 @@ pResource::pResource(void)
 	else
 		m_instance = this;
 
+//	m_flash.eraseAll();
+
 	if (!(configTable = (ConfigTable *)m_flash.getConfigTablePtr()))
 		assert(false);
-	else if (!configTable->kIsExist)
+	else if (configTable->kIsExist)
 		setInitialConfigTable();
 }
 
 void pResource::setInitialConfigTable(void)
 {
-	configTable->kIsExist = true;
+	ConfigTable tempTable;
+	tempTable.kIsExist = false;
 
-	configTable->kEncoderCountToCm = 0; // TODO: find const
+	tempTable.kEncoderCountToCm = 0; // TODO: find const
 
-	configTable->kIdealAngle = 63.5f;
+	tempTable.kIdealAngle = 63.5f;
+
+	tempTable.kLeftMotorKp = 0.001f;
+	tempTable.kLeftMotorKi = 0.0f;
+	tempTable.kLeftMotorKd = 0.0f;
+	tempTable.kRightMotorKp = 0.001f;
+	tempTable.kRightMotorKd = 0.0f;
+	tempTable.kRightMotorKi = 0.0f;
 
 	// Save
-	m_flash.writeConfig();
+	m_flash.writeConfig(&tempTable);
 }

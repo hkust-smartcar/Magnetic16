@@ -33,6 +33,7 @@ public:
 
 	void eraseAll(void);
 	void writeConfig(void);
+	void writeConfig(void *addr);
 
 	void *getConfigTablePtr(void) const;
 

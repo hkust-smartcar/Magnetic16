@@ -26,21 +26,48 @@ public:
 
 	typedef function<float (const float)> MappingFunc;
 
-	pMotor(const uint8_t id, MappingFunc mapingFunction, float &kP, float &kI, float &kD);
+	struct Config
+	{
+		const uint8_t motorId;
+		const uint8_t encoderId;
+		bool isMotorInverse;
+		bool isEncoderrInverse;
+		MappingFunc mappingFunction;
+		float &kP;
+		float &kI;
+		float &kD;
 
-	void update(void);
+		Config(const uint8_t _motorId, const uint8_t _encoderId, bool _isMotorInverse, bool _isEncoderrInverse, MappingFunc _mappingFunction, float &_kP, float &_kI, float &_kD)
+		:
+			motorId(_motorId),
+			encoderId(_encoderId),
+			isMotorInverse(_isMotorInverse),
+			isEncoderrInverse(_isEncoderrInverse),
+			mappingFunction(_mappingFunction),
+			kP(_kP),
+			kI(_kI),
+			kD(_kD)
+		{}
+	};
+
+	pMotor(Config config);
+
+	void update(const float angle);
+
+	void setPower(const int16_t power);
+	int16_t getPower(void);
 
 	float getSpeedMs(void) const;
-	void setSpeedMs(const int32_t speed);
-
 	float getSpeedCount(void) const;
-	void setSpeedCount(const int32_t speed);
+
+	void setSetPoint(const float newSetPoint);
 
 private:
 
 	pEncoder			m_encoder;
 	pPid				m_pid;
 
+	bool				m_isInverse;
 	float				m_setPoint;
 
 };

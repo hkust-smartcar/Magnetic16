@@ -12,28 +12,30 @@
 
 using namespace libsc;
 
-pEncoder::pEncoder(const uint8_t id)
+pEncoder::pEncoder(const uint8_t id, bool isInverse)
 :
-	AbEncoder({ 0 }),
+	AbEncoder({ id }),
 	m_encoderCountToCm(pResource::configTable->kEncoderCountToCm),
 	m_averageCountPerS(0),
-	m_lastTime(0)
+	m_lastTime(0),
+	m_isInverse(isInverse)
 {
 	System::Init();
 }
 
 void pEncoder::update(void)
 {
-	m_averageCountPerS = GetCount() * (System::Time() - m_lastTime) / 1000;
+	Update();
+	m_lastCount = (m_isInverse)? -GetCount() : GetCount();
+	m_averageCountPerS = m_lastCount * (System::Time() - m_lastTime) / 1000;
 }
 
 float pEncoder::getSpeedMs(void) const
 {
-	// m_averageCountPerS * m_encoderCountToCm / 100 = SpeedMs
 	return m_averageCountPerS * m_encoderCountToCm / 100;
 }
 
 float pEncoder::getSpeedCount(void) const
 {
-	return GetCount();
+	return m_lastCount;;
 }

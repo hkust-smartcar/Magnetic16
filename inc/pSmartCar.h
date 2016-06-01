@@ -67,5 +67,7 @@ protected:
 	static void update(void);
 	void updateSensors(void);
 	void balance(void);
+	static void updateLcd(void);
+	void onDraw(void);
 
 };

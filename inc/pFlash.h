@@ -21,10 +21,12 @@ public:
 
 	struct Config
 	{
-		uint16_t tableSize;
+		void			*tablePtr;
+		uint16_t	tableSize;
 
-		Config(uint16_t _tableSize)
+		Config(void *_tablePtr, uint16_t _tableSize)
 		:
+			tablePtr(_tablePtr),
 			tableSize(_tableSize)
 		{}
 	};
@@ -32,8 +34,12 @@ public:
 	pFlash(Config config);
 
 	void eraseAll(void);
+
+	void readConfig(void* tablePtr, size_t tableSize);
 	void writeConfig(void);
 	void writeConfig(void *addr);
+
+	void changeSize(size_t tableSize);
 
 	void *getConfigTablePtr(void) const;
 
@@ -41,7 +47,5 @@ private:
 
 	void				*m_tablePtr;
 	size_t			m_sizeNeeded;
-
-	void readConfig(void);
 
 };

@@ -17,15 +17,16 @@ pSmartCar::pSmartCar(void)
 	m_state(),
 	m_loop(),
 	m_angle(pAngle::Config(10, 0.02, true)),
-	m_motors{	pMotor(pMotor::Config(1, 0, true, false, leftMotorMapping, pResource::configTable->kLeftMotorKp, pResource::configTable->kLeftMotorKi, pResource::configTable->kLeftMotorKd)),
-				pMotor(pMotor::Config(0, 1, false, true, rightMotorMapping, pResource::configTable->kLeftMotorKp, pResource::configTable->kLeftMotorKi, pResource::configTable->kLeftMotorKd)) },
+	m_motors{	pMotor(pMotor::Config(1, 0, true, false, leftMotorMapping, pResource::configTable.kLeftMotorKp, pResource::configTable.kLeftMotorKi, pResource::configTable.kLeftMotorKd)),
+				pMotor(pMotor::Config(0, 1, false, true, rightMotorMapping, pResource::configTable.kLeftMotorKp, pResource::configTable.kLeftMotorKi, pResource::configTable.kLeftMotorKd)) },
 	m_lcd(MiniLcd::Config(0, -1, 30))
 {
 	System::Init();
-	m_motors[0].setSetPoint(pResource::configTable->kIdealAngle);
-	m_motors[1].setSetPoint(pResource::configTable->kIdealAngle);
+	m_motors[0].setSetPoint(pResource::configTable.kIdealAngle);
+	m_motors[1].setSetPoint(pResource::configTable.kIdealAngle);
 	m_loop.addFunctionToLoop(update, 10);
 	m_loop.addFunctionToLoop(updateLcd, 100);
+
 	m_lcd.clear();
 }
 

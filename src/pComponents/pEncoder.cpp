@@ -15,7 +15,7 @@ using namespace libsc;
 pEncoder::pEncoder(const uint8_t id, bool isInverse)
 :
 	AbEncoder({ id }),
-	m_encoderCountToCm(pResource::configTable->kEncoderCountToCm),
+	m_encoderCountToCm(pResource::configTable.kEncoderCountToCm),
 	m_averageCountPerS(0),
 	m_lastTime(0),
 	m_isInverse(isInverse)

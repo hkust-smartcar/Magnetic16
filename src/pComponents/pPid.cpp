@@ -53,5 +53,5 @@ float pPid::getOutput(const float val)
 
 	m_lastTime = System::Time();
 
-	return tempOutput;
+	return inRange(m_param.min, tempOutput, m_param.max);
 }

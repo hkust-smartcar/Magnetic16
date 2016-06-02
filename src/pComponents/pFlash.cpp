@@ -10,6 +10,7 @@
 #include <pFlash.h>
 #include <pResource.h>
 
+using namespace std;
 using namespace libbase::k60;
 
 Flash::Config getFlashConfig(void)
@@ -23,7 +24,7 @@ pFlash::pFlash(Config config)
 	Flash(getFlashConfig()),
 	m_sizeNeeded(config.tableSize)
 {
-	readConfig();
+	readConfig(config.tablePtr, m_sizeNeeded);
 }
 
 void pFlash::eraseAll(void)
@@ -31,9 +32,10 @@ void pFlash::eraseAll(void)
 	EraseSector(GetStartAddr());
 }
 
-void pFlash::readConfig(void)
+void pFlash::readConfig(void *tablePtr, size_t tableSize)
 {
 	m_tablePtr = (void *)GetStartAddr();
+	memcpy(tablePtr, m_tablePtr, tableSize);
 }
 
 void pFlash::writeConfig(void)

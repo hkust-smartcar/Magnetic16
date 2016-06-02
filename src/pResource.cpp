@@ -7,17 +7,19 @@
  */
 
 #include <libsc/system.h>
-#include "pResource.h"
+#include <pResource.h>
+#include <pFlash.h>
 
 using namespace libsc;
+using namespace std;
 
-pResource::ConfigTable	*pResource::configTable = (pResource::ConfigTable *)0x7f800; // hard code due to the structure
+pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
 
 pResource::pResource(void)
 :
-	pSmartCar(),
-	m_flash(pFlash::Config(sizeof(pResource::ConfigTable)))
+	pFlash(pFlash::Config(&configTable, sizeof(pResource::ConfigTable))),
+	pSmartCar()
 {
 	System::Init();
 
@@ -26,30 +28,60 @@ pResource::pResource(void)
 	else
 		m_instance = this;
 
-//	m_flash.eraseAll();
+//	eraseAll();
 
-	if (!(configTable = (ConfigTable *)m_flash.getConfigTablePtr()))
+	if (!getConfigTablePtr())
 		assert(false);
-	else if (configTable->kIsExist)
+	else
+		readConfig(&configTable, ((ConfigTable *)getConfigTablePtr())->kTableSize);
+
+	if (configTable.kIsExist)
+	{
 		setInitialConfigTable();
+		saveConfig();
+	}
+	else
+	{
+		addConfigToConfigTable();
+		saveConfig();
+	}
+}
+
+void pResource::reset(void)
+{
+	eraseAll();
+	setInitialConfigTable();
+	saveConfig();
+}
+
+void pResource::saveConfig(void)
+{
+	writeConfig(&configTable);
 }
 
 void pResource::setInitialConfigTable(void)
 {
+	configTable.kIsExist = false;
+	configTable.kTableSize = sizeof(ConfigTable);
+
+	configTable.kEncoderCountToCm = 0; // TODO: find const
+
+	configTable.kIdealAngle = 63.5f;
+
+	configTable.kLeftMotorKp = -100.0f;
+	configTable.kLeftMotorKi = 0.0f;
+	configTable.kLeftMotorKd = 0.0f;
+	configTable.kRightMotorKp = -100.0f;
+	configTable.kRightMotorKd = 0.0f;
+	configTable.kRightMotorKi = 0.0f;
+}
+
+void pResource::addConfigToConfigTable(void)
+{
 	ConfigTable tempTable;
-	tempTable.kIsExist = false;
-
-	tempTable.kEncoderCountToCm = 0; // TODO: find const
-
-	tempTable.kIdealAngle = 63.5f;
-
-	tempTable.kLeftMotorKp = 0.001f;
-	tempTable.kLeftMotorKi = 0.0f;
-	tempTable.kLeftMotorKd = 0.0f;
-	tempTable.kRightMotorKp = 0.001f;
-	tempTable.kRightMotorKd = 0.0f;
-	tempTable.kRightMotorKi = 0.0f;
-
-	// Save
-	m_flash.writeConfig(&tempTable);
+	memcpy(&tempTable, &configTable, configTable.kTableSize);
+	size_t oldTableSize = tempTable.kTableSize;;
+	setInitialConfigTable();
+	tempTable.kTableSize = sizeof(ConfigTable);
+	memcpy(&configTable, &tempTable, oldTableSize);
 }

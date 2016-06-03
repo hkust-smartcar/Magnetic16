@@ -11,9 +11,10 @@
 #include <functional>
 #include <vector>
 #include <libsc/system.h>
+#include <libsc/mini_lcd.h>
+#include <libutil/pGrapher.h>
 #include <pAngle.h>
 #include <pMotor.h>
-#include <libsc/mini_lcd.h>
 #include <pFlash.h>
 #include <pLoop.h>
 
@@ -52,14 +53,15 @@ public:
 
 	void run(void);
 
-protected:
-
 	State					m_state;
 
 	pLoop					m_loop;
 	pAngle					m_angle;
 	array<pMotor, 2>		m_motors;
 	MiniLcd					m_lcd;
+	pGrapher				m_grapher;
+
+protected:
 
 	static float leftMotorMapping(const float val);
 	static float rightMotorMapping(const float val);

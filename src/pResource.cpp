@@ -28,14 +28,14 @@ pResource::pResource(void)
 	else
 		m_instance = this;
 
-//	eraseAll();
+	reset();
 
 	if (!getConfigTablePtr())
 		assert(false);
 	else
 		readConfig(&configTable, ((ConfigTable *)getConfigTablePtr())->kTableSize);
 
-	if (configTable.kIsExist)
+	if (!configTable.kIsExist)
 	{
 		setInitialConfigTable();
 		saveConfig();
@@ -66,14 +66,14 @@ void pResource::setInitialConfigTable(void)
 
 	configTable.kEncoderCountToCm = 0; // TODO: find const
 
-	configTable.kIdealAngle = 63.5f;
+	configTable.kIdealAngle = 66.0f;
 
-	configTable.kLeftMotorKp = -100.0f;
+	configTable.kLeftMotorKp = 300.0f;
 	configTable.kLeftMotorKi = 0.0f;
-	configTable.kLeftMotorKd = 0.0f;
-	configTable.kRightMotorKp = -100.0f;
-	configTable.kRightMotorKd = 0.0f;
+	configTable.kLeftMotorKd = 0.001f;
+	configTable.kRightMotorKp = 300.0f;
 	configTable.kRightMotorKi = 0.0f;
+	configTable.kRightMotorKd = 0.001f;
 }
 
 void pResource::addConfigToConfigTable(void)

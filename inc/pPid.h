@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <functional>
 #include <stdint.h>
 #include <libsc/system.h>
 #include <libsc/timer.h>
@@ -18,33 +19,30 @@
 #define ABS(v) ((v > 0)? v : -v)
 
 using namespace libsc;
+using namespace std;
 
 class pPid
 {
 
 public:
 
+	typedef function<float (float)> ConstFunc;
+
 	struct PidParam
 	{
-		float &kP;
-		float &kI;
-		float &kD;
-		float &setPoint;
+		float *kP = nullptr;
+		float *kI = nullptr;
+		float *kD = nullptr;
+		float *setPoint = nullptr;
+
+		ConstFunc kPFunc;
+		ConstFunc kIFunc;
+		ConstFunc kDFunc;
 
 		float max;
 		float min;
 
 		bool useStrict = true;
-
-		PidParam(float &_kP, float &_kI, float &_kD, float &_setPoint, float _max, float _min)
-		:
-			kP(_kP), kI(_kI), kD(_kD), setPoint(_setPoint), max(_max), min(_min)
-		{}
-
-		PidParam(const PidParam &other)
-		:
-			kP(other.kP), kI(other.kI), kD(other.kD), setPoint(other.setPoint), max(other.max), min(other.min)
-		{}
 	};
 
 	pPid(PidParam param);

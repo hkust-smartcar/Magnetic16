@@ -10,11 +10,13 @@
 #pragma once
 
 #include <functional>
+#include <cmath>
 #include <libsc/dir_motor.h>
 #include "pEncoder.h"
 #include <pPid.h>
 
 #define ABS(v) ((v < 0)? -v : v)
+#define DegToRad 0.017453293f
 
 using namespace std;
 using namespace libsc;
@@ -53,21 +55,34 @@ public:
 	pMotor(Config config);
 
 	void update(const float angle);
+	void update(void);
 
 	void setPower(const int16_t power);
-	int16_t getPower(void);
+	void setSpeed(const int16_t power);
+	int16_t &getPower(void);
 
-	float getSpeedMs(void) const;
-	float getSpeedCount(void) const;
+	float &getSpeedMs(void);
+	int32_t &getSpeedCount(void);
 
 	void setSetPoint(const float newSetPoint);
 
+	void setKp(const float kP);
+	float getKp(void);
+	void setKi(const float kI);
+	float getKi(void);
+	void setKd(const float kD);
+	float getKd(void);
+
 private:
+
+	Config				m_config;
+	pPid::ConstFunc	m_kPFunc;
 
 	pEncoder			m_encoder;
 	pPid				m_pid;
 
 	bool				m_isInverse;
 	float				m_setPoint;
+	int16_t				m_lastPower;
 
 };

@@ -35,17 +35,17 @@ float pPid::getOutput(const float val)
 	if (m_lastTime)
 	{
 
-		float error = m_param.setPoint - val;
+		float error = *m_param.setPoint - val;
 		uint32_t dt = System::Time() - m_lastTime;
 
-		tempOutput += error * m_param.kP;
+		tempOutput +=  ((m_param.kPFunc)? m_param.kPFunc(error) : *m_param.kP);
 
-		tempOutput += (error - m_lastError) * 1000 / dt * m_param.kD;
+		tempOutput += (error - m_lastError) * 1000 / dt * ((m_param.kDFunc)? m_param.kDFunc(error) : *m_param.kD);
 
 		if (error > m_epsilon)
 		{
 			m_sum += ((error + m_lastError) * dt) * 0.5f;
-			tempOutput += m_sum * m_param.kI;
+			tempOutput += m_sum * ((m_param.kIFunc)? m_param.kIFunc(error) : *m_param.kI);
 		}
 
 		m_lastError = error;

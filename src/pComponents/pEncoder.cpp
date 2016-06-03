@@ -30,12 +30,13 @@ void pEncoder::update(void)
 	m_averageCountPerS = m_lastCount * (System::Time() - m_lastTime) / 1000;
 }
 
-float pEncoder::getSpeedMs(void) const
+float &pEncoder::getSpeedMs(void)
 {
-	return m_averageCountPerS * m_encoderCountToCm / 100;
+	m_lastMs = m_averageCountPerS * m_encoderCountToCm / 100;
+	return m_lastMs;
 }
 
-float pEncoder::getSpeedCount(void) const
+int32_t &pEncoder::getSpeedCount(void)
 {
-	return m_lastCount;;
+	return m_lastCount;
 }

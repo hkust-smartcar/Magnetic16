@@ -15,7 +15,6 @@ using namespace libsc;
 pEncoder::pEncoder(const uint8_t id, bool isInverse)
 :
 	AbEncoder({ id }),
-	m_encoderCountToCm(pResource::configTable.kEncoderCountToCm),
 	m_averageCountPerS(0),
 	m_lastTime(0),
 	m_isInverse(isInverse)
@@ -28,12 +27,6 @@ void pEncoder::update(void)
 	Update();
 	m_lastCount = (m_isInverse)? -GetCount() : GetCount();
 	m_averageCountPerS = m_lastCount * (System::Time() - m_lastTime) / 1000;
-}
-
-float &pEncoder::getSpeedMs(void)
-{
-	m_lastMs = m_averageCountPerS * m_encoderCountToCm / 100;
-	return m_lastMs;
 }
 
 int32_t &pEncoder::getSpeedCount(void)

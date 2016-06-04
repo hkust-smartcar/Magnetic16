@@ -20,6 +20,7 @@ using namespace libsc;
 using namespace std;
 
 #define RadToDeg 57.29577951f
+#define DegToRad 0.017453293f
 #define inRange(n, v, x) ((v > x)? x : ((v < n)? n : v))
 
 class pAngle : private Mma8451q, private Mpu6050
@@ -29,15 +30,16 @@ public:
 
 	struct Config
 	{
-		uint16_t updatePeriod;
 		float accelTrustValue;
+
+		float cgHeight;
 
 		bool useStrict = true;
 
-		Config(uint16_t _updatePeriod, float _accelTrustValue, bool _useStrict = true)
+		Config(float _accelTrustValue, float _cgHeight, bool _useStrict = true)
 		:
-			updatePeriod(_updatePeriod),
 			accelTrustValue(_accelTrustValue),
+			cgHeight(_cgHeight),
 			useStrict(_useStrict)
 		{}
 	};
@@ -54,16 +56,20 @@ public:
 	void update(void);
 
 	float getAngle(void) const;
+	float getSpeed(void) const;
+	float getYawOmega(void) const;
 
 	array<float, 3> getAccel(void) const;
 	array<float, 3> getOmega(void) const;
-	float getAccel(const uint8_t index) const;
-	float getOmega(const uint8_t index) const;
+	float &getAccel(const uint8_t index);
+	float &getOmega(const uint8_t index);
 
 private:
 
 	Config			m_param;
+	float			m_lastSpeed;
 	float			m_lastAngle;
+	float			m_lastYawOmega;
 	float			m_gyroAngle;
 	float			m_gyroOffset;
 	array<float, 3>	m_lastAccel;

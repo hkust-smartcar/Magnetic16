@@ -17,7 +17,7 @@ pSmartCar::pSmartCar(void)
 :
 	m_state(),
 	m_loop(),
-	m_angle(pAngle::Config(10, 0.02, true)),
+	m_angle(pAngle::Config(pResource::configTable.kAccelTruthVal, pResource::configTable.kCgHeightInM, true)),
 	m_motors{	pMotor(pMotor::Config(1, 0, true, false, leftMotorMapping, pResource::configTable.kLeftMotorKp, pResource::configTable.kLeftMotorKi, pResource::configTable.kLeftMotorKd)),
 				pMotor(pMotor::Config(0, 1, false, true, rightMotorMapping, pResource::configTable.kLeftMotorKp, pResource::configTable.kLeftMotorKi, pResource::configTable.kLeftMotorKd)) },
 	m_lcd(MiniLcd::Config(0, -1, 30)),
@@ -29,9 +29,13 @@ pSmartCar::pSmartCar(void)
 	m_loop.addFunctionToLoop(update, 5);
 	m_loop.addFunctionToLoop(updateLcd, 100);
 
-	m_grapher.addWatchedVar(&m_motors[0].getPower(), "power");
-	m_grapher.addWatchedVar(&m_motors[0].getSpeedCount(), "count0");
-	m_grapher.addWatchedVar(&m_motors[1].getSpeedCount(), "count1");
+//	m_grapher.addWatchedVar(&m_motors[0].getPower(), "power");
+//	m_grapher.addWatchedVar(&m_motors[0].getSpeedCount(), "count0");
+//	m_grapher.addWatchedVar(&m_motors[1].getSpeedCount(), "count1");
+//	m_grapher.addWatchedVar(&m_state[StatePos::cur].dX, "dX");
+	m_grapher.addWatchedVar(&m_state[StatePos::cur].angle, "Angle");
+	m_grapher.addWatchedVar(&m_state[StatePos::cur].dX, "Speed");
+	m_grapher.addWatchedVar(&m_state[StatePos::cur].dYaw, "Yaw");
 
 	m_lcd.clear();
 }
@@ -64,7 +68,7 @@ float pSmartCar::rightMotorMapping(const float val)
 void pSmartCar::update(void)
 {
 	pResource::m_instance->updateSensors();
-	pResource::m_instance->m_state.update();
+	pResource::m_instance->updateState();
 }
 
 void pSmartCar::updateSensors(void)
@@ -74,17 +78,28 @@ void pSmartCar::updateSensors(void)
 	m_motors[1].update(m_angle.getAngle());
 }
 
-void pSmartCar::State::update()
+void pSmartCar::updateState(void)
 {
-	if (m_lastUpdateTime)
+	if (m_state[StatePos::prev].timeStamp)
 	{
-		this->angle = pResource::m_instance->m_angle.getAngle();
-		this->dAngle = -pResource::m_instance->m_angle.getOmega(0);
-		this->dX += pResource::m_instance->m_angle.getAccel(0) * (System::Time() - m_lastUpdateTime) / 1000;
-		this->dYaw = 0;
+		m_state[StatePos::prev] = m_state[StatePos::cur];
+		m_state[StatePos::cur].angle = pResource::m_instance->m_angle.getAngle();
+		m_state[StatePos::cur].dAngle = -pResource::m_instance->m_angle.getOmega(0);
+		m_state[StatePos::cur].dX = (m_motors[0].getSpeedCount() + m_motors[1].getSpeedCount()) * 0.5f - pResource::configTable.kCountPerDeg * (m_angle.getAngle() - m_state[StatePos::prev].angle);
+		m_state[StatePos::cur].dYaw = m_angle.getYawOmega();
 	}
 
-	m_lastUpdateTime = System::Time();
+	m_state[StatePos::prev].timeStamp = System::Time();
+}
+
+pSmartCar::State &pSmartCar::State::operator=(const pSmartCar::State &other)
+{
+	this->angle = other.angle;
+	this->dAngle = other.dAngle;
+	this->dX = other.dX;
+	this->dYaw = other.dYaw;
+
+	return *this;
 }
 
 void pSmartCar::balance(void)
@@ -99,11 +114,12 @@ void pSmartCar::updateLcd(void)
 
 void pSmartCar::onDraw(void)
 {
-	m_lcd.setRow(0);
-	m_lcd << m_motors[0].getSpeedCount() << '\t' << m_motors[1].getSpeedCount() << '\t' << endl
-			<< m_motors[0].getPower() << '\t' << m_motors[1].getPower() << '\t' << endl
-			<< m_state.dX << '\t' << m_state.angle << '\t' << endl
-			<< m_state.dYaw << '\t' << m_state.dAngle << '\t' << endl;
+//	m_lcd.setRow(0);
+//	m_lcd << m_motors[0].getSpeedCount() << '\t' << m_motors[1].getSpeedCount() << '\t' << endl
+//			<< m_motors[0].getPower() << '\t' << m_motors[1].getPower() << '\t' << endl
+//			<< m_state[StatePos::cur].dX << '\t' << m_state[StatePos::cur].angle << '\t' << endl
+//			<< m_state[StatePos::cur].dYaw << '\t' << m_state[StatePos::cur].dAngle << '\t' << endl;
 //			<< m_angle.getAccel(0) << '\t' << m_angle.getAccel(1) << '\t' << m_angle.getAccel(2) << '\t' << endl
 //			<< m_angle.getOmega(0) << '\t' << m_angle.getOmega(1) << '\t' << m_angle.getOmega(2) << '\t' << endl
+	m_grapher.sendWatchData();
 }

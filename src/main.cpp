@@ -42,9 +42,12 @@ int main(void)
 
 	pResource resource;
 
-	System::DelayMs(500);
+	DelayMsByTicks(500);
 
-	uint16_t time = System::Time();
+//	float countAvg = 0;
+//	int32_t lCount = 0, rCount = 0;
+//	float dX = 0.0f;
+//	float oldAngle = 0.0f;
 
 //	for (uint16_t i = 0; i < 450; i += 5)
 //	{
@@ -58,14 +61,27 @@ int main(void)
 //		resource.m_grapher.sendWatchData();
 //		DelayMsByTicks(100);
 //		resource.m_motors[0].update();
-//		resource.m_motors[1].update();
+//		resource.m_mot	ors[1].update();
 //		resource.m_grapher.sendWatchData();
 //	}
 //
 //	resource.m_motors[0].setPower(0);
 //	resource.m_motors[1].setPower(0);
 //
-//	while (true);
+//	resource.m_lcd.clear();
+//	while (true)
+//	{
+//		DelayMsByTicks(100);
+//		resource.m_motors[0].update();
+//		resource.m_motors[1].update();
+//		resource.m_angle.update();
+//		countAvg = ((lCount = resource.m_motors[0].getSpeedCount()) + (rCount = resource.m_motors[1].getSpeedCount())) * 0.5f;
+//		dX = countAvg + resource.configTable.kCountPerDeg * (resource.m_angle.getAngle() - oldAngle);
+//		oldAngle = resource.m_angle.getAngle();
+//		resource.m_lcd.setRow(0);
+//		resource.m_lcd	<< lCount << '\t' << rCount << '\t' << endl
+//						<< countAvg << '\t' << dX << '\t';
+//	}
 
 	pResource::m_instance->run();
 

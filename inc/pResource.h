@@ -30,7 +30,9 @@ public:
 		bool			kIsExist;
 		uint16_t		kTableSize;
 
-		int32_t			kEncoderCountToCm;
+		// pAngle
+		float			kAccelTruthVal;
+		float			kCgHeightInM;
 
 		float			kIdealAngle;
 
@@ -41,6 +43,8 @@ public:
 		float			kRightMotorKp;
 		float			kRightMotorKd;
 		float			kRightMotorKi;
+
+		float			kCountPerDeg;
 	};
 
 	pResource(void);

@@ -64,7 +64,8 @@ void pResource::setInitialConfigTable(void)
 	configTable.kIsExist = false;
 	configTable.kTableSize = sizeof(ConfigTable);
 
-	configTable.kEncoderCountToCm = 0; // TODO: find const
+	configTable.kAccelTruthVal = 0.02f;
+	configTable.kCgHeightInM = 0.05f;
 
 	configTable.kIdealAngle = 66.0f;
 
@@ -74,6 +75,8 @@ void pResource::setInitialConfigTable(void)
 	configTable.kRightMotorKp = 300.0f;
 	configTable.kRightMotorKi = 0.0f;
 	configTable.kRightMotorKd = 0.001f;
+
+	configTable.kCountPerDeg = 9560 / 360.0f;
 }
 
 void pResource::addConfigToConfigTable(void)

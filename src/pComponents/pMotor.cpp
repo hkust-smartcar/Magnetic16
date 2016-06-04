@@ -73,11 +73,6 @@ int16_t &pMotor::getPower(void)
 	return	m_lastPower;
 }
 
-float &pMotor::getSpeedMs(void)
-{
-	return m_encoder.getSpeedMs();
-}
-
 int32_t &pMotor::getSpeedCount(void)
 {
 	return m_encoder.getSpeedCount();

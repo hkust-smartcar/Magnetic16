@@ -24,14 +24,11 @@ public:
 
 	void update(void);
 
-	float &getSpeedMs(void);
 	int32_t &getSpeedCount(void);
 
 private:
 
 	int32_t						m_lastCount;
-	float						m_lastMs;
-	const int32_t				m_encoderCountToCm;
 	float 						m_averageCountPerS;
 	Timer::TimerInt				m_lastTime;
 

@@ -61,7 +61,6 @@ public:
 	void setSpeed(const int16_t power);
 	int16_t &getPower(void);
 
-	float &getSpeedMs(void);
 	int32_t &getSpeedCount(void);
 
 	void setSetPoint(const float newSetPoint);

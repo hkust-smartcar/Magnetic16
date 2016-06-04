@@ -28,6 +28,12 @@ class pSmartCar
 
 public:
 
+	enum StatePos
+	{
+		prev = 0,
+		cur
+	};
+
 	struct State
 	{
 		float	dX;
@@ -35,7 +41,7 @@ public:
 		float	dYaw;
 		float	dAngle;
 
-		Timer::TimerInt			m_lastUpdateTime;
+		Timer::TimerInt	timeStamp;
 
 		State(void)
 		:
@@ -43,17 +49,17 @@ public:
 			angle(0.0f),
 			dYaw(0.0f),
 			dAngle(0.0f),
-			m_lastUpdateTime(0)
+			timeStamp(0)
 		{}
 
-		void update(void);
+		State &operator=(const State &other);
 	};
 
 	pSmartCar(void);
 
 	void run(void);
 
-	State					m_state;
+	State					m_state[2];
 
 	pLoop					m_loop;
 	pAngle					m_angle;
@@ -68,6 +74,7 @@ protected:
 
 	static void update(void);
 	void updateSensors(void);
+	void updateState(void);
 	void balance(void);
 	static void updateLcd(void);
 	void onDraw(void);

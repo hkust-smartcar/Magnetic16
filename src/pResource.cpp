@@ -28,19 +28,19 @@ pResource::pResource(void)
 	else
 		m_instance = this;
 
-	reset();
+//	reset();
 
 	if (!getConfigTablePtr())
 		assert(false);
 	else
 		readConfig(&configTable, ((ConfigTable *)getConfigTablePtr())->kTableSize);
 
-	if (!configTable.kIsExist)
+	if (configTable.kIsExist)
 	{
 		setInitialConfigTable();
 		saveConfig();
 	}
-	else
+	else if (configTable.kTableSize != sizeof(ConfigTable))
 	{
 		addConfigToConfigTable();
 		saveConfig();
@@ -69,9 +69,14 @@ void pResource::setInitialConfigTable(void)
 
 	configTable.kIdealAngle = 66.0f;
 
+	configTable.kLeftMotorDeadMarginPos = 0;
+	configTable.kLeftMotorDeadMarginNag = 0;
 	configTable.kLeftMotorKp = 300.0f;
 	configTable.kLeftMotorKi = 0.0f;
 	configTable.kLeftMotorKd = 0.001f;
+
+	configTable.kRightMotorDeadMarginPos = 0;
+	configTable.kRightMotorDeadMarginNag = 0;
 	configTable.kRightMotorKp = 300.0f;
 	configTable.kRightMotorKi = 0.0f;
 	configTable.kRightMotorKd = 0.001f;

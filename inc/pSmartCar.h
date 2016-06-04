@@ -13,6 +13,7 @@
 #include <libsc/system.h>
 #include <libsc/mini_lcd.h>
 #include <libutil/pGrapher.h>
+#include <libsc/button.h>
 #include <pAngle.h>
 #include <pMotor.h>
 #include <pFlash.h>
@@ -65,17 +66,21 @@ public:
 	pAngle					m_angle;
 	array<pMotor, 2>		m_motors;
 	MiniLcd					m_lcd;
+	array<Button, 3>		m_buttons;
 	pGrapher				m_grapher;
+
+	static void onClickListener(const uint8_t id);
 
 protected:
 
+	bool					m_motorEnabled;
+
 	static float leftMotorMapping(const float val);
 	static float rightMotorMapping(const float val);
-
 	static void update(void);
 	void updateSensors(void);
 	void updateState(void);
-	void balance(void);
+	static void speedControl(void);
 	static void updateLcd(void);
 	void onDraw(void);
 

@@ -29,7 +29,16 @@ void pEncoder::update(void)
 	m_averageCountPerS = m_lastCount * (System::Time() - m_lastTime) / 1000;
 }
 
-int32_t &pEncoder::getSpeedCount(void)
+void pEncoder::reset(void)
+{
+	update();
+	update();
+	m_averageCountPerS = 0;
+	m_lastTime = 0;
+	m_lastCount = 0;
+}
+
+int16_t &pEncoder::getSpeedCount(void)
 {
 	return m_lastCount;
 }

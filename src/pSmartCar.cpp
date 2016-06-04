@@ -13,6 +13,16 @@
 using namespace libsc;
 using namespace libutil;
 
+Button::Config getButtonConfig(const uint8_t id)
+{
+	Button::Config config;
+	config.id = id;
+	config.is_active_low = true;
+	config.listener = pSmartCar::onClickListener;
+	config.listener_trigger = Button::Config::Trigger::kDown;
+	return config;
+}
+
 pSmartCar::pSmartCar(void)
 :
 	m_state(),
@@ -21,21 +31,26 @@ pSmartCar::pSmartCar(void)
 	m_motors{	pMotor(pMotor::Config(1, 0, true, false, leftMotorMapping, pResource::configTable.kLeftMotorKp, pResource::configTable.kLeftMotorKi, pResource::configTable.kLeftMotorKd)),
 				pMotor(pMotor::Config(0, 1, false, true, rightMotorMapping, pResource::configTable.kLeftMotorKp, pResource::configTable.kLeftMotorKi, pResource::configTable.kLeftMotorKd)) },
 	m_lcd(MiniLcd::Config(0, -1, 30)),
-	m_grapher()
+	m_buttons{	Button(getButtonConfig(0)),
+				Button(getButtonConfig(1)),
+				Button(getButtonConfig(2)) },
+	m_grapher(),
+	m_motorEnabled(false)
 {
 	System::Init();
 	m_motors[0].setSetPoint(pResource::configTable.kIdealAngle);
 	m_motors[1].setSetPoint(pResource::configTable.kIdealAngle);
 	m_loop.addFunctionToLoop(update, 5);
+	m_loop.addFunctionToLoop(speedControl, 100);
 	m_loop.addFunctionToLoop(updateLcd, 100);
 
-//	m_grapher.addWatchedVar(&m_motors[0].getPower(), "power");
-//	m_grapher.addWatchedVar(&m_motors[0].getSpeedCount(), "count0");
-//	m_grapher.addWatchedVar(&m_motors[1].getSpeedCount(), "count1");
-//	m_grapher.addWatchedVar(&m_state[StatePos::cur].dX, "dX");
 	m_grapher.addWatchedVar(&m_state[StatePos::cur].angle, "Angle");
 	m_grapher.addWatchedVar(&m_state[StatePos::cur].dX, "Speed");
 	m_grapher.addWatchedVar(&m_state[StatePos::cur].dYaw, "Yaw");
+	m_grapher.addSharedVar(&pResource::configTable.kLeftMotorDeadMarginPos, "LPosDead");
+	m_grapher.addSharedVar(&pResource::configTable.kLeftMotorDeadMarginNag, "LNagDead");
+	m_grapher.addSharedVar(&pResource::configTable.kRightMotorDeadMarginPos, "RPosDead");
+	m_grapher.addSharedVar(&pResource::configTable.kRightMotorDeadMarginNag, "RNagDead");
 
 	m_lcd.clear();
 }
@@ -50,9 +65,9 @@ float pSmartCar::leftMotorMapping(const float val)
 	if (val == 0.0f)
 		return 0.0f;
 	else if (val > 0.0f)
-		return (val /** 0.014717151f*/ + 155.0f);
+		return (val + pResource::configTable.kLeftMotorDeadMarginPos);
 	else
-		return (val /** 0.018198482f*/ - 110.0f);
+		return (val + pResource::configTable.kLeftMotorDeadMarginNag);
 }
 
 float pSmartCar::rightMotorMapping(const float val)
@@ -60,9 +75,89 @@ float pSmartCar::rightMotorMapping(const float val)
 	if (val == 0.0f)
 		return 0.0f;
 	else if (val > 0.0f)
-		return (val /** 0.0172827379f*/ + 115.0f);
+		return (val + pResource::configTable.kRightMotorDeadMarginPos);
 	else
-		return (val /** 0.0162533162f*/ - 90.0f);
+		return (val + pResource::configTable.kRightMotorDeadMarginNag);
+}
+
+void pSmartCar::onClickListener(const uint8_t id)
+{
+	switch (id)
+	{
+	default:
+		assert(false);
+		// no break
+
+	case 0:
+		pResource::m_instance->m_motors[0].reset();
+		pResource::m_instance->m_motors[1].reset();
+		pResource::m_instance->m_motorEnabled = !pResource::m_instance->m_motorEnabled;
+		break;
+
+	case 1:
+		pResource::m_instance->m_motors[0].reset();
+		DelayMsByTicks(250);
+		for (int16_t i = 50; i < 500; i++)
+		{
+			pResource::m_instance->m_motors[0].setPower(i);
+			DelayMsByTicks(100);
+			pResource::m_instance->m_motors[0].update();
+			if (ABS(pResource::m_instance->m_motors[0].getSpeedCount()) >= 100)
+			{
+				pResource::configTable.kLeftMotorDeadMarginPos = i;
+				break;
+			}
+		}
+		pResource::m_instance->m_motors[0].setPower(0);
+		DelayMsByTicks(1000);
+		pResource::m_instance->m_motors[0].reset();
+		for (int16_t i = -50; i > -500; i--)
+		{
+			pResource::m_instance->m_motors[0].setPower(i);
+			DelayMsByTicks(100);
+			pResource::m_instance->m_motors[0].update();
+			if (ABS(pResource::m_instance->m_motors[0].getSpeedCount()) >= 100)
+			{
+				pResource::configTable.kLeftMotorDeadMarginNag = i;
+				break;
+			}
+		}
+		pResource::m_instance->saveConfig();
+		pResource::m_instance->m_motors[0].setPower(0);
+		break;
+
+	case 2:
+		pResource::m_instance->m_motors[1].reset();
+		DelayMsByTicks(250);
+		for (int16_t i = 50; i < 500; i++)
+		{
+			pResource::m_instance->m_motors[1].setPower(i);
+			DelayMsByTicks(100);
+			pResource::m_instance->m_motors[1].update();
+			if (ABS(pResource::m_instance->m_motors[1].getSpeedCount()) >= 100)
+			{
+				pResource::configTable.kRightMotorDeadMarginPos = i;
+				break;
+			}
+		}
+		pResource::m_instance->m_motors[1].setPower(0);
+		DelayMsByTicks(1000);
+		pResource::m_instance->m_motors[1].reset();
+		for (int16_t i = -50; i > -500; i--)
+		{
+			pResource::m_instance->m_motors[1].setPower(i);
+			DelayMsByTicks(100);
+			pResource::m_instance->m_motors[1].update();
+			if (ABS(pResource::m_instance->m_motors[1].getSpeedCount()) >= 100)
+			{
+				pResource::configTable.kRightMotorDeadMarginNag = i;
+				break;
+			}
+		}
+		pResource::m_instance->m_motors[1].setPower(0);
+		pResource::m_instance->saveConfig();
+		break;
+	}
 }
 
 void pSmartCar::update(void)
@@ -74,8 +169,11 @@ void pSmartCar::update(void)
 void pSmartCar::updateSensors(void)
 {
 	m_angle.update();
-	m_motors[0].update(m_angle.getAngle());
-	m_motors[1].update(m_angle.getAngle());
+	if (m_motorEnabled)
+	{
+		m_motors[0].update(m_angle.getAngle());
+		m_motors[1].update(m_angle.getAngle());
+	}
 }
 
 void pSmartCar::updateState(void)
@@ -102,7 +200,7 @@ pSmartCar::State &pSmartCar::State::operator=(const pSmartCar::State &other)
 	return *this;
 }
 
-void pSmartCar::balance(void)
+void pSmartCar::speedControl(void)
 {
 
 }

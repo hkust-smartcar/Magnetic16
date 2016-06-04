@@ -23,12 +23,13 @@ public:
 	pEncoder(const uint8_t id, bool isClockwise);
 
 	void update(void);
+	void reset(void);
 
-	int32_t &getSpeedCount(void);
+	int16_t &getSpeedCount(void);
 
 private:
 
-	int32_t						m_lastCount;
+	int16_t						m_lastCount;
 	float 						m_averageCountPerS;
 	Timer::TimerInt				m_lastTime;
 

@@ -53,6 +53,13 @@ void pMotor::update(void)
 	m_encoder.update();
 }
 
+void pMotor::reset(void)
+{
+	m_setPoint = 0.0f;
+	setSpeed(0);
+	m_encoder.reset();
+}
+
 void pMotor::setPower(const int16_t power)
 {
 	SetClockwise((power > 0) ^ m_isInverse);
@@ -73,7 +80,7 @@ int16_t &pMotor::getPower(void)
 	return	m_lastPower;
 }
 
-int32_t &pMotor::getSpeedCount(void)
+int16_t &pMotor::getSpeedCount(void)
 {
 	return m_encoder.getSpeedCount();
 }

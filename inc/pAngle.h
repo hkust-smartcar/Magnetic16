@@ -44,7 +44,7 @@ public:
 		{}
 	};
 
-	typedef enum Axis
+	enum Axis
 	{
 		x = 0,
 		y,

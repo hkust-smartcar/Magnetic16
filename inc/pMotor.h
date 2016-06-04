@@ -56,12 +56,13 @@ public:
 
 	void update(const float angle);
 	void update(void);
+	void reset(void);
 
 	void setPower(const int16_t power);
 	void setSpeed(const int16_t power);
 	int16_t &getPower(void);
 
-	int32_t &getSpeedCount(void);
+	int16_t &getSpeedCount(void);
 
 	void setSetPoint(const float newSetPoint);
 

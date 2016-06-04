@@ -36,10 +36,14 @@ public:
 
 		float			kIdealAngle;
 
+		int16_t			kLeftMotorDeadMarginPos;
+		int16_t			kLeftMotorDeadMarginNag;
 		float			kLeftMotorKp;
 		float			kLeftMotorKd;
 		float			kLeftMotorKi;
 
+		int16_t			kRightMotorDeadMarginPos;
+		int16_t			kRightMotorDeadMarginNag;
 		float			kRightMotorKp;
 		float			kRightMotorKd;
 		float			kRightMotorKi;

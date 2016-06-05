@@ -50,13 +50,15 @@ void pLoop::start(void)
 	for (uint8_t i = 0; i < m_task_list.size(); i++)
 		m_task_list[i].lastRunTime = m_start_time;
 
+	bool isPrevTaskDone = false;
 	while (true)
 	{
 		for (uint8_t i = 0; i < m_task_list.size(); i++)
-			if (System::Time() - m_task_list[i].lastRunTime >= m_task_list[i].interval)
+			if (System::Time() - m_task_list[i].lastRunTime >= m_task_list[i].interval && (i == 0 || m_task_list[i - 1].interval != m_task_list[i].interval || isPrevTaskDone))
 			{
 				((LoopFunction)m_task_list[i].func)();
 				m_task_list[i].lastRunTime = System::Time();
+				isPrevTaskDone = true;
 			}
 	}
 }

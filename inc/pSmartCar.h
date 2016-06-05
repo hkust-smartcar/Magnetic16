@@ -19,6 +19,8 @@
 #include <pFlash.h>
 #include <pLoop.h>
 
+#define isInRange(n, v, x) (v >= n && v <= x)
+
 using namespace libsc;
 using namespace std;
 
@@ -69,6 +71,8 @@ public:
 	array<Button, 3>		m_buttons;
 	pGrapher				m_grapher;
 
+	void setMotorsEnabled(const bool enabled);
+
 	static void onClickListener(const uint8_t id);
 
 protected:
@@ -77,11 +81,14 @@ protected:
 
 	static float leftMotorMapping(const float val);
 	static float rightMotorMapping(const float val);
+
 	static void update(void);
-	void updateSensors(void);
-	void updateState(void);
 	static void speedControl(void);
 	static void updateLcd(void);
+	static void safetyCheck(void);
+
+	void updateSensors(void);
+	void updateState(void);
 	void onDraw(void);
 
 };

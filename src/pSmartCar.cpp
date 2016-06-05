@@ -41,9 +41,12 @@ pSmartCar::pSmartCar(void)
 	m_motors[0].setSetPoint(pResource::configTable.kIdealAngle);
 	m_motors[1].setSetPoint(pResource::configTable.kIdealAngle);
 	m_loop.addFunctionToLoop(update, 5);
-	m_loop.addFunctionToLoop(speedControl, 100);
+	m_loop.addFunctionToLoop(speedControl, 5);
 	m_loop.addFunctionToLoop(updateLcd, 100);
+	m_loop.addFunctionToLoop(safetyCheck, 500);
 
+//	m_grapher.addWatchedVar(&m_motors[0].getPower(), "Power0");
+//	m_grapher.addWatchedVar(&m_motors[1].getPower(), "Power1");
 	m_grapher.addWatchedVar(&m_state[StatePos::cur].angle, "Angle");
 	m_grapher.addWatchedVar(&m_state[StatePos::cur].dX, "Speed");
 	m_grapher.addWatchedVar(&m_state[StatePos::cur].dYaw, "Yaw");
@@ -52,32 +55,15 @@ pSmartCar::pSmartCar(void)
 	m_grapher.addSharedVar(&pResource::configTable.kRightMotorDeadMarginPos, "RPosDead");
 	m_grapher.addSharedVar(&pResource::configTable.kRightMotorDeadMarginNag, "RNagDead");
 
+	m_motors[0].reset();
+	m_motors[1].reset();
+
 	m_lcd.clear();
 }
 
 void pSmartCar::run(void)
 {
 	m_loop.start();
-}
-
-float pSmartCar::leftMotorMapping(const float val)
-{
-	if (val == 0.0f)
-		return 0.0f;
-	else if (val > 0.0f)
-		return (val + pResource::configTable.kLeftMotorDeadMarginPos);
-	else
-		return (val + pResource::configTable.kLeftMotorDeadMarginNag);
-}
-
-float pSmartCar::rightMotorMapping(const float val)
-{
-	if (val == 0.0f)
-		return 0.0f;
-	else if (val > 0.0f)
-		return (val + pResource::configTable.kRightMotorDeadMarginPos);
-	else
-		return (val + pResource::configTable.kRightMotorDeadMarginNag);
 }
 
 void pSmartCar::onClickListener(const uint8_t id)
@@ -160,10 +146,55 @@ void pSmartCar::onClickListener(const uint8_t id)
 	}
 }
 
+float pSmartCar::leftMotorMapping(const float val)
+{
+	if (val == 0.0f)
+		return 0.0f;
+	else if (val > 0.0f)
+		return (val + pResource::configTable.kLeftMotorDeadMarginPos);
+	else
+		return (val + pResource::configTable.kLeftMotorDeadMarginNag);
+}
+
+float pSmartCar::rightMotorMapping(const float val)
+{
+	if (val == 0.0f)
+		return 0.0f;
+	else if (val > 0.0f)
+		return (val + pResource::configTable.kRightMotorDeadMarginPos);
+	else
+		return (val + pResource::configTable.kRightMotorDeadMarginNag);
+}
+
+void pSmartCar::setMotorsEnabled(const bool enabled)
+{
+	m_motorEnabled = enabled;
+}
+
 void pSmartCar::update(void)
 {
 	pResource::m_instance->updateSensors();
 	pResource::m_instance->updateState();
+}
+
+void pSmartCar::speedControl(void)
+{
+
+}
+
+void pSmartCar::updateLcd(void)
+{
+	pResource::m_instance->onDraw();
+}
+
+void pSmartCar::safetyCheck(void)
+{
+	if (!isInRange(pResource::configTable.kAngleMin, pResource::m_instance->m_angle.getAngle(), pResource::configTable.kAngleMax))
+	{
+		pResource::m_instance->m_motors[0].setPower(0);
+		pResource::m_instance->m_motors[1].setPower(0);
+		pResource::m_instance->setMotorsEnabled(false);
+	}
 }
 
 void pSmartCar::updateSensors(void)
@@ -173,6 +204,11 @@ void pSmartCar::updateSensors(void)
 	{
 		m_motors[0].update(m_angle.getAngle());
 		m_motors[1].update(m_angle.getAngle());
+	}
+	else
+	{
+		m_motors[0].update();
+		m_motors[1].update();
 	}
 }
 
@@ -198,16 +234,6 @@ pSmartCar::State &pSmartCar::State::operator=(const pSmartCar::State &other)
 	this->dYaw = other.dYaw;
 
 	return *this;
-}
-
-void pSmartCar::speedControl(void)
-{
-
-}
-
-void pSmartCar::updateLcd(void)
-{
-	pResource::m_instance->onDraw();
 }
 
 void pSmartCar::onDraw(void)

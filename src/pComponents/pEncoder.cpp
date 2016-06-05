@@ -38,7 +38,7 @@ void pEncoder::reset(void)
 	m_lastCount = 0;
 }
 
-int16_t &pEncoder::getSpeedCount(void)
+int16_t &pEncoder::getEncoderCount(void)
 {
 	return m_lastCount;
 }

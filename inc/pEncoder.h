@@ -25,7 +25,7 @@ public:
 	void update(void);
 	void reset(void);
 
-	int16_t &getSpeedCount(void);
+	int16_t &getEncoderCount(void);
 
 private:
 

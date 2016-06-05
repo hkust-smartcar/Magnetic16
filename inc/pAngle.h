@@ -34,13 +34,10 @@ public:
 
 		float cgHeight;
 
-		bool useStrict = true;
-
-		Config(float _accelTrustValue, float _cgHeight, bool _useStrict = true)
+		Config(float _accelTrustValue, float _cgHeight)
 		:
 			accelTrustValue(_accelTrustValue),
-			cgHeight(_cgHeight),
-			useStrict(_useStrict)
+			cgHeight(_cgHeight)
 		{}
 	};
 

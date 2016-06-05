@@ -54,7 +54,7 @@ void pAngle::update(void)
 		m_lastAccel = this->Mma8451q::GetAccelF();
 		m_lastOmega = GetOmegaF();
 
-		Timer::TimerInt dt = (System::Time() - m_lastTime) / 1000;
+		float dt = (System::Time() - m_lastTime) / 1000.0f;
 
 		m_gyroAngle -= m_lastOmega[0] * dt;
 		m_gyroOffset += m_param.accelTrustValue * (asin(inRange(-1.0f, m_lastAccel[0], 1.0f)) * RadToDeg - m_lastAngle);

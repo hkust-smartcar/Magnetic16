@@ -29,12 +29,14 @@ public:
 	{
 		bool			kIsExist;
 		uint16_t		kTableSize;
+		uint8_t			kUniqueVal; // check if the table structure changed
 
-		// pAngle
 		float			kAccelTruthVal;
 		float			kCgHeightInM;
 
 		float			kIdealAngle;
+		float			kAngleMin;
+		float			kAngleMax;
 
 		int16_t			kLeftMotorDeadMarginPos;
 		int16_t			kLeftMotorDeadMarginNag;

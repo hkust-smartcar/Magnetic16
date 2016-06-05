@@ -13,6 +13,9 @@
 using namespace libsc;
 using namespace std;
 
+// UNIQUE_VAL shouldn't be 255
+#define UNIQUE_VAL	25
+
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
 
@@ -28,7 +31,8 @@ pResource::pResource(void)
 	else
 		m_instance = this;
 
-//	reset();
+	if (UNIQUE_VAL != ((ConfigTable *)getConfigTablePtr())->kUniqueVal)
+		reset();
 
 	if (!getConfigTablePtr())
 		assert(false);
@@ -42,7 +46,8 @@ pResource::pResource(void)
 	}
 	else if (configTable.kTableSize != sizeof(ConfigTable))
 	{
-		addConfigToConfigTable();
+		setInitialConfigTable();
+//		addConfigToConfigTable();
 		saveConfig();
 	}
 }
@@ -63,11 +68,14 @@ void pResource::setInitialConfigTable(void)
 {
 	configTable.kIsExist = false;
 	configTable.kTableSize = sizeof(ConfigTable);
+	configTable.kUniqueVal = UNIQUE_VAL;
 
 	configTable.kAccelTruthVal = 0.02f;
 	configTable.kCgHeightInM = 0.05f;
 
 	configTable.kIdealAngle = 66.0f;
+	configTable.kAngleMin = 40.0f;
+	configTable.kAngleMax = 80.0f;
 
 	configTable.kLeftMotorDeadMarginPos = 0;
 	configTable.kLeftMotorDeadMarginNag = 0;

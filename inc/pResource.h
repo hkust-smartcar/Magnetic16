@@ -40,15 +40,20 @@ public:
 
 		int16_t			kLeftMotorDeadMarginPos;
 		int16_t			kLeftMotorDeadMarginNag;
-		float			kLeftMotorKp;
-		float			kLeftMotorKd;
-		float			kLeftMotorKi;
-
 		int16_t			kRightMotorDeadMarginPos;
 		int16_t			kRightMotorDeadMarginNag;
-		float			kRightMotorKp;
-		float			kRightMotorKd;
-		float			kRightMotorKi;
+
+		float			kAngleKp;
+		float			kAngleKd;
+		float			kAngleKi;
+
+		float			kDirectionKp;
+		float			kDirectionKd;
+		float			kDirectionKi;
+
+		float			kSpeedKp;
+		float			kSpeedKd;
+		float			kSpeedKi;
 
 		float			kCountPerDeg;
 	};
@@ -58,6 +63,8 @@ public:
 	void reset(void);
 
 	void saveConfig(void);
+
+	static void grapherOnChangedListener(void);
 
 	static ConfigTable			configTable;
 	static pResource			*m_instance;

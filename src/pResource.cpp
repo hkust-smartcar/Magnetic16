@@ -14,7 +14,7 @@ using namespace libsc;
 using namespace std;
 
 // UNIQUE_VAL shouldn't be 255
-#define UNIQUE_VAL	25
+#define UNIQUE_VAL	40
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -64,6 +64,11 @@ void pResource::saveConfig(void)
 	writeConfig(&configTable);
 }
 
+void pResource::grapherOnChangedListener(void)
+{
+	m_instance->saveConfig();
+}
+
 void pResource::setInitialConfigTable(void)
 {
 	configTable.kIsExist = false;
@@ -79,15 +84,20 @@ void pResource::setInitialConfigTable(void)
 
 	configTable.kLeftMotorDeadMarginPos = 0;
 	configTable.kLeftMotorDeadMarginNag = 0;
-	configTable.kLeftMotorKp = 300.0f;
-	configTable.kLeftMotorKi = 0.0f;
-	configTable.kLeftMotorKd = 0.001f;
-
 	configTable.kRightMotorDeadMarginPos = 0;
 	configTable.kRightMotorDeadMarginNag = 0;
-	configTable.kRightMotorKp = 300.0f;
-	configTable.kRightMotorKi = 0.0f;
-	configTable.kRightMotorKd = 0.001f;
+
+	configTable.kAngleKp = 2000.0f;
+	configTable.kAngleKi = 0.0f;
+	configTable.kAngleKd = 0.0f;
+
+	configTable.kDirectionKp = 10.0f;
+	configTable.kDirectionKi = 0.0f;
+	configTable.kDirectionKd = 0.0f;
+
+	configTable.kSpeedKp = 10.0f;
+	configTable.kSpeedKi = 0.0f;
+	configTable.kSpeedKd = 0.0f;
 
 	configTable.kCountPerDeg = 9560 / 360.0f;
 }

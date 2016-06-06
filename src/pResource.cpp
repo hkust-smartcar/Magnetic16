@@ -91,17 +91,17 @@ void pResource::setInitialConfigTable(void)
 	configTable.kRightMotorDeadMarginPos = 0;
 	configTable.kRightMotorDeadMarginNag = 0;
 
-	configTable.kAngleKp = 3000.0f;
+	configTable.kAngleKp = 3500.0f;
 	configTable.kAngleKi = 0.0f;
 	configTable.kAngleKd = 0.0f;
 
-	configTable.kDirectionKp = 10.0f;
+	configTable.kDirectionKp = 0.865f;
 	configTable.kDirectionKi = 0.0f;
-	configTable.kDirectionKd = 0.0f;
+	configTable.kDirectionKd = 0.0015f;
 
-	configTable.kSpeedKp = 0.77f;
+	configTable.kSpeedKp = 1.1f;
 	configTable.kSpeedKi = 0.0f;
-	configTable.kSpeedKd = 0.0f;
+	configTable.kSpeedKd = 0.001f;
 
 	configTable.kKalmanKq = 0.1f;
 	configTable.kKalmanKr = 0.9f;

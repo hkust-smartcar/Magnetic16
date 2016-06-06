@@ -8,6 +8,7 @@
  */
 
 #include <array>
+#include <cmath>
 #include <functional>
 #include <vector>
 #include <libsc/system.h>
@@ -58,11 +59,55 @@ public:
 		State &operator=(const State &other);
 	};
 
+	enum PidType
+	{
+		Angle = 0,
+		Direction,
+		Speed
+	};
+
 	pSmartCar(void);
+
+	void reset(void);
 
 	void run(void);
 
+	void setMotorsEnabled(const bool enabled);
+
+	static void onClickListener(const uint8_t id);
+
+protected:
+
+	pPid::PidParam getPidConfig(PidType type);
+
+	void updateSmoothOutput(const int16_t speed);
+	int16_t	getSmoothSpeedOutput(void);
+
+	void updatePid(const float val, PidType type);
+
+	void addAllRoutineToLoop(void);
+	void addVariablesToGrapher(void);
+
+	static float leftMotorMapping(const float val);
+	static float rightMotorMapping(const float val);
+
+	static void update(void);
+	static void angleControl(void);
+	static void directionControl(void);
+	static void speedControl(void);
+	static void print(void);
+	static void safetyCheck(void);
+
+	void updateSensors(void);
+	void updateMotors(void);
+	void updateState(void);
+	void updateSpeed(void);
+	void onDraw(void);
+
 	State					m_state[2];
+
+	float					m_direction;
+	float					m_speed;
 
 	pLoop					m_loop;
 	pAngle					m_angle;
@@ -71,24 +116,9 @@ public:
 	array<Button, 3>		m_buttons;
 	pGrapher				m_grapher;
 
-	void setMotorsEnabled(const bool enabled);
-
-	static void onClickListener(const uint8_t id);
-
-protected:
-
 	bool					m_motorEnabled;
 
-	static float leftMotorMapping(const float val);
-	static float rightMotorMapping(const float val);
-
-	static void update(void);
-	static void speedControl(void);
-	static void updateLcd(void);
-	static void safetyCheck(void);
-
-	void updateSensors(void);
-	void updateState(void);
-	void onDraw(void);
+	array<pPid, 3>			m_pidControllers;
+	array<int16_t, 3>		m_pidOutputVal;
 
 };

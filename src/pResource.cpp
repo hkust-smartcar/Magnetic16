@@ -13,8 +13,12 @@
 using namespace libsc;
 using namespace std;
 
-// UNIQUE_VAL shouldn't be 255
-#define UNIQUE_VAL	40
+// UNIQUE_VAL SHOULD NOT be 255
+//
+// Change it if u changed the config table
+// otherwise the config table in flash memory
+// won't update
+#define UNIQUE_VAL	75
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -78,16 +82,16 @@ void pResource::setInitialConfigTable(void)
 	configTable.kAccelTruthVal = 0.02f;
 	configTable.kCgHeightInM = 0.05f;
 
-	configTable.kIdealAngle = 66.0f;
-	configTable.kAngleMin = 40.0f;
-	configTable.kAngleMax = 80.0f;
+	configTable.kIdealAngle = 65.0f;
+	configTable.kAngleMin = 45.0f;
+	configTable.kAngleMax = 75.0f;
 
 	configTable.kLeftMotorDeadMarginPos = 0;
 	configTable.kLeftMotorDeadMarginNag = 0;
 	configTable.kRightMotorDeadMarginPos = 0;
 	configTable.kRightMotorDeadMarginNag = 0;
 
-	configTable.kAngleKp = 2000.0f;
+	configTable.kAngleKp = 3000.0f;
 	configTable.kAngleKi = 0.0f;
 	configTable.kAngleKd = 0.0f;
 
@@ -95,9 +99,12 @@ void pResource::setInitialConfigTable(void)
 	configTable.kDirectionKi = 0.0f;
 	configTable.kDirectionKd = 0.0f;
 
-	configTable.kSpeedKp = 10.0f;
+	configTable.kSpeedKp = 0.77f;
 	configTable.kSpeedKi = 0.0f;
 	configTable.kSpeedKd = 0.0f;
+
+	configTable.kKalmanKq = 0.1f;
+	configTable.kKalmanKr = 0.9f;
 
 	configTable.kCountPerDeg = 9560 / 360.0f;
 }

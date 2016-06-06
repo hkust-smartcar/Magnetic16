@@ -55,6 +55,9 @@ public:
 		float			kSpeedKd;
 		float			kSpeedKi;
 
+		float			kKalmanKq;
+		float			kKalmanKr;
+
 		float			kCountPerDeg;
 	};
 

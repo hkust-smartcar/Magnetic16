@@ -44,6 +44,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::PidType type)
 		param.kI = &pResource::configTable.kAngleKi;
 		param.kD = &pResource::configTable.kAngleKd;
 		param.setPoint = &pResource::configTable.kIdealAngle;
+		param.ignoreRange = 0.5f;
 		param.max = 500;
 		param.min = -500;
 		break;
@@ -53,6 +54,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::PidType type)
 		param.kI = &pResource::configTable.kDirectionKi;
 		param.kD = &pResource::configTable.kDirectionKd;
 		param.setPoint = &m_direction;
+		param.ignoreRange = 25.0f;
 		param.max = 200;
 		param.min = -200;
 		break;
@@ -62,6 +64,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::PidType type)
 		param.kI = &pResource::configTable.kSpeedKi;
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_speed;
+		param.ignoreRange = 0.0f;
 		param.max = 500;
 		param.min = -500;
 	}
@@ -87,7 +90,11 @@ pSmartCar::pSmartCar(void)
 	m_pidControllers{	pPid(getPidConfig(PidType::Angle)),
 						pPid(getPidConfig(PidType::Direction)),
 						pPid(getPidConfig(PidType::Speed)) },
-	m_pidOutputVal{ 0 }
+	m_pidOutputVal{ 0 },
+	m_filter(pResource::configTable.kKalmanKq, pResource::configTable.kKalmanKr, 0, 0.5),
+	m_oldSpeedPidOuput(0),
+	m_smoothCounter(0),
+	m_smoothIncrement(0)
 {
 	System::Init();
 
@@ -116,6 +123,16 @@ void pSmartCar::updatePid(const float val, PidType type)
 	m_pidOutputVal[type] = m_pidControllers[type].getOutput(val);
 }
 
+pSmartCar::State &pSmartCar::State::operator=(const pSmartCar::State &other)
+{
+	this->angle = other.angle;
+	this->dAngle = other.dAngle;
+	this->dX = other.dX;
+	this->dYaw = other.dYaw;
+
+	return *this;
+}
+
 void pSmartCar::onClickListener(const uint8_t id)
 {
 	switch (id)
@@ -125,9 +142,7 @@ void pSmartCar::onClickListener(const uint8_t id)
 		// no break
 
 	case 0:
-		pResource::m_instance->m_motors[0].reset();
-		pResource::m_instance->m_motors[1].reset();
-		pResource::m_instance->m_motorEnabled = !pResource::m_instance->m_motorEnabled;
+		pResource::m_instance->setMotorsEnabled(pResource::m_instance->m_motorEnabled = !pResource::m_instance->m_motorEnabled);
 		break;
 
 	case 1:
@@ -219,4 +234,6 @@ float pSmartCar::rightMotorMapping(const float val)
 void pSmartCar::setMotorsEnabled(const bool enabled)
 {
 	m_motorEnabled = enabled;
+	m_motors[0].setEnabled(enabled);
+	m_motors[1].setEnabled(enabled);
 }

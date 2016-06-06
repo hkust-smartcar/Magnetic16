@@ -14,15 +14,18 @@
 #include <libsc/system.h>
 #include <libsc/mini_lcd.h>
 #include <libutil/pGrapher.h>
+#include <libutil/kalman_filter.h>
 #include <libsc/button.h>
 #include <pAngle.h>
 #include <pMotor.h>
 #include <pFlash.h>
 #include <pLoop.h>
 
+#define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
 #define isInRange(n, v, x) (v >= n && v <= x)
 
 using namespace libsc;
+using namespace libutil;
 using namespace std;
 
 #pragma once
@@ -120,5 +123,10 @@ protected:
 
 	array<pPid, 3>			m_pidControllers;
 	array<int16_t, 3>		m_pidOutputVal;
+
+	KalmanFilter			m_filter;
+	float					m_oldSpeedPidOuput;
+	uint8_t					m_smoothCounter;
+	float					m_smoothIncrement;
 
 };

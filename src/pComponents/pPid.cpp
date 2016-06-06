@@ -32,13 +32,12 @@ float pPid::getOutput(const float val)
 {
 	float tempOutput = 0;
 
-	if (m_lastTime)
+	if (m_lastTime && !isInRange(*m_param.setPoint - m_param.ignoreRange, val, *m_param.setPoint + m_param.ignoreRange))
 	{
-
 		float error = *m_param.setPoint - val;
 		uint32_t dt = System::Time() - m_lastTime;
 
-		tempOutput +=  ((m_param.kPFunc)? m_param.kPFunc(error) : *m_param.kP);
+		tempOutput +=  ((m_param.kPFunc)? m_param.kPFunc(error) : error * *m_param.kP);
 
 		tempOutput += (error - m_lastError) * 1000 / dt * ((m_param.kDFunc)? m_param.kDFunc(error) : *m_param.kD);
 

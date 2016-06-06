@@ -16,6 +16,7 @@
 
 #define MAX(a, b) ((a > b)? a : b)
 #define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
+#define isInRange(n, v, x) (v >= n && v <= x)
 #define ABS(v) ((v > 0)? v : -v)
 
 using namespace libsc;
@@ -38,6 +39,8 @@ public:
 		ConstFunc kPFunc;
 		ConstFunc kIFunc;
 		ConstFunc kDFunc;
+
+		float ignoreRange = 0.0f;
 
 		float max;
 		float min;

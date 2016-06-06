@@ -1,6 +1,6 @@
 # Magnetic16
 HKUST SmartCar 2016 - Magnetic Group
 
-See the power of C++// Son of the bitch
+See the power of C++
 
-By PeterLau/Petel__
+By Petel__

@@ -54,6 +54,9 @@ public:
 	void update(void);
 	void reset(void);
 
+	void setEnabled(const bool enabled);
+	bool isEnabled(void);
+
 	void setPower(const int16_t power);
 	void setMappedPower(const int16_t power);
 
@@ -66,6 +69,7 @@ private:
 
 	pEncoder			m_encoder;
 
+	bool				m_enabled;
 	bool				m_isInverse;
 	int16_t				m_lastPower;
 

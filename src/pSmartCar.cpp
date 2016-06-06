@@ -54,7 +54,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::PidType type)
 		param.kI = &pResource::configTable.kDirectionKi;
 		param.kD = &pResource::configTable.kDirectionKd;
 		param.setPoint = &m_direction;
-		param.ignoreRange = 25.0f;
+		param.ignoreRange = 10.0f;
 		param.max = 200;
 		param.min = -200;
 		break;
@@ -64,7 +64,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::PidType type)
 		param.kI = &pResource::configTable.kSpeedKi;
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_speed;
-		param.ignoreRange = 0.0f;
+		param.ignoreRange = 15.0f;
 		param.max = 500;
 		param.min = -500;
 	}

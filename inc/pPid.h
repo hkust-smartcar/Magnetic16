@@ -56,8 +56,8 @@ private:
 	PidParam			m_param;
 
 	Timer::TimerInt		m_lastTime;
-	int32_t				m_lastError;
-	int32_t				m_sum;
+	float				m_lastError;
+	float				m_sum;
 
 	const float		m_epsilon;
 

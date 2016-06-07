@@ -64,7 +64,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::PidType type)
 		param.kI = &pResource::configTable.kSpeedKi;
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_speed;
-		param.ignoreRange = 15.0f;
+		param.ignoreRange = 0.0f;
 		param.max = 500;
 		param.min = -500;
 	}

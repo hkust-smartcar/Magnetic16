@@ -25,7 +25,7 @@ pMotor::pMotor(Config config)
 	DirMotor(getMotorConfig(config.motorId)),
 	m_config(config),
 	m_encoder(config.encoderId, config.isEncoderrInverse),
-	m_enabled(true),
+	m_enabled(false),
 	m_isInverse(config.isMotorInverse)
 {}
 

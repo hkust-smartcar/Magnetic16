@@ -23,7 +23,7 @@ Mma8451q::Config getAccelConfig(void)
 Mpu6050::Config getGyroConfig(void)
 {
 	Mpu6050::Config config;
-	config.accel_range = Mpu6050::Config::Range::kLarge;
+	config.accel_range = Mpu6050::Config::Range::kSmall;
 	config.gyro_range = Mpu6050::Config::Range::kSmall;
 	config.cal_drift = true;
 	return config;

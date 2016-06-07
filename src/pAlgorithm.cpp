@@ -18,7 +18,7 @@ void pSmartCar::addAllRoutineToLoop(void)
 	m_loop.addFunctionToLoop(angleControl, 5);
 	m_loop.addFunctionToLoop(directionControl, 10);
 	m_loop.addFunctionToLoop(speedControl, 100);
-	m_loop.addFunctionToLoop(print, 100);
+	m_loop.addFunctionToLoop(print, 10);
 	m_loop.addFunctionToLoop(safetyCheck, 200);
 }
 
@@ -26,10 +26,11 @@ void pSmartCar::addVariablesToGrapher(void)
 {
 //	m_grapher.addWatchedVar(&m_motors[0].getPower(), "Power0");
 //	m_grapher.addWatchedVar(&m_motors[1].getPower(), "Power1");
+	m_grapher.addWatchedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
 	m_grapher.addWatchedVar(&m_state[StatePos::cur].angle, "Angle");
 	m_grapher.addWatchedVar(&m_state[StatePos::cur].dX, "Speed");
-	m_grapher.addWatchedVar(&m_state[StatePos::cur].dYaw, "Yaw");
-	m_grapher.addWatchedVar(&m_pidOutputVal[PidType::Direction], "DirectionPidOutput");
+//	m_grapher.addWatchedVar(&m_state[StatePos::cur].dYaw, "Yaw");
+	m_grapher.addWatchedVar(&m_pidOutputVal[PidType::Speed], "PidSpeedOutput");
 	m_grapher.addWatchedVar(&m_motors[0].getPower(), "Power");
 
 	m_grapher.addSharedVar(&pResource::configTable.kAngleKp, "AngleKp");
@@ -38,6 +39,8 @@ void pSmartCar::addVariablesToGrapher(void)
 	m_grapher.addSharedVar(&pResource::configTable.kDirectionKd, "DirectionKd");
 	m_grapher.addSharedVar(&pResource::configTable.kSpeedKp, "SpeedKp");
 	m_grapher.addSharedVar(&pResource::configTable.kSpeedKd, "SpeedKd");
+	m_grapher.addSharedVar(&pResource::configTable.kSpeedKi, "SpeedKi");
+	m_grapher.addSharedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
 
 	m_grapher.setOnChangedListener(pResource::grapherOnChangedListener);
 }
@@ -73,7 +76,7 @@ void pSmartCar::speedControl(void)
 
 void pSmartCar::print(void)
 {
-	pResource::m_instance->onDraw();
+//	pResource::m_instance->onDraw();
 	pResource::m_instance->m_grapher.sendWatchData();
 }
 
@@ -101,7 +104,7 @@ void pSmartCar::updateState(void)
 		m_state[StatePos::prev] = m_state[StatePos::cur];
 		m_state[StatePos::cur].angle = pResource::m_instance->m_angle.getAngle();
 		m_state[StatePos::cur].dAngle = -pResource::m_instance->m_angle.getOmega(0);
-		m_state[StatePos::cur].dX = m_filter.Filter((m_motors[0].getEncoderCount() + m_motors[1].getEncoderCount()) * 0.5f - pResource::configTable.kCountPerDeg * (m_angle.getAngle() - m_state[StatePos::prev].angle));
+		m_state[StatePos::cur].dX = m_filter.Filter((m_motors[0].getEncoderCount() + m_motors[1].getEncoderCount()) * 0.5f);//m_filter.Filter((m_motors[0].getEncoderCount() + m_motors[1].getEncoderCount()) * 0.5f - pResource::configTable.kCountPerDeg * (m_angle.getAngle() - m_state[StatePos::prev].angle));
 		m_state[StatePos::cur].dYaw = m_angle.getYawOmega();
 	}
 
@@ -126,8 +129,8 @@ void pSmartCar::updateMotors(void)
 
 void pSmartCar::updateSpeed(void)
 {
-	m_motors[0].setMappedPower(inRange(-500, m_pidOutputVal[PidType::Angle] + m_pidOutputVal[PidType::Direction] + getSmoothSpeedOutput(), 500));
-	m_motors[1].setMappedPower(inRange(-500, m_pidOutputVal[PidType::Angle] - m_pidOutputVal[PidType::Direction] + getSmoothSpeedOutput(), 500));
+	m_motors[0].setMappedPower(inRange(-500, m_pidOutputVal[PidType::Angle] + m_pidOutputVal[PidType::Direction] - getSmoothSpeedOutput(), 500));
+	m_motors[1].setMappedPower(inRange(-500, m_pidOutputVal[PidType::Angle] - m_pidOutputVal[PidType::Direction] - getSmoothSpeedOutput(), 500));
 }
 
 void pSmartCar::onDraw(void)

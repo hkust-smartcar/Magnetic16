@@ -13,14 +13,19 @@
 #include <vector>
 #include <libsc/system.h>
 #include <libsc/mini_lcd.h>
+#include <libsc/led.h>
 #include <libutil/pGrapher.h>
 #include <libutil/kalman_filter.h>
+#include <libsc/simple_buzzer.h>
+#include <libsc/battery_meter.h>
 #include <libsc/button.h>
+#include <pKalmanFilter.h>
 #include <pAngle.h>
 #include <pMotor.h>
 #include <pFlash.h>
 #include <pLoop.h>
 
+#define ABS(v) ((v > 0)? v : -v)
 #define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
 #define isInRange(n, v, x) (v >= n && v <= x)
 
@@ -62,7 +67,7 @@ public:
 		State &operator=(const State &other);
 	};
 
-	enum PidType
+	enum Type
 	{
 		Angle = 0,
 		Direction,
@@ -81,12 +86,12 @@ public:
 
 protected:
 
-	pPid::PidParam getPidConfig(PidType type);
+	pPid::PidParam getPidConfig(Type type);
 
 	void updateSmoothOutput(const int16_t speed);
 	int16_t	getSmoothSpeedOutput(void);
 
-	void updatePid(const float val, PidType type);
+	void updatePid(const float val, Type type);
 
 	void addAllRoutineToLoop(void);
 	void addVariablesToGrapher(void);
@@ -99,7 +104,7 @@ protected:
 	static void directionControl(void);
 	static void speedControl(void);
 	static void print(void);
-	static void safetyCheck(void);
+//	static void safetyCheck(void);
 
 	void updateSensors(void);
 	void updateMotors(void);
@@ -111,12 +116,16 @@ protected:
 
 	float					m_direction;
 	float					m_speed;
+	float					m_batteryVoltage;
 
 	pLoop					m_loop;
 	pAngle					m_angle;
 	array<pMotor, 2>		m_motors;
 	MiniLcd					m_lcd;
 	array<Button, 3>		m_buttons;
+	array<Led, 4>			m_leds;
+	SimpleBuzzer			m_buzzer;
+	BatteryMeter			m_batmeter;
 	pGrapher				m_grapher;
 
 	bool					m_motorEnabled;
@@ -124,7 +133,7 @@ protected:
 	array<pPid, 3>			m_pidControllers;
 	array<int16_t, 3>		m_pidOutputVal;
 
-	KalmanFilter			m_filter;
+	array<pKalmanFilter, 3>	m_filter;
 	float					m_oldSpeedPidOuput;
 	uint8_t					m_smoothCounter;
 	float					m_smoothIncrement;

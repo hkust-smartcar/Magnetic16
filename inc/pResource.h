@@ -31,6 +31,8 @@ public:
 		uint16_t		kTableSize;
 		uint8_t			kUniqueVal; // check if the table structure changed
 
+		float			kBatteryVoltageRatio;
+
 		float			kAccelTruthVal;
 		float			kCgHeightInM;
 
@@ -46,17 +48,20 @@ public:
 		float			kAngleKp;
 		float			kAngleKd;
 		float			kAngleKi;
+		float			kAngleKq;
+		float			kAngleKr;
 
 		float			kDirectionKp;
 		float			kDirectionKd;
 		float			kDirectionKi;
+		float			kDirectionKq;
+		float			kDirectionKr;
 
 		float			kSpeedKp;
 		float			kSpeedKd;
 		float			kSpeedKi;
-
-		float			kKalmanKq;
-		float			kKalmanKr;
+		float			kSpeedKq;
+		float			kSpeedKr;
 
 		float			kCountPerDeg;
 	};

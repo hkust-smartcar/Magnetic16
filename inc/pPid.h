@@ -42,8 +42,11 @@ public:
 
 		float ignoreRange = 0.0f;
 
-		float max;
-		float min;
+		float outputMax;
+		float outputMin;
+
+		float sumMax;
+		float sumMin;
 
 		bool useStrict = true;
 	};

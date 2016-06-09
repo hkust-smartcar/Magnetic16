@@ -17,7 +17,7 @@ pPid::pPid(pPid::PidParam param)
 	m_lastTime(0),
 	m_lastError(0),
 	m_sum(0),
-	m_epsilon(m_param.max * 15 / 100)
+	m_epsilon(m_param.outputMax * 0.05f)
 {
 	System::Init();
 }
@@ -44,7 +44,7 @@ float pPid::getOutput(const float val)
 		if (error > m_epsilon)
 		{
 			m_sum += ((error + m_lastError) * dt) * 0.5f;
-			tempOutput += m_sum * ((m_param.kIFunc)? m_param.kIFunc(error) : *m_param.kI);
+			tempOutput += inRange(m_param.sumMin, m_sum * ((m_param.kIFunc)? m_param.kIFunc(error) : *m_param.kI), m_param.sumMax);
 		}
 
 		m_lastError = error;
@@ -52,5 +52,5 @@ float pPid::getOutput(const float val)
 
 	m_lastTime = System::Time();
 
-	return inRange(m_param.min, tempOutput, m_param.max);
+	return inRange(m_param.outputMin, tempOutput, m_param.outputMax);
 }

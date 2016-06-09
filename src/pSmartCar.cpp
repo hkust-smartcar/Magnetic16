@@ -24,7 +24,7 @@ Button::Config getButtonConfig(const uint8_t id)
 	return config;
 }
 
-pPid::PidParam pSmartCar::getPidConfig(pSmartCar::PidType type)
+pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 {
 	pPid::PidParam param;
 
@@ -38,15 +38,15 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::PidType type)
 								if (ABS(error) < 0.3f)
 									return 0.0f;
 								else
-									return pResource::configTable.kAngleKp * sin(error * DegToRad);
+									return pResource::configTable.kAngleKp * tan(error * DegToRad);
 							}
 						);
 		param.kI = &pResource::configTable.kAngleKi;
 		param.kD = &pResource::configTable.kAngleKd;
 		param.setPoint = &pResource::configTable.kIdealAngle;
-		param.ignoreRange = 0.5f;
-		param.max = 500;
-		param.min = -500;
+		param.ignoreRange = 0.1f;
+		param.outputMax = 400;
+		param.outputMin = -400;
 		break;
 
 	case 1:
@@ -55,8 +55,8 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::PidType type)
 		param.kD = &pResource::configTable.kDirectionKd;
 		param.setPoint = &m_direction;
 		param.ignoreRange = 10.0f;
-		param.max = 200;
-		param.min = -200;
+		param.outputMax = 400;
+		param.outputMin = -400;
 		break;
 
 	case 2:
@@ -65,8 +65,10 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::PidType type)
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_speed;
 		param.ignoreRange = 0.0f;
-		param.max = 500;
-		param.min = -500;
+		param.outputMax = 500;
+		param.outputMin = -500;
+		param.sumMax = 200;
+		param.sumMin = 200;
 	}
 
 	return param;
@@ -77,6 +79,7 @@ pSmartCar::pSmartCar(void)
 	m_state(),
 	m_direction(0.0f),
 	m_speed(0.0f),
+	m_batteryVoltage(0.0f),
 	m_loop(),
 	m_angle(pAngle::Config(pResource::configTable.kAccelTruthVal, pResource::configTable.kCgHeightInM)),
 	m_motors{ pMotor(pMotor::Config(1, 0, true, false, leftMotorMapping)),
@@ -85,13 +88,21 @@ pSmartCar::pSmartCar(void)
 	m_buttons{	Button(getButtonConfig(0)),
 				Button(getButtonConfig(1)),
 				Button(getButtonConfig(2)) },
+	m_leds{ Led({ 0, true }),
+			Led({ 1, true }),
+			Led({ 2, true }),
+			Led({ 3, true }) },
+	m_buzzer({ 0, false }),
+	m_batmeter({ pResource::configTable.kBatteryVoltageRatio }),
 	m_grapher(),
 	m_motorEnabled(false),
-	m_pidControllers{	pPid(getPidConfig(PidType::Angle)),
-						pPid(getPidConfig(PidType::Direction)),
-						pPid(getPidConfig(PidType::Speed)) },
+	m_pidControllers{	pPid(getPidConfig(Type::Angle)),
+						pPid(getPidConfig(Type::Direction)),
+						pPid(getPidConfig(Type::Speed)) },
 	m_pidOutputVal{ 0 },
-	m_filter(pResource::configTable.kKalmanKq, pResource::configTable.kKalmanKr, 0, 0.5),
+	m_filter{	pKalmanFilter(pResource::configTable.kAngleKq, pResource::configTable.kAngleKr, 0, 0.5f),
+				pKalmanFilter(pResource::configTable.kDirectionKq, pResource::configTable.kDirectionKr, 0, 0.5f),
+				pKalmanFilter(pResource::configTable.kSpeedKq, pResource::configTable.kSpeedKr, 0, 0.5f) },
 	m_oldSpeedPidOuput(0),
 	m_smoothCounter(0),
 	m_smoothIncrement(0)
@@ -101,6 +112,8 @@ pSmartCar::pSmartCar(void)
 	addAllRoutineToLoop();
 	addVariablesToGrapher();
 	reset();
+
+	m_batteryVoltage = m_batmeter.GetVoltage();
 }
 
 void pSmartCar::reset(void)
@@ -118,7 +131,7 @@ void pSmartCar::run(void)
 	m_loop.start();
 }
 
-void pSmartCar::updatePid(const float val, PidType type)
+void pSmartCar::updatePid(const float val, Type type)
 {
 	m_pidOutputVal[type] = m_pidControllers[type].getOutput(val);
 }
@@ -236,4 +249,5 @@ void pSmartCar::setMotorsEnabled(const bool enabled)
 	m_motorEnabled = enabled;
 	m_motors[0].setEnabled(enabled);
 	m_motors[1].setEnabled(enabled);
+	m_leds[0].SetEnable(enabled);
 }

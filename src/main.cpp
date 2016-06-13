@@ -55,7 +55,6 @@ int main(void)
 
 //	pResource::m_instance->setMotorPower(0, 0);
 //	pResource::m_instance->setMotorPower(1, 0);
-//	while (true);
 
 	pResource::m_instance->run();
 

@@ -57,6 +57,8 @@ public:
 
 	float getOutput(const float val);
 
+	float &getSum(void);
+
 private:
 
 	PidParam			m_param;

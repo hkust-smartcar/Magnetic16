@@ -85,6 +85,7 @@ public:
 	void updateMotors(void);
 
 	void setLed(const uint8_t index, const bool enabled);
+	void setBeep(const bool isBeep);
 
 	void sendDataToGrapher(void);
 
@@ -101,6 +102,8 @@ protected:
 
 	void addAllRoutineToLoop(void);
 	void addVariablesToGrapher(void);
+
+	static void watchDogTimeout(void);
 
 	static float leftMotorMapping(const float val);
 	static float rightMotorMapping(const float val);

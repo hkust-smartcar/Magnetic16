@@ -39,17 +39,17 @@ float pPid::getOutput(const float val)
 			error = *m_param.setPoint - val;
 		else
 			error = 0.0f;
-		uint32_t dt = System::Time() - m_lastTime;
+		float dt = (System::Time() - m_lastTime) / 1000.0f;
 
 		tempOutput +=  ((m_param.kPFunc)? m_param.kPFunc(error, error, *m_param.kP) : error * *m_param.kP);
 
-		tempOutput +=  ((m_param.kDFunc)? m_param.kDFunc(error, (error - m_lastError) * 1000 / dt, *m_param.kD) : (error - m_lastError) * 1000 / dt * *m_param.kD);
+		tempOutput +=  ((m_param.kDFunc)? m_param.kDFunc(error, (error - m_lastError) / dt, *m_param.kD) : (error - m_lastError) / dt * *m_param.kD);
 
-		if (error > m_epsilon)
-		{
-			m_sum += ((error + m_lastError) * dt) * 0.5f;
-			tempOutput += inRange(m_param.sumMin, ((m_param.kIFunc)? m_param.kIFunc(error, m_sum, *m_param.kI) : m_sum * *m_param.kI), m_param.sumMax);
-		}
+//		if (error > m_epsilon)
+//		{
+			m_sum = inRange(m_param.sumMin, (m_sum += ((error + m_lastError) * dt) * 0.5f), m_param.sumMax);
+			tempOutput += (m_param.kIFunc)? m_param.kIFunc(error, m_sum, *m_param.kI) : m_sum * *m_param.kI;
+//		}
 
 		m_lastError = error;
 	}
@@ -57,4 +57,9 @@ float pPid::getOutput(const float val)
 	m_lastTime = System::Time();
 
 	return inRange(m_param.outputMin, tempOutput, m_param.outputMax);
+}
+
+float &pPid::getSum(void)
+{
+	return m_sum;
 }

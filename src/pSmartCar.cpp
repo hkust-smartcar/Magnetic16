@@ -8,6 +8,7 @@
  */
 
 #include "pSmartCar.h"
+#include <libbase/k60/watchdog.h>
 #include <pResource.h>
 
 using namespace std;
@@ -59,7 +60,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kI = &pResource::configTable.kDirectionKi;
 		param.kD = &pResource::configTable.kDirectionKd;
 		param.setPoint = &m_direction;
-		param.ignoreRange = 12.0f;
+		param.ignoreRange = 5.0f;
 		param.outputMax = 400;
 		param.outputMin = -400;
 		break;
@@ -70,10 +71,10 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_speed;
 		param.ignoreRange = 0.0f;
-		param.outputMax = 500;
-		param.outputMin = -500;
-		param.sumMax = 200;
-		param.sumMin = 200;
+		param.outputMax = 10;
+		param.outputMin = -10;
+		param.sumMax = 400;
+		param.sumMin = -400;
 	}
 
 	return param;
@@ -84,7 +85,7 @@ pSmartCar::pSmartCar(void)
 	m_state(),
 	m_direction(0.0f),
 	m_speed(0.0f),
-	m_idealAngleOffset(pResource::configTable.kIdealAngle),
+	m_idealAngleOffset(0.0f),
 	m_idealAngle(pResource::configTable.kIdealAngle),
 	m_batteryVoltage(0.0f),
 	m_loop(),
@@ -114,6 +115,7 @@ pSmartCar::pSmartCar(void)
 	m_smoothIncrement(0)
 {
 	System::Init();
+	Watchdog::SetIsr(watchDogTimeout);
 
 	addAllRoutineToLoop();
 	addVariablesToGrapher();
@@ -136,6 +138,7 @@ void pSmartCar::reset(void)
 
 void pSmartCar::run(void)
 {
+	Watchdog::Init();
 	m_loop.start();
 }
 
@@ -152,6 +155,13 @@ pSmartCar::State &pSmartCar::State::operator=(const pSmartCar::State &other)
 	this->dYaw = other.dYaw;
 
 	return *this;
+}
+
+void pSmartCar::watchDogTimeout(void)
+{
+	pResource::m_instance->setMotorsEnabled(false);
+	for (uint8_t i = 0; i < 4; i++)
+		pResource::m_instance->setLed(i, true);
 }
 
 void pSmartCar::onClickListener(const uint8_t id)
@@ -255,6 +265,8 @@ float pSmartCar::rightMotorMapping(const float val)
 void pSmartCar::setMotorsEnabled(const bool enabled)
 {
 	m_motorEnabled = enabled;
+	for (uint8_t i = 0; i < 3; i++)
+		m_pidControllers[i].reset();
 	m_motors[0].setEnabled(enabled);
 	m_motors[1].setEnabled(enabled);
 	m_leds[0].SetEnable(enabled);
@@ -268,6 +280,11 @@ void pSmartCar::setMotorPower(const uint8_t index, const int16_t power)
 void pSmartCar::setLed(const uint8_t index, const bool enabled)
 {
 	m_leds[index].SetEnable(enabled);
+}
+
+void pSmartCar::setBeep(const bool isBeep)
+{
+	m_buzzer.SetBeep(isBeep);
 }
 
 void pSmartCar::sendDataToGrapher(void)

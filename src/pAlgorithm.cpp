@@ -7,10 +7,12 @@
  */
 
 #include <pSmartCar.h>
+#include <libbase/k60/watchdog.h>
 #include <pResource.h>
 
 using namespace std;
 using namespace libsc;
+using namespace libbase::k60;
 
 void pSmartCar::addAllRoutineToLoop(void)
 {
@@ -33,9 +35,11 @@ void pSmartCar::addVariablesToGrapher(void)
 //	m_grapher.addWatchedVar(&m_pidOutputVal[Type::Angle], "PidAngleOutput");
 ////	m_grapher.addWatchedVar(&m_pidOutputVal[Type::Direction], "PidDirectionOutput");
 ////	m_grapher.addWatchedVar(&m_pidOutputVal[Type::Speed], "PidSpeedOutput");
-//	m_grapher.addWatchedVar(&m_state[StatePos::cur].dX, "Speed");
-	m_grapher.addWatchedVar(&m_motors[0].getPower(), "Power0");
-	m_grapher.addWatchedVar(&m_motors[1].getPower(), "Power1");
+	m_grapher.addWatchedVar(&m_state[StatePos::cur].dX, "Speed");
+	m_grapher.addWatchedVar(&m_idealAngleOffset, "angleOffset");
+	m_grapher.addWatchedVar(&m_pidControllers[Type::Speed].getSum(), "Sum");
+//	m_grapher.addWatchedVar(&m_motors[0].getPower(), "Power0");
+//	m_grapher.addWatchedVar(&m_motors[1].getPower(), "Power1");
 ////	m_grapher.addWatchedVar(&m_batteryVoltage, "BatVol");
 
 	m_grapher.addSharedVar(&pResource::configTable.kAngleKp, "AngleKp");
@@ -63,11 +67,12 @@ void pSmartCar::update(void)
 	pResource::m_instance->updateSensors();
 	pResource::m_instance->updateState();
 	pResource::m_instance->updateMotors();
+	Watchdog::Feed();
 }
 
 void pSmartCar::angleControl(void)
 {
-	pResource::m_instance->updatePid(pResource::m_instance->m_state[StatePos::cur].angle/* + pResource::m_instance->getSmoothAngleOutput()*/, Type::Angle);
+	pResource::m_instance->updatePid(pResource::m_instance->m_state[StatePos::cur].angle + pResource::m_instance->getSmoothAngleOutput(), Type::Angle);
 	if (pResource::m_instance->m_motorEnabled && !isInRange(pResource::configTable.kAngleMin, pResource::m_instance->m_angle.getAngle(), pResource::configTable.kAngleMax))
 		pResource::m_instance->setMotorsEnabled(false);
 	pResource::m_instance->updatePid(pResource::m_instance->m_state[StatePos::cur].dYaw, Type::Direction);
@@ -119,13 +124,13 @@ void pSmartCar::updateState(void)
 
 void pSmartCar::updateSmoothAngleOutput(const int16_t newAngle)
 {
-	m_smoothIncrement = (newAngle - m_idealAngle) * 0.05f;
+	m_smoothIncrement = (newAngle - m_idealAngleOffset) * 0.05f;
 }
 
 int16_t	pSmartCar::getSmoothAngleOutput(void)
 {
 //	return 0;
-	return (int16_t)(m_idealAngle += m_smoothIncrement);
+	return (int16_t)(m_idealAngleOffset += m_smoothIncrement);
 }
 
 void pSmartCar::updateMotors(void)

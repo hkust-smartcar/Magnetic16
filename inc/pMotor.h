@@ -57,8 +57,9 @@ public:
 	void setEnabled(const bool enabled);
 	bool isEnabled(void);
 
-	void setPower(const int16_t power);
-	void setMappedPower(const int16_t power);
+	void setSpeed(const float rpt);
+	void setPower(const float power);
+	void setMappedPower(const float power);
 
 	int16_t &getPower(void);
 	int16_t &getEncoderCount(void);

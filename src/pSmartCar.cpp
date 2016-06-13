@@ -31,20 +31,25 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 	switch (type)
 	{
 	case 0:
-		param.kPFunc =	function<float (float)>
+		param.kPFunc =	function<float (float, float, float)>
 						(
-							[](float error)
+							[](float error, float additionalInfo, float constant)
 							{
-								if (ABS(error) < 0.3f)
-									return 0.0f;
-								else
-									return pResource::configTable.kAngleKp * tan(error * DegToRad);
+								return constant * tan(error * DegToRad);
 							}
 						);
+		param.kP = &pResource::configTable.kAngleKp;
 		param.kI = &pResource::configTable.kAngleKi;
 		param.kD = &pResource::configTable.kAngleKd;
-		param.setPoint = &pResource::configTable.kIdealAngle;
-		param.ignoreRange = 0.1f;
+		param.kDFunc =	function<float (float, float, float)>
+						(
+							[&](float error, float additionalInfo, float constant)
+							{
+								return constant * m_state[StatePos::cur].dAngle;
+							}
+						);
+		param.setPoint = &m_idealAngle;
+		param.ignoreRange = 0.2f;
 		param.outputMax = 400;
 		param.outputMin = -400;
 		break;
@@ -54,7 +59,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kI = &pResource::configTable.kDirectionKi;
 		param.kD = &pResource::configTable.kDirectionKd;
 		param.setPoint = &m_direction;
-		param.ignoreRange = 10.0f;
+		param.ignoreRange = 12.0f;
 		param.outputMax = 400;
 		param.outputMin = -400;
 		break;
@@ -79,6 +84,8 @@ pSmartCar::pSmartCar(void)
 	m_state(),
 	m_direction(0.0f),
 	m_speed(0.0f),
+	m_idealAngleOffset(pResource::configTable.kIdealAngle),
+	m_idealAngle(pResource::configTable.kIdealAngle),
 	m_batteryVoltage(0.0f),
 	m_loop(),
 	m_angle(pAngle::Config(pResource::configTable.kAccelTruthVal, pResource::configTable.kCgHeightInM)),
@@ -88,10 +95,10 @@ pSmartCar::pSmartCar(void)
 	m_buttons{	Button(getButtonConfig(0)),
 				Button(getButtonConfig(1)),
 				Button(getButtonConfig(2)) },
-	m_leds{ Led({ 0, true }),
-			Led({ 1, true }),
+	m_leds{ Led({ 3, true }),
 			Led({ 2, true }),
-			Led({ 3, true }) },
+			Led({ 1, true }),
+			Led({ 0, true }) },
 	m_buzzer({ 0, false }),
 	m_batmeter({ pResource::configTable.kBatteryVoltageRatio }),
 	m_grapher(),
@@ -103,7 +110,6 @@ pSmartCar::pSmartCar(void)
 	m_filter{	pKalmanFilter(pResource::configTable.kAngleKq, pResource::configTable.kAngleKr, 0, 0.5f),
 				pKalmanFilter(pResource::configTable.kDirectionKq, pResource::configTable.kDirectionKr, 0, 0.5f),
 				pKalmanFilter(pResource::configTable.kSpeedKq, pResource::configTable.kSpeedKr, 0, 0.5f) },
-	m_oldSpeedPidOuput(0),
 	m_smoothCounter(0),
 	m_smoothIncrement(0)
 {
@@ -114,6 +120,8 @@ pSmartCar::pSmartCar(void)
 	reset();
 
 	m_batteryVoltage = m_batmeter.GetVoltage();
+
+	m_leds[1].SetEnable(true);
 }
 
 void pSmartCar::reset(void)
@@ -229,9 +237,9 @@ float pSmartCar::leftMotorMapping(const float val)
 	if (val == 0.0f)
 		return 0.0f;
 	else if (val > 0.0f)
-		return (val + pResource::configTable.kLeftMotorDeadMarginPos);
+		return val * pResource::configTable.kLeftMotorPosConstant + pResource::configTable.kLeftMotorDeadMarginPos;
 	else
-		return (val - pResource::configTable.kLeftMotorDeadMarginNag);
+		return (val * pResource::configTable.kLeftMotorNagConstant - pResource::configTable.kLeftMotorDeadMarginNag);
 }
 
 float pSmartCar::rightMotorMapping(const float val)
@@ -239,9 +247,9 @@ float pSmartCar::rightMotorMapping(const float val)
 	if (val == 0.0f)
 		return 0.0f;
 	else if (val > 0.0f)
-		return (val + pResource::configTable.kRightMotorDeadMarginPos);
+		return val * pResource::configTable.kRightMotorPosConstant + pResource::configTable.kRightMotorDeadMarginPos;
 	else
-		return (val - pResource::configTable.kRightMotorDeadMarginNag);
+		return val * pResource::configTable.kRightMotorNagConstant - pResource::configTable.kRightMotorDeadMarginNag;
 }
 
 void pSmartCar::setMotorsEnabled(const bool enabled)
@@ -250,4 +258,19 @@ void pSmartCar::setMotorsEnabled(const bool enabled)
 	m_motors[0].setEnabled(enabled);
 	m_motors[1].setEnabled(enabled);
 	m_leds[0].SetEnable(enabled);
+}
+
+void pSmartCar::setMotorPower(const uint8_t index, const int16_t power)
+{
+	m_motors[index].setPower(power);
+}
+
+void pSmartCar::setLed(const uint8_t index, const bool enabled)
+{
+	m_leds[index].SetEnable(enabled);
+}
+
+void pSmartCar::sendDataToGrapher(void)
+{
+	m_grapher.sendWatchData();
 }

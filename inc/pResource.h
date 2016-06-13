@@ -36,6 +36,12 @@ public:
 		float			kAccelTruthVal;
 		float			kCgHeightInM;
 
+		float			kLeftMotorPosConstant;
+		float			kRightMotorPosConstant;
+		float			kLeftMotorNagConstant;
+		float			kRightMotorNagConstant;
+		float			kBatteryConstant;
+
 		float			kIdealAngle;
 		float			kAngleMin;
 		float			kAngleMax;
@@ -44,6 +50,10 @@ public:
 		int16_t			kLeftMotorDeadMarginNag;
 		int16_t			kRightMotorDeadMarginPos;
 		int16_t			kRightMotorDeadMarginNag;
+
+		float			kMotorKp;
+		float			kMotorKi;
+		float			kMotorKd;
 
 		float			kAngleKp;
 		float			kAngleKd;

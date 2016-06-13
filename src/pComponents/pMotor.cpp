@@ -51,24 +51,24 @@ bool pMotor::isEnabled(void)
 	return m_enabled;
 }
 
-void pMotor::setPower(const int16_t power)
+void pMotor::setPower(const float power)
 {
 	if (m_enabled)
 	{
 		SetClockwise((power > 0) ^ m_isInverse);
-		SetPower(ABS(power));
-		m_lastPower = power;
+		m_lastPower = (int16_t)power;
+		SetPower(ABS(m_lastPower));
 	}
 }
 
-void pMotor::setMappedPower(const int16_t speed)
+void pMotor::setMappedPower(const float speed)
 {
 	if (m_enabled)
 	{
-		int16_t tempPower = (int16_t)m_config.mappingFunction(speed);
+		float tempPower = m_config.mappingFunction(speed);
 		SetClockwise((tempPower > 0) ^ m_isInverse);
-		SetPower(ABS(tempPower));
-		m_lastPower = tempPower;
+		m_lastPower = (int16_t)tempPower;
+		SetPower(ABS(m_lastPower));
 	}
 }
 

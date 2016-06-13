@@ -27,7 +27,7 @@ class pPid
 
 public:
 
-	typedef function<float (float)> ConstFunc;
+	typedef function<float (float error, float additionalInfo, float constant)> ConstFunc;
 
 	struct PidParam
 	{

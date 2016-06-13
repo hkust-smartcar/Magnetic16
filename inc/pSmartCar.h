@@ -81,6 +81,12 @@ public:
 	void run(void);
 
 	void setMotorsEnabled(const bool enabled);
+	void setMotorPower(const uint8_t id, const int16_t power);
+	void updateMotors(void);
+
+	void setLed(const uint8_t index, const bool enabled);
+
+	void sendDataToGrapher(void);
 
 	static void onClickListener(const uint8_t id);
 
@@ -88,8 +94,8 @@ protected:
 
 	pPid::PidParam getPidConfig(Type type);
 
-	void updateSmoothOutput(const int16_t speed);
-	int16_t	getSmoothSpeedOutput(void);
+	void updateSmoothAngleOutput(const int16_t speed);
+	int16_t	getSmoothAngleOutput(void);
 
 	void updatePid(const float val, Type type);
 
@@ -107,7 +113,6 @@ protected:
 //	static void safetyCheck(void);
 
 	void updateSensors(void);
-	void updateMotors(void);
 	void updateState(void);
 	void updateSpeed(void);
 	void onDraw(void);
@@ -116,6 +121,9 @@ protected:
 
 	float					m_direction;
 	float					m_speed;
+	float					m_idealAngleOffset;
+	float					m_idealAngle;
+
 	float					m_batteryVoltage;
 
 	pLoop					m_loop;
@@ -131,10 +139,9 @@ protected:
 	bool					m_motorEnabled;
 
 	array<pPid, 3>			m_pidControllers;
-	array<int16_t, 3>		m_pidOutputVal;
+	array<float, 3>			m_pidOutputVal;
 
 	array<pKalmanFilter, 3>	m_filter;
-	float					m_oldSpeedPidOuput;
 	uint8_t					m_smoothCounter;
 	float					m_smoothIncrement;
 

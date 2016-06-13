@@ -133,3 +133,10 @@ void pResource::addConfigToConfigTable(void)
 	tempTable.kTableSize = sizeof(ConfigTable);
 	memcpy(&configTable, &tempTable, oldTableSize);
 }
+
+void pResource::testing()
+{
+	while(true){
+
+	}
+}

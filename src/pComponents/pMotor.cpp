@@ -72,6 +72,11 @@ void pMotor::setMappedPower(const float speed)
 	}
 }
 
+void pMotor::setAccel(const float accel)
+{
+setMappedPower(100);
+}
+
 int16_t &pMotor::getPower(void)
 {
 	return	m_lastPower;

@@ -82,6 +82,8 @@ public:
 
 	void saveConfig(void);
 
+	void testing(void);
+
 	static void grapherOnChangedListener(void);
 
 	static ConfigTable			configTable;

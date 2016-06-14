@@ -28,7 +28,6 @@ void pSmartCar::addVariablesToGrapher(void)
 {
 //	m_grapher.addWatchedVar(&m_motors[0].getEncoderCount(), "Count0");
 //	m_grapher.addWatchedVar(&m_motors[1].getEncoderCount(), "Count1");
-	m_grapher.addWatchedVar(&m_idealAngle, "IdealAngle");
 	m_grapher.addWatchedVar(&m_state[StatePos::cur].angle, "Angle");
 //	m_grapher.addWatchedVar(&m_state[StatePos::cur].dX, "Speed");
 //	m_grapher.addWatchedVar(&m_state[StatePos::cur].dYaw, "Yaw");
@@ -36,7 +35,7 @@ void pSmartCar::addVariablesToGrapher(void)
 ////	m_grapher.addWatchedVar(&m_pidOutputVal[Type::Direction], "PidDirectionOutput");
 ////	m_grapher.addWatchedVar(&m_pidOutputVal[Type::Speed], "PidSpeedOutput");
 	m_grapher.addWatchedVar(&m_state[StatePos::cur].dX, "Speed");
-	m_grapher.addWatchedVar(&m_idealAngleOffset, "angleOffset");
+	m_grapher.addWatchedVar(&m_motorPidOldOutput, "motorPidOutput");
 	m_grapher.addWatchedVar(&m_pidControllers[Type::Speed].getSum(), "Sum");
 //	m_grapher.addWatchedVar(&m_motors[0].getPower(), "Power0");
 //	m_grapher.addWatchedVar(&m_motors[1].getPower(), "Power1");
@@ -84,6 +83,7 @@ void pSmartCar::directionControl(void)
 
 void pSmartCar::speedControl(void)
 {
+	pResource::m_instance->m_motorPidOldOutput = pResource::m_instance->m_pidOutputVal[Type::Speed];
 	pResource::m_instance->updatePid(pResource::m_instance->m_state[StatePos::cur].dX, Type::Speed);
 	pResource::m_instance->updateSmoothAngleOutput(pResource::m_instance->m_pidOutputVal[Type::Speed]);
 }
@@ -121,14 +121,16 @@ void pSmartCar::updateState(void)
 	m_state[StatePos::prev].timeStamp = System::Time();
 }
 
-void pSmartCar::updateSmoothAngleOutput(const int16_t newAngle)
+void pSmartCar::updateSmoothAngleOutput(const float newAngle)
 {
-	m_smoothIncrement = (newAngle - m_idealAngleOffset) * 0.05f;
+	m_smoothIncrement = (newAngle - m_motorPidOldOutput) * 0.05f;
 }
 
 int16_t	pSmartCar::getSmoothAngleOutput(void)
 {
-	return (int16_t)(m_idealAngleOffset += m_smoothIncrement);
+	if (m_motorPidOldOutput >= 1000.0f)
+		return 0;
+	return (int16_t)(m_motorPidOldOutput += m_smoothIncrement);
 }
 
 void pSmartCar::updateMotors(void)
@@ -139,8 +141,8 @@ void pSmartCar::updateMotors(void)
 
 void pSmartCar::updateSpeed(void)
 {
-		m_motors[0].setMappedPower(inRange(-400, m_pidOutputVal[Type::Angle] + m_pidOutputVal[Type::Direction], 400));
-		m_motors[1].setMappedPower(inRange(-400, m_pidOutputVal[Type::Angle] - m_pidOutputVal[Type::Direction], 400));
+		m_motors[0].setMappedPower(inRange(-400, m_pidOutputVal[Type::Angle] + getSmoothAngleOutput() + m_pidOutputVal[Type::Direction], 400));
+		m_motors[1].setMappedPower(inRange(-400, m_pidOutputVal[Type::Angle] + getSmoothAngleOutput() - m_pidOutputVal[Type::Direction], 400));
 }
 
 void pSmartCar::onDraw(void)

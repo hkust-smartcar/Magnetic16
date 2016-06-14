@@ -95,7 +95,7 @@ protected:
 
 	pPid::PidParam getPidConfig(Type type);
 
-	void updateSmoothAngleOutput(const int16_t speed);
+	void updateSmoothAngleOutput(const float speed);
 	int16_t	getSmoothAngleOutput(void);
 
 	void updatePid(const float val, Type type);
@@ -124,8 +124,7 @@ protected:
 
 	float					m_direction;
 	float					m_speed;
-	float					m_idealAngleOffset;
-	float					m_idealAngle;
+	float					m_motorPidOldOutput;
 
 	float					m_batteryVoltage;
 

@@ -49,7 +49,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 								return constant * m_state[StatePos::cur].dAngle;
 							}
 						);
-		param.setPoint = &m_idealAngle;
+		param.setPoint = &pResource::configTable.kIdealAngle;
 		param.ignoreRange = 0.2f;
 		param.outputMax = 400;
 		param.outputMin = -400;
@@ -85,8 +85,7 @@ pSmartCar::pSmartCar(void)
 	m_state(),
 	m_direction(0.0f),
 	m_speed(0.0f),
-	m_idealAngleOffset(0.0f),
-	m_idealAngle(pResource::configTable.kIdealAngle),
+	m_motorPidOldOutput(0.0f),
 	m_batteryVoltage(0.0f),
 	m_loop(),
 	m_angle(pAngle::Config(pResource::configTable.kAccelTruthVal, pResource::configTable.kCgHeightInM)),

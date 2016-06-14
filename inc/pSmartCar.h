@@ -140,6 +140,7 @@ protected:
 	pGrapher				m_grapher;
 
 	bool					m_motorEnabled;
+	bool					m_lowBattery;
 
 	array<pPid, 3>			m_pidControllers;
 	array<float, 3>			m_pidOutputVal;

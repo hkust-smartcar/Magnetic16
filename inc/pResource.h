@@ -40,7 +40,6 @@ public:
 		float			kRightMotorPosConstant;
 		float			kLeftMotorNagConstant;
 		float			kRightMotorNagConstant;
-		float			kBatteryConstant;
 
 		float			kIdealAngle;
 		float			kAngleMin;

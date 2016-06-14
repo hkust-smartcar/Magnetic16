@@ -73,8 +73,8 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.ignoreRange = 0.0f;
 		param.outputMax = 10;
 		param.outputMin = -10;
-		param.sumMax = 400;
-		param.sumMin = -400;
+		param.sumMax = 100;
+		param.sumMin = -100;
 	}
 
 	return param;
@@ -104,6 +104,7 @@ pSmartCar::pSmartCar(void)
 	m_batmeter({ pResource::configTable.kBatteryVoltageRatio }),
 	m_grapher(),
 	m_motorEnabled(false),
+	m_lowBattery(false),
 	m_pidControllers{	pPid(getPidConfig(Type::Angle)),
 						pPid(getPidConfig(Type::Direction)),
 						pPid(getPidConfig(Type::Speed)) },
@@ -121,7 +122,7 @@ pSmartCar::pSmartCar(void)
 	addVariablesToGrapher();
 	reset();
 
-	m_batteryVoltage = m_batmeter.GetVoltage();
+	m_lowBattery = ((m_batteryVoltage = m_batmeter.GetVoltage()) <= 7.55f);
 
 	m_leds[1].SetEnable(true);
 }

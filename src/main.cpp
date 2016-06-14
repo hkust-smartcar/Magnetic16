@@ -15,18 +15,18 @@
 
 namespace libbase
 {
-	namespace k60
-	{
+namespace k60
+{
 
-		Mcg::Config Mcg::GetMcgConfig()
-		{
-			Mcg::Config config;
-			config.external_oscillator_khz = 50000;
-			config.core_clock_khz = 150000;
-			return config;
-		}
+Mcg::Config Mcg::GetMcgConfig()
+{
+	Mcg::Config config;
+	config.external_oscillator_khz = 50000;
+	config.core_clock_khz = 150000;
+	return config;
+}
 
-	}
+}
 }
 
 using namespace std;
@@ -40,23 +40,23 @@ int main(void)
 
 	pResource resource;
 
-//	pResource::m_instance->setMotorsEnabled(true);
+	//	pResource::m_instance->setMotorsEnabled(true);
 
 	DelayMsByTicks(500);
 
-//	for (uint8_t i = 0; i < 400; i += 2)
-//	{
-//		pResource::m_instance->setMotorPower(0, i);
-//		pResource::m_instance->setMotorPower(1, i);
-//		DelayMsByTicks(500);
-//		pResource::m_instance->updateMotors();
-//		pResource::m_instance->sendDataToGrapher();
-//	}
+	//	for (uint8_t i = 0; i < 400; i += 2)
+	//	{
+	//		pResource::m_instance->setMotorPower(0, i);
+	//		pResource::m_instance->setMotorPower(1, i);
+	//		DelayMsByTicks(500);
+	//		pResource::m_instance->updateMotors();
+	//		pResource::m_instance->sendDataToGrapher();
+	//	}
 
-//	pResource::m_instance->setMotorPower(0, 0);
-//	pResource::m_instance->setMotorPower(1, 0);
-//	while (true);
-
-	pResource::m_instance->run();
+	//	pResource::m_instance->setMotorPower(0, 0);
+	//	pResource::m_instance->setMotorPower(1, 0);
+	//	while (true);
+	pResource::m_instance->testing();
+	//	pResource::m_instance->run();
 
 }

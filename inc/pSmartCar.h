@@ -89,6 +89,14 @@ public:
 	void sendDataToGrapher(void);
 
 	static void onClickListener(const uint8_t id);
+	int16_t set_accel;
+		int16_t cur_accel_l;
+		int16_t cur_accel_r;
+		int16_t cur_speed_l;
+		int16_t cur_speed_r;
+		int16_t last_speed_l;
+		int16_t last_speed_r;
+		int16_t stop;
 
 protected:
 

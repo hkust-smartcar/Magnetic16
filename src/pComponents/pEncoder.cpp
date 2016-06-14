@@ -26,7 +26,7 @@ void pEncoder::update(void)
 {
 	Update();
 	m_lastCount = (m_isInverse)? -GetCount() : GetCount();
-	m_averageCountPerS = m_lastCount * (System::Time() - m_lastTime) / 1000;
+	//m_averageCountPerS = m_lastCount * (System::Time() - m_lastTime) / 1000;
 }
 
 void pEncoder::reset(void)

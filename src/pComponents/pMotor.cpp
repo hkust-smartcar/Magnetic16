@@ -22,11 +22,11 @@ DirMotor::Config getMotorConfig(const uint8_t id)
 
 pMotor::pMotor(Config config)
 :
-	DirMotor(getMotorConfig(config.motorId)),
-	m_config(config),
-	m_encoder(config.encoderId, config.isEncoderrInverse),
-	m_enabled(false),
-	m_isInverse(config.isMotorInverse)
+											DirMotor(getMotorConfig(config.motorId)),
+											m_config(config),
+											m_encoder(config.encoderId, config.isEncoderrInverse),
+											m_enabled(false),
+											m_isInverse(config.isMotorInverse)
 {}
 
 void pMotor::update(void)
@@ -74,7 +74,18 @@ void pMotor::setMappedPower(const float speed)
 
 void pMotor::setAccel(const float accel)
 {
-setMappedPower(100);
+	if(m_enabled){
+		m_lastPower += (int16_t)(m_config.mappingFunction(accel));
+		if(m_lastPower >=500){
+			m_lastPower = 500;
+		}
+		if(m_lastPower <=-500){
+			m_lastPower = -500;
+		}
+		SetClockwise((m_lastPower > 0) ^ m_isInverse);
+		SetPower(ABS(m_lastPower));
+
+	}
 }
 
 int16_t &pMotor::getPower(void)

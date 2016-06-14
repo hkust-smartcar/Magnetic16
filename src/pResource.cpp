@@ -18,15 +18,15 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	50
+#define UNIQUE_VAL	99
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
 
 pResource::pResource(void)
 :
-	pFlash(pFlash::Config(&configTable, sizeof(pResource::ConfigTable))),
-	pSmartCar()
+									pFlash(pFlash::Config(&configTable, sizeof(pResource::ConfigTable))),
+									pSmartCar()
 {
 	System::Init();
 
@@ -51,7 +51,7 @@ pResource::pResource(void)
 	else if (configTable.kTableSize != sizeof(ConfigTable))
 	{
 		setInitialConfigTable();
-//		addConfigToConfigTable();
+		//		addConfigToConfigTable();
 		saveConfig();
 	}
 }
@@ -84,10 +84,12 @@ void pResource::setInitialConfigTable(void)
 	configTable.kAccelTruthVal = 0.02f;
 	configTable.kCgHeightInM = 0.05f;
 
-	configTable.kLeftMotorPosConstant = 32.29167f;
-	configTable.kRightMotorPosConstant = 45.625f;
-	configTable.kLeftMotorNagConstant = 28.58333f;
-	configTable.kRightMotorNagConstant = 43.166f;
+	//	configTable.kLeftMotorPosConstant = 32.29167f;
+	//	configTable.kRightMotorPosConstant = 45.625f;
+	configTable.kLeftMotorPosConstant = 0.3229167f;//increase 1 power
+	configTable.kRightMotorPosConstant = 0.45625f;
+	configTable.kLeftMotorNagConstant = 0.2858333f;
+	configTable.kRightMotorNagConstant = 0.43166f;
 	configTable.kBatteryConstant = 0.0586022f;
 
 	configTable.kIdealAngle = 62.2f;
@@ -136,7 +138,29 @@ void pResource::addConfigToConfigTable(void)
 
 void pResource::testing()
 {
-	while(true){
 
+//	stop = 1;
+//	set_accel = 0;
+	pSmartCar::setMotorsEnabled(true);
+	pSmartCar::m_motors[0].update();
+	pSmartCar::m_motors[1].update();
+	while(true){
+		if(!stop){
+			pSmartCar::m_motors[0].setAccel(set_accel);
+			pSmartCar::m_motors[1].setAccel(set_accel);
+			DelayMsByTicks(5);
+			pSmartCar::m_motors[0].update();
+			pSmartCar::m_motors[1].update();
+			cur_speed_l = pSmartCar::m_motors[0].getEncoderCount();
+			cur_speed_r = pSmartCar::m_motors[1].getEncoderCount();
+			cur_accel_l = cur_speed_l - last_speed_l;
+			cur_accel_r = cur_speed_r - last_speed_r;
+			pSmartCar::m_grapher.sendWatchData();
+		}else{
+			pSmartCar::m_motors[0].reset();
+			pSmartCar::m_motors[1].reset();
+			DelayMsByTicks(5);
+			pSmartCar::m_grapher.sendWatchData();
+		}
 	}
 }

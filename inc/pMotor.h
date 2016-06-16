@@ -61,6 +61,7 @@ public:
 	void setSpeed(const float rpt);
 	void setPower(const float power);
 	void setMappedPower(const float power);
+	void setAccel(const float accel);
 
 	int16_t &getPower(void);
 	int16_t &getEncoderCount(void);
@@ -74,5 +75,6 @@ private:
 	bool				m_enabled;
 	bool				m_isInverse;
 	int16_t				m_lastPower;
+	float 				m_lastAccel;
 
 };

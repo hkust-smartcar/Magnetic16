@@ -84,6 +84,8 @@ public:
 
 	static void grapherOnChangedListener(void);
 
+	void testing();
+
 	static ConfigTable			configTable;
 	static pResource			*m_instance;
 

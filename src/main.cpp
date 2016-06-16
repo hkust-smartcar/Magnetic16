@@ -43,6 +43,7 @@ int main(void)
 
 	DelayMsByTicks(500);
 
-	pResource::m_instance->run();
+	pResource::m_instance->testing();
+//	pResource::m_instance->run();
 
 }

@@ -100,6 +100,14 @@ public:
 	void sendDataToGrapher(void);
 
 	static void onClickListener(const uint8_t id);
+	float set_accel;
+	int16_t cur_accel_l;
+	int16_t cur_accel_r;
+	int16_t cur_speed_l;
+	int16_t cur_speed_r;
+	int16_t last_speed_l;
+	int16_t last_speed_r;
+	int16_t stop;
 
 protected:
 
@@ -115,8 +123,8 @@ protected:
 
 	static void watchDogTimeout(void);
 
-	static float leftMotorMapping(const float val);
-	static float rightMotorMapping(const float val);
+	static int16_t leftMotorMapping(const float val);
+	static int16_t rightMotorMapping(const float val);
 
 	static void onReceive(const std::vector<Byte>& bytes);
 
@@ -125,7 +133,7 @@ protected:
 	static void directionControl(void);
 	static void speedControl(void);
 	static void print(void);
-//	static void safetyCheck(void);
+	//	static void safetyCheck(void);
 
 	void updateSensors(void);
 	void updateState(void);
@@ -146,7 +154,7 @@ protected:
 	array<pMotor, 2>		m_motors;
 	MiniLcd					m_lcd;
 	Joystick				m_joystick;
-//	array<Button, 3>		m_buttons;
+	//	array<Button, 3>		m_buttons;
 	array<Led, 4>			m_leds;
 	pBuzzer					m_buzzer;
 	BatteryMeter			m_batmeter;

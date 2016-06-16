@@ -11,6 +11,7 @@
 #include <libbase/k60/mcg.h>
 #include <pResource.h>
 #include <pSmartCar.h>
+#include <pBuzzer.h>
 #include <pLoop.h>
 
 namespace libbase
@@ -40,21 +41,7 @@ int main(void)
 
 	pResource resource;
 
-//	pResource::m_instance->setMotorsEnabled(true);
-
 	DelayMsByTicks(500);
-
-//	for (uint8_t i = 0; i < 400; i += 2)
-//	{
-//		pResource::m_instance->setMotorPower(0, i);
-//		pResource::m_instance->setMotorPower(1, i);
-//		DelayMsByTicks(500);
-//		pResource::m_instance->updateMotors();
-//		pResource::m_instance->sendDataToGrapher();
-//	}
-
-//	pResource::m_instance->setMotorPower(0, 0);
-//	pResource::m_instance->setMotorPower(1, 0);
 
 	pResource::m_instance->run();
 

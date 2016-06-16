@@ -55,24 +55,25 @@ public:
 		float			kMotorKd;
 
 		float			kAngleKp;
-		float			kAngleKd;
 		float			kAngleKi;
+		float			kAngleKd;
 		float			kAngleKq;
 		float			kAngleKr;
+		float			kAngleBeta;
 
 		float			kDirectionKp;
-		float			kDirectionKd;
 		float			kDirectionKi;
+		float			kDirectionKd;
 		float			kDirectionKq;
 		float			kDirectionKr;
 
 		float			kSpeedKp;
-		float			kSpeedKd;
 		float			kSpeedKi;
+		float			kSpeedKd;
 		float			kSpeedKq;
 		float			kSpeedKr;
 
-		float			kCountPerDeg;
+		float			kCountPerRevo;
 	};
 
 	pResource(void);

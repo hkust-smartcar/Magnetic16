@@ -30,7 +30,6 @@ public:
 private:
 
 	int16_t						m_lastCount;
-	float 						m_averageCountPerS;
 	Timer::TimerInt				m_lastTime;
 
 	bool						m_isInverse;

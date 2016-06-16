@@ -13,16 +13,16 @@
 using namespace libsc;
 using namespace std;
 
-DirMotor::Config getMotorConfig(const uint8_t id)
+AlternateMotor::Config getMotorConfig(const uint8_t id)
 {
-	DirMotor::Config config;
+	AlternateMotor::Config config;
 	config.id = id;
 	return config;
 }
 
 pMotor::pMotor(Config config)
 :
-	DirMotor(getMotorConfig(config.motorId)),
+	AlternateMotor(getMotorConfig(config.motorId)),
 	m_config(config),
 	m_encoder(config.encoderId, config.isEncoderrInverse),
 	m_enabled(false),

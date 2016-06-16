@@ -18,7 +18,7 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	40
+#define UNIQUE_VAL	56
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -79,7 +79,7 @@ void pResource::setInitialConfigTable(void)
 	configTable.kTableSize = sizeof(ConfigTable);
 	configTable.kUniqueVal = UNIQUE_VAL;
 
-	configTable.kBatteryVoltageRatio = 0.3879623f;
+	configTable.kBatteryVoltageRatio = 0.3886279f;
 
 	configTable.kAccelTruthVal = 0.02f;
 	configTable.kCgHeightInM = 0.05f;
@@ -89,9 +89,9 @@ void pResource::setInitialConfigTable(void)
 	configTable.kLeftMotorNagConstant = 28.58333f;
 	configTable.kRightMotorNagConstant = 43.166f;
 
-	configTable.kIdealAngle = 62.2f;
+	configTable.kIdealAngle = 65.0f;
 	configTable.kAngleMin = 45.0f;
-	configTable.kAngleMax = 75.0f;
+	configTable.kAngleMax = 80.0f;
 
 	configTable.kLeftMotorDeadMarginPos = 0;//104;//156;
 	configTable.kLeftMotorDeadMarginNag = 0;//143;//164;
@@ -102,25 +102,26 @@ void pResource::setInitialConfigTable(void)
 	configTable.kMotorKi = 0.0f;
 	configTable.kMotorKd = 0.0f;
 
-	configTable.kAngleKp = 73.0f;
+	configTable.kAngleKp = 343.0f;
 	configTable.kAngleKi = 0.0f;
-	configTable.kAngleKd = 0.018586f;
-	configTable.kAngleKq = 0.3f;
-	configTable.kAngleKr = 0.9f;
+	configTable.kAngleKd = 0.0077f;
+	configTable.kAngleKq = 0.001f;
+	configTable.kAngleKr = 0.999f;
+	configTable.kAngleBeta = 0.12f;
 
-	configTable.kDirectionKp = 0.5f;
+	configTable.kDirectionKp = 0.33f;
 	configTable.kDirectionKi = 0.0f;
 	configTable.kDirectionKd = 0.0f;
 	configTable.kDirectionKq = 0.001f;
 	configTable.kDirectionKr = 0.999f;
 
-	configTable.kSpeedKp = 3.5f;
-	configTable.kSpeedKi = 0.17f;
+	configTable.kSpeedKp = 0.0f;
+	configTable.kSpeedKi = 0.0f;
 	configTable.kSpeedKd = 0.0f;
 	configTable.kSpeedKq = 0.001f;
 	configTable.kSpeedKr = 0.999f;
 
-	configTable.kCountPerDeg = 9557.725f / 360.0;
+	configTable.kCountPerRevo = 9557.725f;
 }
 
 void pResource::addConfigToConfigTable(void)

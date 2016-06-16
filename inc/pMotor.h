@@ -13,6 +13,7 @@
 #include <functional>
 #include <cmath>
 #include <libsc/dir_motor.h>
+#include <libsc/alternate_motor.h>
 #include "pEncoder.h"
 #include <pPid.h>
 
@@ -22,7 +23,7 @@
 using namespace std;
 using namespace libsc;
 
-class pMotor : private DirMotor
+class pMotor : private AlternateMotor//private DirMotor
 {
 
 public:

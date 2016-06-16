@@ -15,7 +15,7 @@ using namespace libsc;
 pEncoder::pEncoder(const uint8_t id, bool isInverse)
 :
 	AbEncoder({ id }),
-	m_averageCountPerS(0),
+	m_lastCount(0),
 	m_lastTime(0),
 	m_isInverse(isInverse)
 {
@@ -26,14 +26,12 @@ void pEncoder::update(void)
 {
 	Update();
 	m_lastCount = (m_isInverse)? -GetCount() : GetCount();
-	m_averageCountPerS = m_lastCount * (System::Time() - m_lastTime) / 1000;
 }
 
 void pEncoder::reset(void)
 {
 	update();
 	update();
-	m_averageCountPerS = 0;
 	m_lastTime = 0;
 	m_lastCount = 0;
 }

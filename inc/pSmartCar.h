@@ -19,8 +19,11 @@
 #include <libsc/simple_buzzer.h>
 #include <libsc/battery_meter.h>
 #include <libsc/button.h>
+#include <libsc/joystick.h>
 #include <pKalmanFilter.h>
+#include <pLowPassFilter.h>
 #include <pAngle.h>
+#include <pBuzzer.h>
 #include <pMotor.h>
 #include <pFlash.h>
 #include <pLoop.h>
@@ -28,6 +31,7 @@
 #define ABS(v) ((v > 0)? v : -v)
 #define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
 #define isInRange(n, v, x) (v >= n && v <= x)
+#define sgn(v) ((v > 0)? 1 : -1)
 
 using namespace libsc;
 using namespace libutil;
@@ -80,12 +84,18 @@ public:
 
 	void run(void);
 
+	void addSpeed(const float speed);
+
 	void setMotorsEnabled(const bool enabled);
+	bool isMotorsEnabled(void);
+
 	void setMotorPower(const uint8_t id, const int16_t power);
 	void updateMotors(void);
 
+	bool isReadyAndSet(void);
+
 	void setLed(const uint8_t index, const bool enabled);
-	void setBeep(const bool isBeep);
+	void setBeep(const bool isBeep, const uint8_t noteIndex = 40);
 
 	void sendDataToGrapher(void);
 
@@ -95,8 +105,8 @@ protected:
 
 	pPid::PidParam getPidConfig(Type type);
 
-	void updateSmoothAngleOutput(const int16_t speed);
-	int16_t	getSmoothAngleOutput(void);
+	void updateSmoothAngleOutput(const float speed);
+	float getSmoothAngleOutput(void);
 
 	void updatePid(const float val, Type type);
 
@@ -107,6 +117,8 @@ protected:
 
 	static float leftMotorMapping(const float val);
 	static float rightMotorMapping(const float val);
+
+	static void onReceive(const std::vector<Byte>& bytes);
 
 	static void update(void);
 	static void angleControl(void);
@@ -133,14 +145,16 @@ protected:
 	pAngle					m_angle;
 	array<pMotor, 2>		m_motors;
 	MiniLcd					m_lcd;
-	array<Button, 3>		m_buttons;
+	Joystick				m_joystick;
+//	array<Button, 3>		m_buttons;
 	array<Led, 4>			m_leds;
-	SimpleBuzzer			m_buzzer;
+	pBuzzer					m_buzzer;
 	BatteryMeter			m_batmeter;
 	pGrapher				m_grapher;
+	pLowPassFilter			m_lpf;
 
 	bool					m_motorEnabled;
-	bool					m_lowBattery;
+	bool					m_isReadyToRun;
 
 	array<pPid, 3>			m_pidControllers;
 	array<float, 3>			m_pidOutputVal;

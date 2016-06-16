@@ -76,15 +76,9 @@ void pMotor::setAccel(const float accel)
 {
 	if(m_enabled){
 		m_lastPower += (int16_t)(m_config.mappingFunction(accel));
-		if(m_lastPower >=500){
-			m_lastPower = 500;
-		}
-		if(m_lastPower <=-500){
-			m_lastPower = -500;
-		}
+		m_lastPower = inRange(-300,m_lastPower,300);
 		SetClockwise((m_lastPower > 0) ^ m_isInverse);
 		SetPower(ABS(m_lastPower));
-
 	}
 }
 

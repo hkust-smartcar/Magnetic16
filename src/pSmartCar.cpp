@@ -81,15 +81,15 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 
 pSmartCar::pSmartCar(void)
 :
-					m_state(),
-					m_direction(0.0f),
-					m_speed(0.0f),
-					m_idealAngleOffset(pResource::configTable.kIdealAngle),
-					m_idealAngle(pResource::configTable.kIdealAngle),
-					m_batteryVoltage(0.0f),
-					m_loop(),
-					m_angle(pAngle::Config(pResource::configTable.kAccelTruthVal, pResource::configTable.kCgHeightInM)),
-					m_motors{ pMotor(pMotor::Config(1, 0, true, false, leftMotorMapping)),
+											m_state(),
+											m_direction(0.0f),
+											m_speed(0.0f),
+											m_idealAngleOffset(pResource::configTable.kIdealAngle),
+											m_idealAngle(pResource::configTable.kIdealAngle),
+											m_batteryVoltage(0.0f),
+											m_loop(),
+											m_angle(pAngle::Config(pResource::configTable.kAccelTruthVal, pResource::configTable.kCgHeightInM)),
+											m_motors{ pMotor(pMotor::Config(1, 0, true, false, leftMotorMapping)),
 	pMotor(pMotor::Config(0, 1, false, true, rightMotorMapping)) },
 	m_lcd(MiniLcd::Config(0, -1, 30)),
 	m_buttons{	Button(getButtonConfig(0)),
@@ -234,31 +234,51 @@ pSmartCar::pSmartCar(void)
 						}
 					}
 
-					float pSmartCar::leftMotorMapping(const float val)
+					int pSmartCar::leftMotorMapping(const float val)
 					{
+						float temp = 0.0f;
+						int temp_int = 0;
 						if (val == 0.0f)
 							return 0.0f;
 						else{
-							return (val/pResource::configTable.kLeftMotorPosConstant);
+							temp_int = temp = val/pResource::configTable.kLeftMotorPosConstant;
+							if(temp_int != temp){//round up acceleration
+								if(temp_int > 0)
+									return ++temp_int;
+								else
+									return --temp_int;
+							}else{
+								return temp_int;
+							}
 						}
-//							else if (val > 0.0f)
-//								return val * pResource::configTable.kLeftMotorPosConstant + pResource::configTable.kLeftMotorDeadMarginPos;
-//							else
-//								return (val * pResource::configTable.kLeftMotorNagConstant - pResource::configTable.kLeftMotorDeadMarginNag);
+						//							else if (val > 0.0f)
+						//								return val * pResource::configTable.kLeftMotorPosConstant + pResource::configTable.kLeftMotorDeadMarginPos;
+						//							else
+						//								return (val * pResource::configTable.kLeftMotorNagConstant - pResource::configTable.kLeftMotorDeadMarginNag);
 
 					}
 
-					float pSmartCar::rightMotorMapping(const float val)
+					int pSmartCar::rightMotorMapping(const float val)
 					{
+						float temp = 0.0f;
+						int temp_int = 0;
 						if (val == 0.0f)
 							return 0.0f;
 						else{
-							return (val/pResource::configTable.kRightMotorPosConstant);
+							temp_int = temp = val/pResource::configTable.kRightMotorPosConstant;
+							if(temp_int != temp){//round up acceleration
+								if(temp_int > 0)
+									return ++temp_int;
+								else
+									return --temp_int;
+							}else{
+								return temp_int;
+							}
 						}
-//							else if (val > 0.0f)
-//								return val * pResource::configTable.kRightMotorPosConstant + pResource::configTable.kRightMotorDeadMarginPos;
-//							else
-//								return val * pResource::configTable.kRightMotorNagConstant - pResource::configTable.kRightMotorDeadMarginNag;
+						//							else if (val > 0.0f)
+						//								return val * pResource::configTable.kRightMotorPosConstant + pResource::configTable.kRightMotorDeadMarginPos;
+						//							else
+						//								return val * pResource::configTable.kRightMotorNagConstant - pResource::configTable.kRightMotorDeadMarginNag;
 
 					}
 

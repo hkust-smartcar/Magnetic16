@@ -110,8 +110,8 @@ protected:
 	void addAllRoutineToLoop(void);
 	void addVariablesToGrapher(void);
 
-	static float leftMotorMapping(const float val);
-	static float rightMotorMapping(const float val);
+	static int leftMotorMapping(const float val);
+	static int rightMotorMapping(const float val);
 
 	static void update(void);
 	static void angleControl(void);

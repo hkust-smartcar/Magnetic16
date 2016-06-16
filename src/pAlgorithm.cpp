@@ -15,9 +15,9 @@ using namespace libsc;
 void pSmartCar::addAllRoutineToLoop(void)
 {
 	m_loop.addFunctionToLoop(update, 5);
+	//	m_loop.addFunctionToLoop(speedControl, 100);
 	m_loop.addFunctionToLoop(angleControl, 5);
 	m_loop.addFunctionToLoop(directionControl, 10);
-	m_loop.addFunctionToLoop(speedControl, 100);
 	m_loop.addFunctionToLoop(print, 20);
 	//	m_loop.addFunctionToLoop(safetyCheck, 200);
 }
@@ -42,8 +42,8 @@ void pSmartCar::addVariablesToGrapher(void)
 
 	m_grapher.addSharedVar(&set_accel, "set_accel");
 	m_grapher.addSharedVar(&stop, "stop");
-	//	m_grapher.addSharedVar(&pResource::configTable.kAngleKp, "AngleKp");
-	//	m_grapher.addSharedVar(&pResource::configTable.kAngleKd, "AngleKd");
+	m_grapher.addSharedVar(&pResource::configTable.kAngleKp, "AngleKp");
+	m_grapher.addSharedVar(&pResource::configTable.kAngleKd, "AngleKd");
 	//	m_grapher.addSharedVar(&pResource::configTable.kDirectionKp, "DirectionKp");
 	//	m_grapher.addSharedVar(&pResource::configTable.kDirectionKd, "DirectionKd");
 	//	m_grapher.addSharedVar(&pResource::configTable.kDirectionKi, "DirectionKi");
@@ -66,7 +66,7 @@ void pSmartCar::update(void)
 {
 	pResource::m_instance->updateSensors();
 	pResource::m_instance->updateState();
-	pResource::m_instance->updateMotors();
+	//	pResource::m_instance->updateMotors();
 }
 
 void pSmartCar::angleControl(void)
@@ -163,8 +163,8 @@ void pSmartCar::updateSpeed(void)
 	//		m_motors[0].setMappedPower(inRange(-400, m_pidOutputVal[Type::Angle] + m_pidOutputVal[Type::Direction], 400));
 	//		m_motors[1].setMappedPower(inRange(-400, m_pidOutputVal[Type::Angle] - m_pidOutputVal[Type::Direction], 400));
 	//	}
-	m_motors[0].setAccel(inRange(-400, m_pidOutputVal[Type::Angle] + m_pidOutputVal[Type::Direction], 400));
-	m_motors[1].setAccel(inRange(-400, m_pidOutputVal[Type::Angle] - m_pidOutputVal[Type::Direction], 400));
+	m_motors[0].setAccel(inRange(-400, m_pidOutputVal[Type::Angle]/* + m_pidOutputVal[Type::Direction]*/, 400));
+	m_motors[1].setAccel(inRange(-400, m_pidOutputVal[Type::Angle]/* - m_pidOutputVal[Type::Direction]*/, 400));
 }
 
 void pSmartCar::onDraw(void)

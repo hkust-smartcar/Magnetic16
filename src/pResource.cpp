@@ -25,8 +25,8 @@ pResource				*pResource::m_instance = nullptr;
 
 pResource::pResource(void)
 :
-									pFlash(pFlash::Config(&configTable, sizeof(pResource::ConfigTable))),
-									pSmartCar()
+													pFlash(pFlash::Config(&configTable, sizeof(pResource::ConfigTable))),
+													pSmartCar()
 {
 	System::Init();
 
@@ -86,7 +86,7 @@ void pResource::setInitialConfigTable(void)
 
 	//	configTable.kLeftMotorPosConstant = 32.29167f;
 	//	configTable.kRightMotorPosConstant = 45.625f;
-	configTable.kLeftMotorPosConstant = 0.3229167f;//increase 1 power
+	configTable.kLeftMotorPosConstant = 0.3229167f;//acceleration by increasing 1 power
 	configTable.kRightMotorPosConstant = 0.45625f;
 	configTable.kLeftMotorNagConstant = 0.2858333f;
 	configTable.kRightMotorNagConstant = 0.43166f;
@@ -139,28 +139,28 @@ void pResource::addConfigToConfigTable(void)
 void pResource::testing()
 {
 
-//	stop = 1;
-//	set_accel = 0;
+	//	stop = 1;
+	//	set_accel = 0;
 	pSmartCar::setMotorsEnabled(true);
 	pSmartCar::m_motors[0].update();
 	pSmartCar::m_motors[1].update();
 	while(true){
+		DelayMsByTicks(5);
 		if(!stop){
-			pSmartCar::m_motors[0].setAccel(set_accel);
-			pSmartCar::m_motors[1].setAccel(set_accel);
-			DelayMsByTicks(5);
 			pSmartCar::m_motors[0].update();
 			pSmartCar::m_motors[1].update();
 			cur_speed_l = pSmartCar::m_motors[0].getEncoderCount();
 			cur_speed_r = pSmartCar::m_motors[1].getEncoderCount();
 			cur_accel_l = cur_speed_l - last_speed_l;
 			cur_accel_r = cur_speed_r - last_speed_r;
-			pSmartCar::m_grapher.sendWatchData();
+			pSmartCar::m_motors[0].setAccel(set_accel);
+			pSmartCar::m_motors[1].setAccel(set_accel);
 		}else{
 			pSmartCar::m_motors[0].reset();
 			pSmartCar::m_motors[1].reset();
-			DelayMsByTicks(5);
-			pSmartCar::m_grapher.sendWatchData();
+			set_accel = 0;
+			stop = cur_accel_l = cur_accel_r = cur_speed_l = cur_speed_r = 0;
 		}
+		pSmartCar::m_grapher.sendWatchData();
 	}
 }

@@ -33,9 +33,9 @@ pAngle::pAngle(pAngle::Config config)
 :
 	Mpu6050(getGyroConfig()),
 	m_param(config),
-	m_lastSpeed(0),
 	m_lastAngle(0),
 	m_lastYawOmega(0),
+	m_accelAngle(0),
 	m_gyroAngle(0),
 	m_gyroOffset(0),
 	m_lastTime(0)
@@ -54,17 +54,17 @@ void pAngle::update(void)
 
 		float dt = (System::Time() - m_lastTime) / 1000.0f;
 
-		m_gyroAngle += m_lastOmega[0] * dt;
-		m_gyroOffset += m_param.accelTrustValue * (asin(inRange(-1.0f, -m_lastAccel[1], 1.0f)) * RadToDeg - m_lastAngle);
-		m_lastSpeed = (m_gyroAngle + m_gyroOffset - m_lastAngle) / dt * m_param.cgHeight;
-		m_lastAngle = m_gyroAngle + m_gyroOffset;
+		float tempAngleDiff = m_lastOmega[0] * dt;
+		m_gyroAngle += tempAngleDiff;
+		m_gyroOffset = *m_param.accelTrustValue * ((m_accelAngle = asin(inRange(-1.0f, -m_lastAccel[1], 1.0f)) * RadToDeg) - m_lastAngle);
+		m_lastAngle += tempAngleDiff + m_gyroOffset;
 		m_lastYawOmega = m_lastOmega[1] * sin(m_lastAngle * DegToRad);
 	}
 	else
 	{
 		UpdateF();
 		m_lastAccel = GetAccelF();
-		m_lastAngle = m_gyroOffset = asin(inRange(-1.0f, m_lastAccel[1], 1.0f)) * RadToDeg;
+		m_lastAngle = m_gyroAngle = asin(inRange(-1.0f, -m_lastAccel[1], 1.0f)) * RadToDeg;
 	}
 
 	m_lastTime = System::Time();
@@ -73,11 +73,6 @@ void pAngle::update(void)
 float pAngle::getAngle(void) const
 {
 	return m_lastAngle;
-}
-
-float pAngle::getSpeed(void) const
-{
-	return m_lastSpeed;
 }
 
 float pAngle::getYawOmega(void) const
@@ -103,4 +98,14 @@ float &pAngle::getAccel(const uint8_t index)
 float &pAngle::getOmega(const uint8_t index)
 {
 	return m_lastOmega[index];
+}
+
+float &pAngle::getAccelAngle(void)
+{
+	return m_accelAngle;
+}
+
+float &pAngle::getGyroAngle(void)
+{
+	return m_gyroAngle;
 }

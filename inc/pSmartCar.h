@@ -23,6 +23,7 @@
 #include <pKalmanFilter.h>
 #include <pLowPassFilter.h>
 #include <pAngle.h>
+#include <pMagSen.h>
 #include <pBuzzer.h>
 #include <pMotor.h>
 #include <pFlash.h>
@@ -100,6 +101,8 @@ public:
 	void sendDataToGrapher(void);
 
 	static void onClickListener(const uint8_t id);
+
+	array<pMagSen, 2>		m_magSen;
 
 protected:
 

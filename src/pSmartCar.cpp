@@ -50,12 +50,26 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 							}
 						);
 		param.setPoint = &pResource::configTable.kIdealAngle;
-		param.ignoreRange = 0.3f;
+		param.ignoreRange = 0.2f;
 		param.outputMax = 400;
 		param.outputMin = -400;
 		break;
 
 	case 1:
+		param.kPFunc =	function<float (float, float, float)>
+					(
+						[](float error, float additionalInfo, float constant)
+						{
+							return pResource::configTable.kDirectionKp * error;
+						}
+					);
+		param.kDFunc =	function<float (float, float, float)>
+					(
+						[&](float error, float additionalInfo, float constant)
+						{
+							return constant * m_state[StatePos::cur].dYaw;
+						}
+					);
 		param.kP = &pResource::configTable.kDirectionKp;
 		param.kI = &pResource::configTable.kDirectionKi;
 		param.kD = &pResource::configTable.kDirectionKd;
@@ -120,6 +134,7 @@ pSmartCar::pSmartCar(void)
 			Led({ 1, true }),
 			Led({ 0, true }) },
 	m_buzzer(),
+	m_magSen{ pMagSen(0, true), pMagSen(2, false) },
 	m_batmeter({ pResource::configTable.kBatteryVoltageRatio }),
 	m_grapher(),
 	m_lpf(0.17f),

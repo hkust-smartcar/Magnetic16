@@ -43,6 +43,13 @@ int main(void)
 
 	DelayMsByTicks(500);
 
+//	while (true)
+//	{
+//		resource.m_magSen[0].updatePair();
+//		resource.sendDataToGrapher();
+//		DelayMsByTicks(10);
+//	}
+
 	pResource::m_instance->run();
 
 }

@@ -30,13 +30,13 @@ public:
 
 	struct Config
 	{
-		float accelTrustValue;
+		float *accelTrustValue;
 
 		float cgHeight;
 
-		Config(float _accelTrustValue, float _cgHeight)
+		Config(float &_accelTrustValue, float _cgHeight)
 		:
-			accelTrustValue(_accelTrustValue),
+			accelTrustValue(&_accelTrustValue),
 			cgHeight(_cgHeight)
 		{}
 	};
@@ -53,22 +53,29 @@ public:
 	void update(void);
 
 	float getAngle(void) const;
-	float getSpeed(void) const;
 	float getYawOmega(void) const;
 
 	array<float, 3> getAccel(void) const;
 	array<float, 3> getOmega(void) const;
+
 	float &getAccel(const uint8_t index);
 	float &getOmega(const uint8_t index);
+
+	float &getAccelAngle(void);
+	float &getGyroAngle(void);
 
 private:
 
 	Config			m_param;
-	float			m_lastSpeed;
+
 	float			m_lastAngle;
 	float			m_lastYawOmega;
+
+	float			m_accelAngle;
 	float			m_gyroAngle;
+
 	float			m_gyroOffset;
+
 	array<float, 3>	m_lastAccel;
 	array<float, 3>	m_lastOmega;
 

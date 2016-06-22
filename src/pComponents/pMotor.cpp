@@ -26,7 +26,8 @@ pMotor::pMotor(Config config)
 	m_config(config),
 	m_encoder(config.encoderId, config.isEncoderrInverse),
 	m_enabled(false),
-	m_isInverse(config.isMotorInverse)
+	m_isInverse(config.isMotorInverse),
+	m_lastPower(0)
 {}
 
 void pMotor::update(void)

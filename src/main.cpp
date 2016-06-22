@@ -41,14 +41,25 @@ int main(void)
 
 	pResource resource;
 
-	DelayMsByTicks(500);
-
+	resource.setMotorsEnabled(true);
+//	resource.setMotorPower(0, 200);
 //	while (true)
 //	{
-//		resource.m_magSen[0].updatePair();
+//		resource.updateMotors();
 //		resource.sendDataToGrapher();
 //		DelayMsByTicks(10);
 //	}
+
+	DelayMsByTicks(5000);
+
+	for (int16_t i = 0; i <= 10000; i += 100)
+	{
+		resource.setMotorPower(0, i);
+//		resource.setMotorPower(1, i);
+		DelayMsByTicks(100);
+		resource.updateMotors();
+		resource.sendDataToGrapher();
+	}
 
 	pResource::m_instance->run();
 

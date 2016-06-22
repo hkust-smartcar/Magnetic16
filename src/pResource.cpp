@@ -18,7 +18,7 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	70
+#define UNIQUE_VAL	40
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -81,7 +81,7 @@ void pResource::setInitialConfigTable(void)
 
 	configTable.kBatteryVoltageRatio = 0.3886279f;
 
-	configTable.kAccelTruthVal = 0.02f;
+	configTable.kAccelTruthVal = 0.0185f;
 	configTable.kCgHeightInM = 0.05f;
 
 	configTable.kLeftMotorPosConstant = 32.29167f;
@@ -89,34 +89,33 @@ void pResource::setInitialConfigTable(void)
 	configTable.kLeftMotorNagConstant = 28.58333f;
 	configTable.kRightMotorNagConstant = 43.166f;
 
-	configTable.kIdealAngle = 60.48f;
-	configTable.kAngleMin = 45.0f;
-	configTable.kAngleMax = 80.0f;
+	configTable.kIdealAngle = 67.2f;
+	configTable.kAngleRange = 20.0f;
 
-	configTable.kLeftMotorDeadMarginPos = 0;//156;
-	configTable.kLeftMotorDeadMarginNag = 0;//164;
-	configTable.kRightMotorDeadMarginPos = 0;//41;
-	configTable.kRightMotorDeadMarginNag = 0;//60;
+	configTable.kLeftMotorDeadMarginPos = 70;//65;//156;
+	configTable.kLeftMotorDeadMarginNag = 100;//65;//164;
+	configTable.kRightMotorDeadMarginPos = 20;//23;//41;
+	configTable.kRightMotorDeadMarginNag = 43;//28;//60;
 
 	configTable.kMotorKp = 0.0f;
 	configTable.kMotorKi = 0.0f;
 	configTable.kMotorKd = 0.0f;
 
-	configTable.kAngleKp = 340.0f;
+	configTable.kAngleKp = 6100.0f;
 	configTable.kAngleKi = 0.0f;
-	configTable.kAngleKd = 0.00367f;
+	configTable.kAngleKd = 2.828f;
 	configTable.kAngleKq = 0.001f;
 	configTable.kAngleKr = 0.999f;
 	configTable.kAngleBeta = 0.12f;
 
-	configTable.kDirectionKp = 0.34f;
+	configTable.kDirectionKp = 15.0f;
 	configTable.kDirectionKi = 0.0f;
 	configTable.kDirectionKd = 0.0f;
 	configTable.kDirectionKq = 0.001f;
 	configTable.kDirectionKr = 0.999f;
 
-	configTable.kSpeedKp = 0.7f;
-	configTable.kSpeedKi = 0.0f;
+	configTable.kSpeedKp = 3.45f;
+	configTable.kSpeedKi = 0.01f;
 	configTable.kSpeedKd = 0.0f;
 	configTable.kSpeedKq = 0.001f;
 	configTable.kSpeedKr = 0.999f;

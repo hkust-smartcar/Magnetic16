@@ -42,8 +42,7 @@ public:
 		float			kRightMotorNagConstant;
 
 		float			kIdealAngle;
-		float			kAngleMin;
-		float			kAngleMax;
+		float			kAngleRange;
 
 		int16_t			kLeftMotorDeadMarginPos;
 		int16_t			kLeftMotorDeadMarginNag;

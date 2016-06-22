@@ -46,11 +46,11 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 						(
 							[&](float error, float additionalInfo, float constant)
 							{
-								return sgn(m_state[StatePos::cur].dAngle) * constant * m_state[StatePos::cur].dAngle * m_state[StatePos::cur].dAngle;
+								return constant /* ABS(m_state[StatePos::cur].dAngle)*/ * m_state[StatePos::cur].dAngle;
 							}
 						);
 		param.setPoint = &pResource::configTable.kIdealAngle;
-		param.ignoreRange = 0.2f;
+		param.ignoreRange = 0.0f;
 		param.outputMax = 400;
 		param.outputMin = -400;
 		break;
@@ -75,8 +75,8 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kD = &pResource::configTable.kDirectionKd;
 		param.setPoint = &m_direction;
 		param.ignoreRange = 5.0f;
-		param.outputMax = 400;
-		param.outputMin = -400;
+		param.outputMax = 200;
+		param.outputMin = -200;
 		break;
 
 	case 2:
@@ -89,6 +89,17 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.outputMin = -10;
 		param.sumMax = 100;
 		param.sumMin = -100;
+		break;
+
+	case 3:
+		param.kP = &pResource::configTable.kDirectionKp;
+		param.kI = &pResource::configTable.kDirectionKi;
+		param.kD = &pResource::configTable.kDirectionKd;
+		param.setPoint = &m_direction;
+		param.ignoreRange = 5.0f;
+		param.outputMax = 200;
+		param.outputMin = -200;
+		break;
 	}
 
 	return param;
@@ -122,10 +133,10 @@ pSmartCar::pSmartCar(void)
 	m_batteryVoltage(0.0f),
 	m_loop(),
 	m_angle(pAngle::Config(pResource::configTable.kAccelTruthVal, pResource::configTable.kCgHeightInM)),
-	m_motors{ pMotor(pMotor::Config(0, 0, true, true, leftMotorMapping)),
-				pMotor(pMotor::Config(1, 1, true, false, rightMotorMapping)) },
-	m_lcd(MiniLcd::Config(0, -1, 30)),
-	m_joystick(getJoystickConfig()),
+	m_motors{ pMotor(pMotor::Config(1, 0, true, true, leftMotorMapping)),
+				pMotor(pMotor::Config(0, 1, true, false, rightMotorMapping)) },
+//	m_lcd(MiniLcd::Config(0, -1, 30)),
+//	m_joystick(getJoystickConfig()),
 //	m_buttons{	Button(getButtonConfig(0)),
 //				Button(getButtonConfig(1)),
 //				Button(getButtonConfig(2)) },
@@ -141,13 +152,14 @@ pSmartCar::pSmartCar(void)
 	m_motorEnabled(false),
 	m_pidControllers{	pPid(getPidConfig(Type::Angle)),
 						pPid(getPidConfig(Type::Direction)),
-						pPid(getPidConfig(Type::Speed)) },
+						pPid(getPidConfig(Type::Speed)),
+						pPid(getPidConfig(Type::SelfDirection)) },
 	m_pidOutputVal{ 0 },
 	m_filter{	pKalmanFilter(pResource::configTable.kAngleKq, pResource::configTable.kAngleKr, 0, 0.5f),
 				pKalmanFilter(pResource::configTable.kDirectionKq, pResource::configTable.kDirectionKr, 0, 0.5f),
 				pKalmanFilter(pResource::configTable.kSpeedKq, pResource::configTable.kSpeedKr, 0, 0.5f) },
 	m_smoothCounter(0),
-	m_smoothIncrement(0)
+	m_smoothIncrement{ 0.0f, 0.0f }
 {
 	System::Init();
 	Watchdog::SetIsr(watchDogTimeout);
@@ -160,7 +172,12 @@ pSmartCar::pSmartCar(void)
 
 	m_leds[1].SetEnable(true);
 
-	pBuzzer::startSong();
+	m_grapher.setOnReceiveListener(onReceive);
+
+//	pBuzzer::startSong();
+	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
+	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
+	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
 
 	m_isReadyToRun = true;
 }
@@ -172,7 +189,7 @@ void pSmartCar::reset(void)
 	m_motors[0].reset();
 	m_motors[1].reset();
 
-	m_lcd.clear();
+//	m_lcd.clear();
 }
 
 void pSmartCar::run(void)
@@ -211,7 +228,9 @@ pSmartCar::State &pSmartCar::State::operator=(const pSmartCar::State &other)
 void pSmartCar::watchDogTimeout(void)
 {
 	pResource::m_instance->setMotorsEnabled(false);
-	pResource::m_instance->setBeep(true, 0);
+	for (uint8_t i = 0; i < 4; i++)
+		pResource::m_instance->setLed(i, true);
+	assert(false);
 }
 
 void pSmartCar::onClickListener(const uint8_t id)
@@ -294,22 +313,38 @@ void pSmartCar::onClickListener(const uint8_t id)
 
 float pSmartCar::leftMotorMapping(const float val)
 {
-	if (val == 0.0f)
+	return val;
+	if (isInRange2(val, 0, 0.01f))
 		return 0.0f;
 	else if (val > 0.0f)
-		return val * pResource::configTable.kLeftMotorPosConstant + pResource::configTable.kLeftMotorDeadMarginPos;
+		return val /* pResource::configTable.kRightMotorPosConstant*/ + pResource::configTable.kLeftMotorDeadMarginPos;
 	else
-		return (val * pResource::configTable.kLeftMotorNagConstant - pResource::configTable.kLeftMotorDeadMarginNag);
+		return val /* pResource::configTable.kRightMotorNagConstant*/ - pResource::configTable.kLeftMotorDeadMarginNag;
 }
 
 float pSmartCar::rightMotorMapping(const float val)
 {
-	if (val == 0.0f)
+	return val;
+	if (isInRange2(val, 0, 0.01f))
 		return 0.0f;
 	else if (val > 0.0f)
-		return val * pResource::configTable.kRightMotorPosConstant + pResource::configTable.kRightMotorDeadMarginPos;
+		return val /* pResource::configTable.kRightMotorPosConstant*/ + pResource::configTable.kRightMotorDeadMarginPos;
 	else
-		return val * pResource::configTable.kRightMotorNagConstant - pResource::configTable.kRightMotorDeadMarginNag;
+		return val /* pResource::configTable.kRightMotorNagConstant*/ - pResource::configTable.kRightMotorDeadMarginNag;
+}
+
+void pSmartCar::onReceive(const std::vector<Byte>& bytes)
+{
+	switch (bytes[0])
+	{
+	case 's':
+		pResource::m_instance->setMotorsEnabled(true);
+		break;
+
+	case 'd':
+		pResource::m_instance->setMotorsEnabled(false);
+		break;
+	}
 }
 
 bool pSmartCar::isReadyAndSet(void)

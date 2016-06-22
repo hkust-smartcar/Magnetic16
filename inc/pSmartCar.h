@@ -31,6 +31,7 @@
 
 #define ABS(v) ((v > 0)? v : -v)
 #define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
+#define isInRange2(v, m, r) ((v < m + r) && (v > m - r))
 #define isInRange(n, v, x) (v >= n && v <= x)
 #define sgn(v) ((v > 0)? 1 : -1)
 
@@ -76,7 +77,14 @@ public:
 	{
 		Angle = 0,
 		Direction,
-		Speed
+		Speed,
+		SelfDirection
+	};
+
+	enum IncrementType
+	{
+		SpeedIncrement = 0,
+		DirectionIncrement
 	};
 
 	pSmartCar(void);
@@ -108,8 +116,11 @@ protected:
 
 	pPid::PidParam getPidConfig(Type type);
 
-	void updateSmoothAngleOutput(const float speed);
+	void updateSmoothAngleOutput(const float newAngle);
 	float getSmoothAngleOutput(void);
+
+	void updateSmoothDirectionOutput(const float newDirection);
+	float getSmoothDirectionOutput(void);
 
 	void updatePid(const float val, Type type);
 
@@ -125,6 +136,7 @@ protected:
 
 	static void update(void);
 	static void angleControl(void);
+	static void selfDirectionControl(void);
 	static void directionControl(void);
 	static void speedControl(void);
 	static void print(void);
@@ -147,8 +159,8 @@ protected:
 	pLoop					m_loop;
 	pAngle					m_angle;
 	array<pMotor, 2>		m_motors;
-	MiniLcd					m_lcd;
-	Joystick				m_joystick;
+//	MiniLcd					m_lcd;
+//	Joystick				m_joystick;
 //	array<Button, 3>		m_buttons;
 	array<Led, 4>			m_leds;
 	pBuzzer					m_buzzer;
@@ -159,11 +171,11 @@ protected:
 	bool					m_motorEnabled;
 	bool					m_isReadyToRun;
 
-	array<pPid, 3>			m_pidControllers;
-	array<float, 3>			m_pidOutputVal;
+	array<pPid, 4>			m_pidControllers;
+	array<float, 4>			m_pidOutputVal;
 
 	array<pKalmanFilter, 3>	m_filter;
 	uint8_t					m_smoothCounter;
-	float					m_smoothIncrement;
+	array<float, 2>			m_smoothIncrement;
 
 };

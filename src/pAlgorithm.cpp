@@ -35,7 +35,7 @@ void pSmartCar::addVariablesToGrapher(void)
 //	m_grapher.addWatchedVar(&m_angle.getAccel(1), "Accel[1]");
 //	m_grapher.addWatchedVar(&m_angle.getAccel(2), "Accel[2]");
 
-	m_grapher.addWatchedVar(&m_motors[0].getEncoderCount(), "Count0");
+//	m_grapher.addWatchedVar(&m_motors[0].getEncoderCount(), "Count0");
 //	m_grapher.addWatchedVar(&m_motors[1].getEncoderCount(), "Count1");
 //	m_grapher.addWatchedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
 ////	m_grapher.addWatchedVar(&m_state[StatePos::cur].dAngle, "dAngle");
@@ -47,7 +47,7 @@ void pSmartCar::addVariablesToGrapher(void)
 //	m_grapher.addWatchedVar(&m_pidOutputVal[Type::Speed], "PidSpeedOutput");
 ////	m_grapher.addWatchedVar(&m_idealAngleOffset, "angleOffset");
 //	m_grapher.addWatchedVar(&m_pidControllers[Type::Speed].getSum(), "Sum");
-	m_grapher.addWatchedVar(&m_motors[0].getPower(), "Power0");
+//	m_grapher.addWatchedVar(&m_motors[0].getPower(), "Power0");
 //	m_grapher.addWatchedVar(&m_motors[1].getPower(), "Power1");
 //////	m_grapher.addWatchedVar(&m_batteryVoltage, "BatVol");
 ////	m_grapher.addWatchedVar(&m_magSen[0].getVoltage(0), "LeftVol");

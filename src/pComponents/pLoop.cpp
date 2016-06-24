@@ -35,15 +35,15 @@ void pLoop::start(void)
 	if (m_task_list.size() == 0)
 		return ;
 
-	sort
-	(
-		m_task_list.begin(),
-		m_task_list.end(),
-		[] (TaskInfo a, TaskInfo b)
-		{
-			return (a.interval < b.interval);
-		}
-	);
+//	sort
+//	(
+//		m_task_list.begin(),
+//		m_task_list.end(),
+//		[] (TaskInfo a, TaskInfo b)
+//		{
+//			return (a.interval < b.interval);
+//		}
+//	);
 
 	m_start_time = System::Time();
 
@@ -53,13 +53,16 @@ void pLoop::start(void)
 	bool isPrevTaskDone = false;
 	while (true)
 	{
-		for (uint8_t i = 0; i < m_task_list.size(); i++)
-			if (System::Time() - m_task_list[i].lastRunTime >= m_task_list[i].interval &&
-					(i == 0 || m_task_list[i - 1].interval != m_task_list[i].interval || isPrevTaskDone))
-			{
-				((LoopFunction)m_task_list[i].func)();
-				m_task_list[i].lastRunTime = System::Time();
-				isPrevTaskDone = true;
-			}
+		if (System::Time() - m_task_list[0].lastRunTime >= m_task_list[0].interval)
+		{
+			for (uint8_t i = 0; i < m_task_list.size(); i++)
+				if (System::Time() - m_task_list[i].lastRunTime >= m_task_list[i].interval &&
+						(i == 0 || m_task_list[i - 1].interval != m_task_list[i].interval || isPrevTaskDone))
+				{
+					((LoopFunction)m_task_list[i].func)();
+					m_task_list[i].lastRunTime = System::Time();
+					isPrevTaskDone = true;
+				}
+		}
 	}
 }

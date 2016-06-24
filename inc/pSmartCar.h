@@ -31,8 +31,9 @@
 
 #define ABS(v) ((v > 0)? v : -v)
 #define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
-#define isInRange2(v, m, r) ((v < m + r) && (v > m - r))
+#define inRange2(v, m, r) ((v < m - r)? m - r : ((v > m + r)? m + r : v))
 #define isInRange(n, v, x) (v >= n && v <= x)
+#define isInRange2(v, m, r) ((v < m + r) && (v > m - r))
 #define sgn(v) ((v > 0)? 1 : -1)
 
 using namespace libsc;
@@ -110,8 +111,6 @@ public:
 
 	static void onClickListener(const uint8_t id);
 
-	array<pMagSen, 2>		m_magSen;
-
 protected:
 
 	pPid::PidParam getPidConfig(Type type);
@@ -152,6 +151,7 @@ protected:
 	float					m_direction;
 	float					m_speed;
 	float					m_idealAngleOffset;
+	float					m_directionOffset;
 	float					m_idealAngle;
 
 	float					m_batteryVoltage;
@@ -164,6 +164,7 @@ protected:
 //	array<Button, 3>		m_buttons;
 	array<Led, 4>			m_leds;
 	pBuzzer					m_buzzer;
+	array<pMagSen, 2>		m_magSen;
 	BatteryMeter			m_batmeter;
 	pGrapher				m_grapher;
 	pLowPassFilter			m_lpf;

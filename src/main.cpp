@@ -9,6 +9,7 @@
 #include <cassert>
 #include <cstring>
 #include <libbase/k60/mcg.h>
+#include <libbase/k60/watchdog.h>
 #include <pResource.h>
 #include <pSmartCar.h>
 #include <pBuzzer.h>
@@ -41,7 +42,7 @@ int main(void)
 
 	pResource resource;
 
-	resource.setMotorsEnabled(true);
+//	resource.setMotorsEnabled(true);
 //	resource.setMotorPower(0, 200);
 //	while (true)
 //	{
@@ -50,16 +51,18 @@ int main(void)
 //		DelayMsByTicks(10);
 //	}
 
-	DelayMsByTicks(5000);
+	DelayMsByTicks(500);
 
-	for (int16_t i = 0; i <= 10000; i += 100)
-	{
-		resource.setMotorPower(0, i);
+//	for (int16_t i = 0; i >= -3000; i -= 10)
+//	{
+//		resource.setMotorPower(0, i);
 //		resource.setMotorPower(1, i);
-		DelayMsByTicks(100);
-		resource.updateMotors();
-		resource.sendDataToGrapher();
-	}
+//		DelayMsByTicks(10);
+//		resource.updateMotors();
+//		resource.sendDataToGrapher();
+//	}
+//	resource.setMotorPower(0, 0);
+//	resource.setMotorPower(1, 0);
 
 	pResource::m_instance->run();
 

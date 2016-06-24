@@ -54,10 +54,14 @@ void pAngle::update(void)
 
 		float dt = (System::Time() - m_lastTime) / 1000.0f;
 
-		float tempAngleDiff = m_lastOmega[0] * dt;
-		m_gyroAngle += tempAngleDiff;
-		m_gyroOffset = *m_param.accelTrustValue * ((m_accelAngle = asin(inRange(-1.0f, -m_lastAccel[1], 1.0f)) * RadToDeg) - m_lastAngle);
-		m_lastAngle += tempAngleDiff + m_gyroOffset;
+//		float tempAngleDiff = m_lastOmega[0] * dt;
+//		m_gyroAngle += tempAngleDiff;
+//		m_gyroOffset = *m_param.accelTrustValue * ((m_accelAngle = asin(inRange(-1.0f, -m_lastAccel[1], 1.0f)) * RadToDeg) - m_lastAngle);
+//		m_lastAngle = m_gyroAngle + m_gyroOffset;
+//		m_lastYawOmega = m_lastOmega[1] * sin(m_lastAngle * DegToRad);
+		m_gyroOffset = ((m_accelAngle = asin(inRange(-1.0f, -m_lastAccel[1], 1.0f)) * RadToDeg) - m_lastAngle) / *m_param.accelTrustValue;
+		m_gyroAngle += m_lastOmega[0] * dt;
+		m_lastAngle += (m_lastOmega[0] + m_gyroOffset) * dt;
 		m_lastYawOmega = m_lastOmega[1] * sin(m_lastAngle * DegToRad);
 	}
 	else

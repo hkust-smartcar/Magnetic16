@@ -80,7 +80,7 @@ float pMagSen::updatePair(void)
 	{
 		m_lastResultPair[0] = m_magSenPair[0].GetResultF();
 		m_lastResultPair[1] =  m_magSenPair[1].GetResultF();
-		return ((m_lastResultPair[0] - m_lastResultPair[1]) / (m_lastResultPair[0] + m_lastResultPair[1]));
+		return (m_lastResult = (m_lastResultPair[0] - m_lastResultPair[1]) / (m_lastResultPair[0] + m_lastResultPair[1]));
 	}
 	else
 		return 0.0f;
@@ -94,11 +94,6 @@ float pMagSen::update(void)
 		return 0.0f;
 }
 
-float pMagSen::getResult(void) const
-{
-	return m_lastResult;
-}
-
 float &pMagSen::getVoltage(const uint8_t index)
 {
 	if (m_isPair)
@@ -107,3 +102,7 @@ float &pMagSen::getVoltage(const uint8_t index)
 		return m_lastResult;
 }
 
+float &pMagSen::getResult(void)
+{
+	return m_lastResult;
+}

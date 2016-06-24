@@ -51,32 +51,32 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 						);
 		param.setPoint = &pResource::configTable.kIdealAngle;
 		param.ignoreRange = 0.0f;
-		param.outputMax = 400;
-		param.outputMin = -400;
+		param.outputMax = 4000;
+		param.outputMin = -4000;
 		break;
 
 	case 1:
-		param.kPFunc =	function<float (float, float, float)>
-					(
-						[](float error, float additionalInfo, float constant)
-						{
-							return pResource::configTable.kDirectionKp * error;
-						}
-					);
+//		param.kPFunc =	function<float (float, float, float)>
+//						(
+//							[](float error, float additionalInfo, float constant)
+//							{
+//								return pResource::configTable.kDirectionKp * error;
+//							}
+//						);
 		param.kDFunc =	function<float (float, float, float)>
-					(
-						[&](float error, float additionalInfo, float constant)
-						{
-							return constant * m_state[StatePos::cur].dYaw;
-						}
-					);
+						(
+							[&](float error, float additionalInfo, float constant)
+							{
+								return constant * m_state[StatePos::cur].dYaw;
+							}
+						);
 		param.kP = &pResource::configTable.kDirectionKp;
 		param.kI = &pResource::configTable.kDirectionKi;
 		param.kD = &pResource::configTable.kDirectionKd;
 		param.setPoint = &m_direction;
-		param.ignoreRange = 5.0f;
-		param.outputMax = 200;
-		param.outputMin = -200;
+		param.ignoreRange = 0.0f;
+		param.outputMax = 4000;
+		param.outputMin = -4000;
 		break;
 
 	case 2:
@@ -85,8 +85,8 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_speed;
 		param.ignoreRange = 0.0f;
-		param.outputMax = 10;
-		param.outputMin = -10;
+		param.outputMax = 20;
+		param.outputMin = -20;
 		param.sumMax = 100;
 		param.sumMin = -100;
 		break;
@@ -96,9 +96,9 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kI = &pResource::configTable.kDirectionKi;
 		param.kD = &pResource::configTable.kDirectionKd;
 		param.setPoint = &m_direction;
-		param.ignoreRange = 5.0f;
-		param.outputMax = 200;
-		param.outputMin = -200;
+		param.ignoreRange = 0.0f;
+		param.outputMax = 4000;
+		param.outputMin = -4000;
 		break;
 	}
 
@@ -129,6 +129,7 @@ pSmartCar::pSmartCar(void)
 	m_direction(0.0f),
 	m_speed(0.0f),
 	m_idealAngleOffset(0.0f),
+	m_directionOffset(0.0f),
 	m_idealAngle(pResource::configTable.kIdealAngle),
 	m_batteryVoltage(0.0f),
 	m_loop(),
@@ -162,7 +163,6 @@ pSmartCar::pSmartCar(void)
 	m_smoothIncrement{ 0.0f, 0.0f }
 {
 	System::Init();
-	Watchdog::SetIsr(watchDogTimeout);
 
 	addAllRoutineToLoop();
 	addVariablesToGrapher();
@@ -201,7 +201,6 @@ void pSmartCar::run(void)
 		pBuzzer::noteDown(40, pBuzzer::defaultValue, 500, 200);
 		assert(false);
 	}
-	Watchdog::Init();
 	m_loop.start();
 }
 
@@ -230,6 +229,7 @@ void pSmartCar::watchDogTimeout(void)
 	pResource::m_instance->setMotorsEnabled(false);
 	for (uint8_t i = 0; i < 4; i++)
 		pResource::m_instance->setLed(i, true);
+	pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 100);
 	assert(false);
 }
 
@@ -317,9 +317,9 @@ float pSmartCar::leftMotorMapping(const float val)
 	if (isInRange2(val, 0, 0.01f))
 		return 0.0f;
 	else if (val > 0.0f)
-		return val /* pResource::configTable.kRightMotorPosConstant*/ + pResource::configTable.kLeftMotorDeadMarginPos;
+		return val ;///* pResource::configTable.kRightMotorPosConstant*/ + pResource::configTable.kLeftMotorDeadMarginPos;
 	else
-		return val /* pResource::configTable.kRightMotorNagConstant*/ - pResource::configTable.kLeftMotorDeadMarginNag;
+		return val * 1.175774f; ///* pResource::configTable.kRightMotorNagConstant*/ - pResource::configTable.kLeftMotorDeadMarginNag;
 }
 
 float pSmartCar::rightMotorMapping(const float val)
@@ -330,7 +330,7 @@ float pSmartCar::rightMotorMapping(const float val)
 	else if (val > 0.0f)
 		return val /* pResource::configTable.kRightMotorPosConstant*/ + pResource::configTable.kRightMotorDeadMarginPos;
 	else
-		return val /* pResource::configTable.kRightMotorNagConstant*/ - pResource::configTable.kRightMotorDeadMarginNag;
+		return val * 0.9042553f; ///* pResource::configTable.kRightMotorNagConstant*/ - pResource::configTable.kRightMotorDeadMarginNag;
 }
 
 void pSmartCar::onReceive(const std::vector<Byte>& bytes)
@@ -344,6 +344,58 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 	case 'd':
 		pResource::m_instance->setMotorsEnabled(false);
 		break;
+
+	case '+':
+		pResource::m_instance->m_speed += 2;
+		break;
+
+	case '-':
+		pResource::m_instance->m_speed -= 2;
+		break;
+
+	case '*':
+		pResource::m_instance->m_speed = 0;
+		break;
+
+	case '0':
+		pResource::m_instance->m_grapher.removeAllWatchedVar();
+		break;
+
+	case '1':
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_magSen[0].getVoltage(), "LeftVol");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_magSen[0].getVoltage(1), "RightVol");
+		break;
+
+	case '2':
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].angle, "Angle");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_pidOutputVal[Type::Angle], "PidAngleOutput");
+		break;
+
+	case '3':
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_angle.getAccelAngle(), "AccelAngle");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_angle.getGyroAngle(), "GyroAngle");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].angle, "Angle");
+		break;
+
+	case '4':
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_motors[0].getPower(), "Power0");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_motors[1].getPower(), "Power1");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_motors[0].getEncoderCount(), "Count0");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_motors[1].getEncoderCount(), "Count1");
+		break;
+
+	case '5':
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].dX, "Speed");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_pidControllers[Type::Speed].getSum(), "SpeedSum");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].dYaw, "Yaw");
+		break;
+
+	case '6':
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_magSen[0].getResult(), "MAGSEN");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_pidOutputVal[Type::Direction], "PidAngleOutput");
+		break;
+
 	}
 }
 

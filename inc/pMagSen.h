@@ -25,9 +25,8 @@ public:
 	float updatePair(void);
 	float update(void);
 
-	float getResult(void) const;
-
 	float &getVoltage(const uint8_t index = 0);
+	float &getResult(void);
 
 private:
 

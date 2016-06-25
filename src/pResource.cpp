@@ -18,7 +18,7 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	150
+#define UNIQUE_VAL	15
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -107,14 +107,14 @@ void pResource::setInitialConfigTable(void)
 
 	configTable.kAngleKp = 202000.0f;
 	configTable.kAngleKi = 0.0f;
-	configTable.kAngleKd = 25.5f;
+	configTable.kAngleKd = 23.0f;
 	configTable.kAngleKq = 0.001f;
 	configTable.kAngleKr = 0.999f;
 	configTable.kAngleBeta = 0.12f;
 
-	configTable.kDirectionKp = 71000.0f;
+	configTable.kDirectionKp = 12000.0f;
 	configTable.kDirectionKi = 0.0f;
-	configTable.kDirectionKd = 16.0f;
+	configTable.kDirectionKd = 0.1f;
 	configTable.kDirectionKq = 0.001f;
 	configTable.kDirectionKr = 0.999f;
 

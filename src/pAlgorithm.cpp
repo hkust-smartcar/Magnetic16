@@ -57,7 +57,7 @@ void pSmartCar::addVariablesToGrapher(void)
 //	m_grapher.addWatchedVar(&m_angle.getGyroAngle(), "GyroAngle");
 //	m_grapher.addWatchedVar(&m_state[StatePos::cur].angle, "Angle");
 
-	m_grapher.addSharedVar(&pResource::configTable.kAngleKp, "AngleKp");
+//	m_grapher.addSharedVar(&pResource::configTable.kAngleKp, "AngleKp");
 	m_grapher.addSharedVar(&pResource::configTable.kAngleKd, "AngleKd");
 	m_grapher.addSharedVar(&pResource::configTable.kDirectionKp, "DirectionKp");
 	m_grapher.addSharedVar(&pResource::configTable.kDirectionKd, "DirectionKd");
@@ -70,8 +70,8 @@ void pSmartCar::addVariablesToGrapher(void)
 //	m_grapher.addSharedVar(&pResource::configTable.kAngleKr, "AngleKr");
 	m_grapher.addSharedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
 //	m_grapher.addSharedVar(&pResource::configTable.kAccelTruthVal, "TrustVal");
-//	m_grapher.addSharedVar(&pResource::configTable.kLeftMotorDeadMarginPos, "LPDZ");
-//	m_grapher.addSharedVar(&pResource::configTable.kLeftMotorDeadMarginNag, "LNDZ");
+	m_grapher.addSharedVar(&pResource::configTable.kLeftMotorDeadMarginPos, "LPDZ");
+	m_grapher.addSharedVar(&pResource::configTable.kLeftMotorDeadMarginNag, "LNDZ");
 //	m_grapher.addSharedVar(&pResource::configTable.kRightMotorDeadMarginPos, "RPDZ");
 //	m_grapher.addSharedVar(&pResource::configTable.kRightMotorDeadMarginNag, "RNDZ");
 

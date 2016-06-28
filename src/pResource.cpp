@@ -18,7 +18,7 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	15
+#define UNIQUE_VAL	80
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -96,8 +96,8 @@ void pResource::setInitialConfigTable(void)
 	configTable.kIdealAngle = 65.0f;
 	configTable.kAngleRange = 20.0f;
 
-	configTable.kLeftMotorDeadMarginPos = 600;//70,65;//156;
-	configTable.kLeftMotorDeadMarginNag = 100;//65;//164;
+	configTable.kLeftMotorDeadMarginPos = 300;//70,65;//156;
+	configTable.kLeftMotorDeadMarginNag = 300;//65;//164;
 	configTable.kRightMotorDeadMarginPos = 300;//20,23;//41;
 	configTable.kRightMotorDeadMarginNag = 43;//28;//60;
 
@@ -107,7 +107,7 @@ void pResource::setInitialConfigTable(void)
 
 	configTable.kAngleKp = 202000.0f;
 	configTable.kAngleKi = 0.0f;
-	configTable.kAngleKd = 23.0f;
+	configTable.kAngleKd = 17.0f;
 	configTable.kAngleKq = 0.001f;
 	configTable.kAngleKr = 0.999f;
 	configTable.kAngleBeta = 0.12f;

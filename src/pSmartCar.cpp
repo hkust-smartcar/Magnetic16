@@ -46,7 +46,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 						(
 							[&](float error, float additionalInfo, float constant)
 							{
-								return constant * ABS(m_state[StatePos::cur].dAngle) * m_state[StatePos::cur].dAngle;
+								return constant /* ABS(m_state[StatePos::cur].dAngle)*/ * m_state[StatePos::cur].dAngle;
 							}
 						);
 		param.setPoint = &pResource::configTable.kIdealAngle;
@@ -56,20 +56,20 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		break;
 
 	case 1:
-		param.kPFunc =	function<float (float, float, float)>
-						(
-							[](float error, float additionalInfo, float constant)
-							{
-								return pResource::configTable.kDirectionKp * ABS(error) * error;
-							}
-						);
-		param.kDFunc =	function<float (float, float, float)>
-						(
-							[&](float error, float additionalInfo, float constant)
-							{
-								return constant * -m_state[StatePos::cur].dYaw;
-							}
-						);
+//		param.kPFunc =	function<float (float, float, float)>
+//						(
+//							[](float error, float additionalInfo, float constant)
+//							{
+//								return pResource::configTable.kDirectionKp * ABS(error) * error;
+//							}
+//						);
+//		param.kDFunc =	function<float (float, float, float)>
+//						(
+//							[&](float error, float additionalInfo, float constant)
+//							{
+//								return constant * -m_state[StatePos::cur].dYaw;
+//							}
+//						);
 		param.kP = &pResource::configTable.kDirectionKp;
 		param.kI = &pResource::configTable.kDirectionKi;
 		param.kD = &pResource::configTable.kDirectionKd;
@@ -317,7 +317,7 @@ float pSmartCar::leftMotorMapping(const float val)
 	if (isInRange2(val, 0, 0.01f))
 		return 0.0f;
 	else if (val > 0.0f)
-		return val ;///* pResource::configTable.kRightMotorPosConstant*/ + pResource::configTable.kLeftMotorDeadMarginPos;
+		return val /* pResource::configTable.kRightMotorPosConstant*/ + pResource::configTable.kLeftMotorDeadMarginPos;
 	else
 		return val * 1.175774f; ///* pResource::configTable.kRightMotorNagConstant*/ - pResource::configTable.kLeftMotorDeadMarginNag;
 }
@@ -328,7 +328,7 @@ float pSmartCar::rightMotorMapping(const float val)
 	if (isInRange2(val, 0, 0.01f))
 		return 0.0f;
 	else if (val > 0.0f)
-		return val ///* pResource::configTable.kRightMotorPosConstant*/ + pResource::configTable.kRightMotorDeadMarginPos;
+		return val /* pResource::configTable.kRightMotorPosConstant*/ + pResource::configTable.kRightMotorDeadMarginPos;
 	else
 		return val * 0.9042553f; ///* pResource::configTable.kRightMotorNagConstant*/ - pResource::configTable.kRightMotorDeadMarginNag;
 }

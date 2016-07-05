@@ -172,6 +172,8 @@ float pSmartCar::getSmoothAngleOutput(void)
 		return (m_idealAngleOffset += m_smoothIncrement[IncrementType::SpeedIncrement]);
 	else if (isInRange2(m_state[StatePos::cur].angle, pResource::configTable.kIdealAngle, pResource::configTable.kAngleRange))
 		return (m_idealAngleOffset = inRange2(m_state[StatePos::cur].angle + m_smoothIncrement[IncrementType::SpeedIncrement] + m_idealAngleOffset, pResource::configTable.kIdealAngle, pResource::configTable.kAngleRange) - pResource::configTable.kIdealAngle);
+	else
+		return m_idealAngleOffset;
 }
 
 void pSmartCar::updateSmoothDirectionOutput(const float newDirection)

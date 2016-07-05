@@ -85,10 +85,10 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_speed;
 		param.ignoreRange = 0.0f;
-		param.outputMax = 20;
-		param.outputMin = -20;
-		param.sumMax = 100;
-		param.sumMin = -100;
+		param.outputMax = 10;
+		param.outputMin = -10;
+		param.sumMax = 10;
+		param.sumMin = -10;
 		break;
 
 	case 3:
@@ -134,8 +134,8 @@ pSmartCar::pSmartCar(void)
 	m_batteryVoltage(0.0f),
 	m_loop(),
 	m_angle(pAngle::Config(pResource::configTable.kAccelTruthVal, pResource::configTable.kCgHeightInM)),
-	m_motors{ pMotor(pMotor::Config(1, 0, true, true, leftMotorMapping)),
-				pMotor(pMotor::Config(0, 1, true, false, rightMotorMapping)) },
+	m_motors{ pMotor(pMotor::Config(1, 1, true, true, leftMotorMapping)),
+				pMotor(pMotor::Config(0, 0, false, false, rightMotorMapping)) },
 //	m_lcd(MiniLcd::Config(0, -1, 30)),
 //	m_joystick(getJoystickConfig()),
 //	m_buttons{	Button(getButtonConfig(0)),
@@ -174,10 +174,10 @@ pSmartCar::pSmartCar(void)
 
 	m_grapher.setOnReceiveListener(onReceive);
 
-//	pBuzzer::startSong();
-	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
+	pBuzzer::startSong();
+//	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
+//	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
+//	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
 
 	m_isReadyToRun = true;
 }
@@ -355,6 +355,7 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 
 	case '*':
 		pResource::m_instance->m_speed = 0;
+		pResource::m_instance->m_pidControllers[2].reset();
 		break;
 
 	case '0':
@@ -396,6 +397,15 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_magSen[0].getResult(), "MAGSEN");
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_pidOutputVal[Type::Direction], "PidAngleOutput");
 		break;
+
+	case '7':
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_angle.getOmega(0), "Omega[0]");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_angle.getOmega(1), "Omega[1]");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_angle.getOmega(2), "Omega[2]");
+
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_angle.getAccel(0), "Accel[0]");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_angle.getAccel(1), "Accel[1]");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_angle.getAccel(2), "Accel[2]");
 
 	}
 }

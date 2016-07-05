@@ -9,7 +9,8 @@
 #include <cassert>
 #include <cstring>
 #include <libbase/k60/mcg.h>
-#include <libbase/k60/watchdog.h>
+#include <libutil/pGrapher.h>
+#include <libsc/ldc1000.h>
 #include <pResource.h>
 #include <pSmartCar.h>
 #include <pBuzzer.h>
@@ -43,7 +44,8 @@ int main(void)
 	pResource resource;
 
 //	resource.setMotorsEnabled(true);
-//	resource.setMotorPower(0, 200);
+//	resource.setMotorPower(0, 2000);
+//	resource.setMotorPower(1, 2000);
 //	while (true)
 //	{
 //		resource.updateMotors();

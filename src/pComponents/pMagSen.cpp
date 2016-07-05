@@ -24,7 +24,7 @@ Adc::Config getAdcConfig(libbase::k60::Pin::Name pin)
 
 libbase::k60::Pin::Name getAdcPinNameByIndex(const uint8_t index)
 {
-	assert(index < LIBSC_USE_MAGSEN);
+//	assert(index < LIBSC_USE_MAGSEN);
 
 	switch (index)
 	{

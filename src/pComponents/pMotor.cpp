@@ -17,6 +17,7 @@ AlternateMotor::Config getMotorConfig(const uint8_t id)
 {
 	AlternateMotor::Config config;
 	config.id = id;
+	config.multiplier = 10;
 	return config;
 }
 

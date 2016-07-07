@@ -18,7 +18,7 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	65
+#define UNIQUE_VAL	62
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -85,7 +85,7 @@ void pResource::setInitialConfigTable(void)
 
 	configTable.kBatteryVoltageRatio = 0.3886279f;
 
-	configTable.kAccelTruthVal = 2.3f;
+	configTable.kAccelTruthVal = 1.75f;
 	configTable.kCgHeightInM = 0.05f;
 
 	configTable.kLeftMotorPosConstant = 32.29167f;
@@ -93,7 +93,7 @@ void pResource::setInitialConfigTable(void)
 	configTable.kLeftMotorNagConstant = 28.58333f;
 	configTable.kRightMotorNagConstant = 43.166f;
 
-	configTable.kIdealAngle = 75.5f;
+	configTable.kIdealAngle = 74.0f;
 	configTable.kAngleRange = 30.0f;
 
 	configTable.kLeftMotorDeadMarginPos = 300;//70,65;//156;
@@ -107,9 +107,9 @@ void pResource::setInitialConfigTable(void)
 	configTable.kSpeedKq = 0.001f;
 	configTable.kSpeedKr = 0.999f;
 
-	configTable.kAngleKp = 130000.0f;//39150.0f;
+	configTable.kAngleKp = 100000.0f;//39150.0f;
 	configTable.kAngleKi = 0.0f;
-	configTable.kAngleKd = 0.0f;
+	configTable.kAngleKd = 5.0f;
 	configTable.kAngleKq = 0.001f;
 	configTable.kAngleKr = 0.999f;
 	configTable.kAngleBeta = 0.12f;

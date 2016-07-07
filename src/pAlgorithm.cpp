@@ -69,7 +69,7 @@ void pSmartCar::addVariablesToGrapher(void)
 	//	m_grapher.addSharedVar(&pResource::configTable.kAngleKq, "AngleKq");
 	//	m_grapher.addSharedVar(&pResource::configTable.kAngleKr, "AngleKr");
 	m_grapher.addSharedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
-		m_grapher.addSharedVar(&pResource::configTable.kAccelTruthVal, "TrustVal");
+//		m_grapher.addSharedVar(&pResource::configTable.kAccelTruthVal, "TrustVal");
 	m_grapher.addSharedVar(&pResource::configTable.kLiarConst, "kLiarConst");
 	//	m_grapher.addSharedVar(&pResource::configTable.kLeftMotorDeadMarginPos, "LPDZ");
 	//	m_grapher.addSharedVar(&pResource::configTable.kLeftMotorDeadMarginNag, "LNDZ");
@@ -94,7 +94,7 @@ void pSmartCar::update(void)
 void pSmartCar::angleControl(void)
 {
 	pResource::m_instance->m_idealAngleOffset = pResource::m_instance->m_smoothIncrement[IncrementType::SpeedIncrement] * pResource::m_instance->configTable.kLiarConst;
-	pResource::m_instance->updatePid(pResource::m_instance->m_state[StatePos::cur].angle + pResource::m_instance->m_idealAngleOffset, Type::Angle);
+	pResource::m_instance->updatePid(pResource::m_instance->m_state[StatePos::cur].angle - pResource::m_instance->m_idealAngleOffset, Type::Angle);
 	if (pResource::m_instance->m_motorEnabled && !isInRange2(pResource::m_instance->m_angle.getAngle(), pResource::configTable.kIdealAngle, pResource::configTable.kAngleRange))
 	{
 		pResource::m_instance->setMotorsEnabled(false);

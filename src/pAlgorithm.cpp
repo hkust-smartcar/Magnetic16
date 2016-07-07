@@ -154,7 +154,7 @@ void pSmartCar::updateState(void)
 		m_state[StatePos::prev] = m_state[StatePos::cur];
 		m_state[StatePos::cur].angle = /*m_filter[Type::Angle].filter(*/pResource::m_instance->m_angle.getAngle()/*)*/;
 		m_state[StatePos::cur].dAngle = -pResource::m_instance->m_angle.getOmega(0);
-		m_state[StatePos::cur].dX = m_filter[Type::Speed].filter((m_motors[0].getEncoderCount() + m_motors[1].getEncoderCount()) * 0.0523137f / (System::Time() - m_state[StatePos::prev].timeStamp));//m_filter.Filter((m_motors[0].getEncoderCount() + m_motors[1].getEncoderCount()) * 0.5f - pResource::configTable.kCountPerDeg * (m_angle.getAngle() - m_state[StatePos::prev].angle));
+		m_state[StatePos::cur].dX = /*m_filter[Type::Speed].filter(*/(m_motors[0].getEncoderCount() + m_motors[1].getEncoderCount()) * 0.0523137f / (System::Time() - m_state[StatePos::prev].timeStamp);//m_filter.Filter((m_motors[0].getEncoderCount() + m_motors[1].getEncoderCount()) * 0.5f - pResource::configTable.kCountPerDeg * (m_angle.getAngle() - m_state[StatePos::prev].angle));
 		m_state[StatePos::cur].dYaw = /*m_filter[Type::Direction].filter(*/m_angle.getYawOmega()/*)*/;
 	}
 

@@ -207,7 +207,8 @@ void pSmartCar::run(void)
 
 void pSmartCar::addSpeed(const float speed)
 {
-	m_cur_speed += speed;
+
+	inRange(0,m_cur_speed += speed,m_ideal_speed);
 }
 
 void pSmartCar::updatePid(const float val, Type type)
@@ -344,6 +345,7 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 
 	case 'd':
 		pResource::m_instance->setMotorsEnabled(false);
+		pResource::m_instance->m_cur_speed = 0;
 		break;
 
 	case '+':
@@ -356,6 +358,7 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 
 	case '*':
 		pResource::m_instance->m_ideal_speed = 0;
+		pResource::m_instance->m_cur_speed = 0;
 		pResource::m_instance->m_pidControllers[2].reset();
 		break;
 

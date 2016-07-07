@@ -18,15 +18,15 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	70
+#define UNIQUE_VAL	65
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
 
 pResource::pResource(void)
 :
-	pFlash(pFlash::Config(&configTable, sizeof(pResource::ConfigTable))),
-	pSmartCar()
+			pFlash(pFlash::Config(&configTable, sizeof(pResource::ConfigTable))),
+			pSmartCar()
 {
 	System::Init();
 
@@ -55,7 +55,7 @@ pResource::pResource(void)
 	else if (configTable.kTableSize != sizeof(ConfigTable))
 	{
 		setInitialConfigTable();
-//		addConfigToConfigTable();
+		//		addConfigToConfigTable();
 		saveConfig();
 	}
 }
@@ -93,7 +93,7 @@ void pResource::setInitialConfigTable(void)
 	configTable.kLeftMotorNagConstant = 28.58333f;
 	configTable.kRightMotorNagConstant = 43.166f;
 
-	configTable.kIdealAngle = 71.0f;
+	configTable.kIdealAngle = 75.5f;
 	configTable.kAngleRange = 30.0f;
 
 	configTable.kLeftMotorDeadMarginPos = 300;//70,65;//156;
@@ -101,13 +101,15 @@ void pResource::setInitialConfigTable(void)
 	configTable.kRightMotorDeadMarginPos = 300;//20,23;//41;
 	configTable.kRightMotorDeadMarginNag = 43;//28;//60;
 
-	configTable.kMotorKp = 0.0f;
-	configTable.kMotorKi = 0.0f;
-	configTable.kMotorKd = 0.0f;
+	configTable.kSpeedKp = 0.0f;
+	configTable.kSpeedKi = 0.0f;
+	configTable.kSpeedKd = 0.0f;
+	configTable.kSpeedKq = 0.001f;
+	configTable.kSpeedKr = 0.999f;
 
-	configTable.kAngleKp = 42000.0f;//39150.0f;
+	configTable.kAngleKp = 130000.0f;//39150.0f;
 	configTable.kAngleKi = 0.0f;
-	configTable.kAngleKd = 11.0f;
+	configTable.kAngleKd = 0.0f;
 	configTable.kAngleKq = 0.001f;
 	configTable.kAngleKr = 0.999f;
 	configTable.kAngleBeta = 0.12f;
@@ -118,11 +120,7 @@ void pResource::setInitialConfigTable(void)
 	configTable.kDirectionKq = 0.001f;
 	configTable.kDirectionKr = 0.999f;
 
-	configTable.kSpeedKp = 3.0f; //3.3f
-	configTable.kSpeedKi = 0.8f; //1.3f
-	configTable.kSpeedKd = 0.0f;
-	configTable.kSpeedKq = 0.001f;
-	configTable.kSpeedKr = 0.999f;
+	configTable.kLiarConst = 1.5f; //3.3f
 
 	configTable.kCountPerRevo = 9557.725f;
 }

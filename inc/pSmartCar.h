@@ -53,9 +53,11 @@ public:
 		cur
 	};
 
+
 	struct State
 	{
 		float	dX;
+		float   a;
 		float	angle;
 		float	dYaw;
 		float	dAngle;
@@ -65,6 +67,7 @@ public:
 		State(void)
 		:
 			dX(0.0f),
+			a(0.0f),
 			angle(0.0f),
 			dYaw(0.0f),
 			dAngle(0.0f),
@@ -115,8 +118,9 @@ protected:
 
 	pPid::PidParam getPidConfig(Type type);
 
-	void updateSmoothAngleOutput(const float newAngle);
-	float getSmoothAngleOutput(void);
+	void updateSmoothSpeedIncrement(const float newAngle);
+	void updateSmoothSpeedOutput(void);
+	float getSmoothSpeedOutput(void);
 
 	void updateSmoothDirectionOutput(const float newDirection);
 	float getSmoothDirectionOutput(void);
@@ -150,7 +154,9 @@ protected:
 
 	float					m_direction;
 	float					m_speed;
+	float 					m_lie;
 	float					m_idealAngleOffset;
+	float 					m_idealSpeedOffset;
 	float					m_directionOffset;
 	float					m_idealAngle;
 

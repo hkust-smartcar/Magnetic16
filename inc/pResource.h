@@ -49,9 +49,11 @@ public:
 		int16_t			kRightMotorDeadMarginPos;
 		int16_t			kRightMotorDeadMarginNag;
 
-		float			kMotorKp;
-		float			kMotorKi;
-		float			kMotorKd;
+		float			kSpeedKp;
+		float			kSpeedKi;
+		float			kSpeedKd;
+		float			kSpeedKq;
+		float 			kSpeedKr;
 
 		float			kAngleKp;
 		float			kAngleKi;
@@ -66,11 +68,7 @@ public:
 		float			kDirectionKq;
 		float			kDirectionKr;
 
-		float			kSpeedKp;
-		float			kSpeedKi;
-		float			kSpeedKd;
-		float			kSpeedKq;
-		float			kSpeedKr;
+		float			kLiarConst;
 
 		float			kCountPerRevo;
 	};

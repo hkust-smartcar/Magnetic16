@@ -105,16 +105,16 @@ void pResource::setInitialConfigTable(void)
 	configTable.kMotorKi = 0.0f;
 	configTable.kMotorKd = 0.0f;
 
-	configTable.kAngleKp = 42000.0f;//39150.0f;
+	configTable.kAngleKp = 100000.0f;//39150.0f;
 	configTable.kAngleKi = 0.0f;
-	configTable.kAngleKd = 11.0f;
+	configTable.kAngleKd = 5.0f;
 	configTable.kAngleKq = 0.001f;
 	configTable.kAngleKr = 0.999f;
 	configTable.kAngleBeta = 0.12f;
 
-	configTable.kDirectionKp = 2800.0f;
+	configTable.kDirectionKp = 0.0f;
 	configTable.kDirectionKi = 0.0f;
-	configTable.kDirectionKd = 780.0f;
+	configTable.kDirectionKd = 0.0f;
 	configTable.kDirectionKq = 0.001f;
 	configTable.kDirectionKr = 0.999f;
 

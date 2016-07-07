@@ -208,7 +208,7 @@ void pSmartCar::run(void)
 void pSmartCar::addSpeed(const float speed)
 {
 
-	inRange(0,m_cur_speed += speed,m_ideal_speed);
+	m_cur_speed = inRange(0,m_cur_speed += speed,m_ideal_speed);
 }
 
 void pSmartCar::updatePid(const float val, Type type)

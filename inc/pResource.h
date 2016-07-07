@@ -58,7 +58,6 @@ public:
 		float			kAngleKd;
 		float			kAngleKq;
 		float			kAngleKr;
-		float			kAngleBeta;
 
 		float			kDirectionKp;
 		float			kDirectionKi;
@@ -71,6 +70,7 @@ public:
 		float			kSpeedKd;
 		float			kSpeedKq;
 		float			kSpeedKr;
+		float 			kAccelSpeed;
 
 		float			kCountPerRevo;
 	};

@@ -83,10 +83,10 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kP = &pResource::configTable.kSpeedKp;
 		param.kI = &pResource::configTable.kSpeedKi;
 		param.kD = &pResource::configTable.kSpeedKd;
-		param.setPoint = &m_speed;
+		param.setPoint = &m_cur_speed;
 		param.ignoreRange = 0.0f;
-		param.outputMax = 10;
-		param.outputMin = -10;
+		param.outputMax = 20;
+		param.outputMin = -20;
 		param.sumMax = 10;
 		param.sumMin = -10;
 		break;
@@ -167,7 +167,8 @@ pSmartCar::pSmartCar(void)
 :
 	m_state(),
 	m_direction(0.0f),
-	m_speed(0.0f),
+	m_ideal_speed(0.0f),
+	m_cur_speed(0.0f),
 	m_idealAngleOffset(0.0f),
 	m_directionOffset(0.0f),
 	m_idealAngle(pResource::configTable.kIdealAngle),
@@ -226,7 +227,7 @@ pSmartCar::pSmartCar(void)
 void pSmartCar::reset(void)
 {
 	m_direction = 0.0f;
-	m_speed = 0.0f;
+	m_ideal_speed = 0.0f;
 	m_motors[0].reset();
 	m_motors[1].reset();
 
@@ -247,7 +248,8 @@ void pSmartCar::run(void)
 
 void pSmartCar::addSpeed(const float speed)
 {
-	m_speed += speed;
+
+	m_cur_speed = inRange(0,m_cur_speed + speed,m_ideal_speed);
 }
 
 void pSmartCar::updatePid(const float val, Type type)
@@ -308,18 +310,20 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 
 	case 'd':
 		pResource::m_instance->setMotorsEnabled(false);
+		pResource::m_instance->m_cur_speed = 0;
 		break;
 
 	case '+':
-		pResource::m_instance->m_speed += 2;
+		pResource::m_instance->m_ideal_speed += 1;
 		break;
 
 	case '-':
-		pResource::m_instance->m_speed -= 2;
+		pResource::m_instance->m_ideal_speed -= 1;
 		break;
 
 	case '*':
-		pResource::m_instance->m_speed = 0;
+		pResource::m_instance->m_ideal_speed = 0;
+		pResource::m_instance->m_cur_speed = 0;
 		pResource::m_instance->m_pidControllers[2].reset();
 		break;
 
@@ -354,8 +358,9 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 	case '5':
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].dX, "Speed");
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_pidControllers[Type::Speed].getSum(), "SpeedSum");
-		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].dYaw, "Yaw");
-		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_idealAngleOffset, "angleOffset");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_cur_speed, "cur_ideal_speed");
+		//		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].dYaw, "Yaw");
+//		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_idealAngleOffset, "angleOffset");
 		break;
 
 	case '6':

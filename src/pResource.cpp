@@ -95,7 +95,6 @@ void pResource::setInitialConfigTable(void)
 	configTable.kAngleKd = 11.0f;
 	configTable.kAngleKq = 0.001f;
 	configTable.kAngleKr = 0.999f;
-	configTable.kAngleBeta = 0.12f;
 
 	configTable.kDirectionKp = 5000.0f;
 	configTable.kDirectionKi = 0.0f;
@@ -108,6 +107,7 @@ void pResource::setInitialConfigTable(void)
 	configTable.kSpeedKd = 0.0f;
 	configTable.kSpeedKq = 0.001f;
 	configTable.kSpeedKr = 0.999f;
+	configTable.kAccelSpeed = 0.0f;
 
 	configTable.kCountPerRevo = 9557.725f;
 }

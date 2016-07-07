@@ -139,6 +139,7 @@ protected:
 	static void selfDirectionControl(void);
 	static void directionControl(void);
 	static void speedControl(void);
+	static void smoothedIdealSpeed(void);
 	static void print(void);
 //	static void safetyCheck(void);
 
@@ -150,7 +151,8 @@ protected:
 	State					m_state[2];
 
 	float					m_direction;
-	float					m_speed;
+	float					m_ideal_speed;
+	float					m_cur_speed;
 	float					m_idealAngleOffset;
 	float					m_directionOffset;
 	float					m_idealAngle;

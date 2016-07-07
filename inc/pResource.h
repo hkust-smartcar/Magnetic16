@@ -34,24 +34,9 @@ public:
 		float			kBatteryVoltageRatio;
 
 		float			kAccelTruthVal;
-		float			kCgHeightInM;
-
-		float			kLeftMotorPosConstant;
-		float			kRightMotorPosConstant;
-		float			kLeftMotorNagConstant;
-		float			kRightMotorNagConstant;
 
 		float			kIdealAngle;
 		float			kAngleRange;
-
-		int16_t			kLeftMotorDeadMarginPos;
-		int16_t			kLeftMotorDeadMarginNag;
-		int16_t			kRightMotorDeadMarginPos;
-		int16_t			kRightMotorDeadMarginNag;
-
-		float			kMotorKp;
-		float			kMotorKi;
-		float			kMotorKd;
 
 		float			kAngleKp;
 		float			kAngleKi;

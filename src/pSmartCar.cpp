@@ -105,6 +105,46 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 	return param;
 }
 
+pFuzzyLogic::Config getFuzzyLogicConfig(void)
+{
+	pFuzzyLogic::Config config;
+	pFuzzyLogic::MembershipFunc errorMF = {	{ -1.0f, -1.0f, -0.82f, -0.5f },			// NL
+											{ -0.82f, -0.5f, -0.5f, -0.2f },			// NM
+											{ -0.5f, -0.2f, -0.2f, 0.0f },				// NS
+											{ -0.1f, 0.0f, 0.0f, 0.1f },				// ZR
+											{ 0.0f, 0.2f, 0.2f, 0.5f },					// PS
+											{ 0.2f, 0.5f, 0.5f, 0.82f },				// PM
+											{ 0.5f, 0.82f, 1.0f, 1.0f } };				// PL
+
+	pFuzzyLogic::MembershipFunc dErrorMF = {{ -200.0f, -200.0f, -175.0f, -130.0f },	// NL
+											{ -175.0f, -130.0f, -130.0f, -50.0f },		// NM
+											{ -130.0f, -50.0f, -50.0f, 0.0f },			// NS
+											{ -50.0f, 0.0f, 0.0f, 50.0f },				// ZR
+											{ 0.0f, 50.0f, 50.0f, 130.0f },				// PS
+											{ 50.0f, 130.0f, 130.0f, 175.0f },			// PM
+											{ 130.0f, 175.0f, 200.0f, 200.0f } };		// PL
+
+	pFuzzyLogic::MembershipFunc outputMF = {{ -4000.0f, -4000.0f, -3500.0f, -2700.0f },	// NL
+											{ -3500.0f, -2700.0f, -2700.0f, -1450.0f },	// NM
+											{ -2700.0f, -1450.0f, -1450.0f, 0.0f },		// NS
+											{ -1450.0f, -100.0f, 100.0f, 1450.0f },		// ZR
+											{ 100.0f, 1450.0f, 1450.0f, 2700.0f },		// PS
+											{ 1450.0f, 2700.0f, 2700.0f, 3500.0f },		// PM
+											{ 2700.0f, 3500.0f, 4000.0f, 4000.0f } };	// PL
+	pFuzzyLogic::Rules rules = {	{ 0, 0, 1, 1, 2, 3 },
+									{ 0, 1, 1, 2, 3, 4 },
+									{ 1, 1, 2, 3, 4, 4 },
+									{ 1, 2, 3, 4, 4, 5 },
+									{ 2, 3, 4, 4, 5, 6 },
+									{ 3, 4, 4, 5, 6, 6 } };
+	memcpy(config.errorMembershipFuncs, errorMF, sizeof(pFuzzyLogic::MembershipFunc));
+	memcpy(config.dErrorMembershipFuncs, dErrorMF, sizeof(pFuzzyLogic::MembershipFunc));
+	memcpy(config.outputMembershipFuncs, outputMF, sizeof(pFuzzyLogic::MembershipFunc));
+	memcpy(config.rules, rules, sizeof(pFuzzyLogic::Rules));
+	config.approxAccuracy = 1.0f;
+	return config;
+}
+
 Joystick::Config getJoystickConfig(void)
 {
 	Joystick::Config config;
@@ -133,7 +173,7 @@ pSmartCar::pSmartCar(void)
 	m_idealAngle(pResource::configTable.kIdealAngle),
 	m_batteryVoltage(0.0f),
 	m_loop(),
-	m_angle(pAngle::Config(pResource::configTable.kAccelTruthVal, pResource::configTable.kCgHeightInM)),
+	m_angle(pAngle::Config(pResource::configTable.kAccelTruthVal)),
 	m_motors{ pMotor(pMotor::Config(1, 1, true, true, leftMotorMapping)),
 				pMotor(pMotor::Config(0, 0, false, false, rightMotorMapping)) },
 //	m_lcd(MiniLcd::Config(0, -1, 30)),
@@ -150,6 +190,7 @@ pSmartCar::pSmartCar(void)
 	m_batmeter({ pResource::configTable.kBatteryVoltageRatio }),
 	m_grapher(),
 	m_lpf(0.17f),
+	m_fuzzyLogic(getFuzzyLogicConfig()),
 	m_motorEnabled(false),
 	m_pidControllers{	pPid(getPidConfig(Type::Angle)),
 						pPid(getPidConfig(Type::Direction)),
@@ -244,93 +285,17 @@ void pSmartCar::onClickListener(const uint8_t id)
 	case 0:
 		pResource::m_instance->setMotorsEnabled(pResource::m_instance->m_motorEnabled = !pResource::m_instance->m_motorEnabled);
 		break;
-
-	case 1:
-		pResource::m_instance->m_motors[0].reset();
-		DelayMsByTicks(250);
-		for (int16_t i = 50; i < 500; i++)
-		{
-			pResource::m_instance->m_motors[0].setPower(i);
-			DelayMsByTicks(100);
-			pResource::m_instance->m_motors[0].update();
-			if (ABS(pResource::m_instance->m_motors[0].getEncoderCount()) >= 100)
-			{
-				pResource::configTable.kLeftMotorDeadMarginPos = i;
-				break;
-			}
-		}
-		pResource::m_instance->m_motors[0].setPower(0);
-		DelayMsByTicks(1000);
-		pResource::m_instance->m_motors[0].reset();
-		for (int16_t i = -50; i > -500; i--)
-		{
-			pResource::m_instance->m_motors[0].setPower(i);
-			DelayMsByTicks(100);
-			pResource::m_instance->m_motors[0].update();
-			if (ABS(pResource::m_instance->m_motors[0].getEncoderCount()) >= 100)
-			{
-				pResource::configTable.kLeftMotorDeadMarginNag = i;
-				break;
-			}
-		}
-		pResource::m_instance->saveConfig();
-		pResource::m_instance->m_motors[0].setPower(0);
-		break;
-
-	case 2:
-		pResource::m_instance->m_motors[1].reset();
-		DelayMsByTicks(250);
-		for (int16_t i = 50; i < 500; i++)
-		{
-			pResource::m_instance->m_motors[1].setPower(i);
-			DelayMsByTicks(100);
-			pResource::m_instance->m_motors[1].update();
-			if (ABS(pResource::m_instance->m_motors[1].getEncoderCount()) >= 100)
-			{
-				pResource::configTable.kRightMotorDeadMarginPos = i;
-				break;
-			}
-		}
-		pResource::m_instance->m_motors[1].setPower(0);
-		DelayMsByTicks(1000);
-		pResource::m_instance->m_motors[1].reset();
-		for (int16_t i = -50; i > -500; i--)
-		{
-			pResource::m_instance->m_motors[1].setPower(i);
-			DelayMsByTicks(100);
-			pResource::m_instance->m_motors[1].update();
-			if (ABS(pResource::m_instance->m_motors[1].getEncoderCount()) >= 100)
-			{
-				pResource::configTable.kRightMotorDeadMarginNag = i;
-				break;
-			}
-		}
-		pResource::m_instance->m_motors[1].setPower(0);
-		pResource::m_instance->saveConfig();
-		break;
 	}
 }
 
 float pSmartCar::leftMotorMapping(const float val)
 {
 	return val;
-	if (isInRange2(val, 0, 0.01f))
-		return 0.0f;
-	else if (val > 0.0f)
-		return val /* pResource::configTable.kRightMotorPosConstant*/ + pResource::configTable.kLeftMotorDeadMarginPos;
-	else
-		return val * 1.175774f; ///* pResource::configTable.kRightMotorNagConstant*/ - pResource::configTable.kLeftMotorDeadMarginNag;
 }
 
 float pSmartCar::rightMotorMapping(const float val)
 {
 	return val;
-	if (isInRange2(val, 0, 0.01f))
-		return 0.0f;
-	else if (val > 0.0f)
-		return val /* pResource::configTable.kRightMotorPosConstant*/ + pResource::configTable.kRightMotorDeadMarginPos;
-	else
-		return val * 0.9042553f; ///* pResource::configTable.kRightMotorNagConstant*/ - pResource::configTable.kRightMotorDeadMarginNag;
 }
 
 void pSmartCar::onReceive(const std::vector<Byte>& bytes)

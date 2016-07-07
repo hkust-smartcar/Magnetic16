@@ -11,6 +11,8 @@
 #include <array>
 #include <cstring>
 
+typedef unsigned char uint8_t;
+
 using namespace std;
 
 class pFuzzyLogic
@@ -29,6 +31,19 @@ public:
 	typedef MembShipFuncInput MembershipFunc[7];
 	// index of element in output fuzzy set
 	typedef uint8_t RuleResult;
+	// Rules[dError][error]
+	/**
+	 *				  error
+	 * 		   NL NM NS ZR PS PM PL
+	 * 		NL
+	 * 	d	NM
+	 * 	E	NS
+	 * 	r	ZR
+	 * 	r	PS
+	 * 	o	PM
+	 * 	r	PL
+	 *
+	 */
 	typedef RuleResult Rules[7][7];
 
 	struct Config
@@ -37,21 +52,33 @@ public:
 		MembershipFunc		dErrorMembershipFuncs;
 		MembershipFunc		outputMembershipFuncs;
 
-		Rules					rules;
+		Rules				rules;
 
-		float					approxAccuracy = 0.5f;
+		float				approxAccuracy = 0.5f;
 	};
 
 	struct FuzzResult
 	{
-		uint8_t					relatedIndex[2];
-		float					degreeOfMembship[2];
+		uint8_t				relatedIndex[2];
+		float				degreeOfMembship[2];
+
+		FuzzResult(void)
+		:
+			relatedIndex{ 7, 7 },
+			degreeOfMembship{ 0.0f }
+		{}
 	};
 
 	struct InferenceResult
 	{
-		bool outputIndice[7];
-		float outputDom[7];
+		bool				outputIndice[7];
+		float				outputDom[7];
+
+		InferenceResult(void)
+		:
+			outputIndice{ false },
+			outputDom{ 0.0f }
+		{}
 	};
 
 	enum ErrorType
@@ -73,8 +100,8 @@ private:
 	InferenceResult fuzzyInference(const FuzzResult &errorResult, const FuzzResult &dErrorResult);
 	float defuzzification(const InferenceResult &inferResult);
 
-	array<MembershipFunc, 2> m_MembershipFuncs;
-	MembershipFunc			m_outputMembershipFuncs;
+	array<MembershipFunc, 2> 	m_MembershipFuncs;
+	MembershipFunc				m_outputMembershipFuncs;
 
 	Rules						m_rules;
 

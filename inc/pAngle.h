@@ -32,12 +32,9 @@ public:
 	{
 		float *accelTrustValue;
 
-		float cgHeight;
-
-		Config(float &_accelTrustValue, float _cgHeight)
+		Config(float &_accelTrustValue)
 		:
-			accelTrustValue(&_accelTrustValue),
-			cgHeight(_cgHeight)
+			accelTrustValue(&_accelTrustValue)
 		{}
 	};
 

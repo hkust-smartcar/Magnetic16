@@ -28,6 +28,7 @@
 #include <pMotor.h>
 #include <pFlash.h>
 #include <pLoop.h>
+#include <pFuzzyLogic.h>
 
 #define ABS(v) ((v > 0)? v : -v)
 #define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
@@ -168,6 +169,7 @@ protected:
 	BatteryMeter			m_batmeter;
 	pGrapher				m_grapher;
 	pLowPassFilter			m_lpf;
+	pFuzzyLogic				m_fuzzyLogic;
 
 	bool					m_motorEnabled;
 	bool					m_isReadyToRun;

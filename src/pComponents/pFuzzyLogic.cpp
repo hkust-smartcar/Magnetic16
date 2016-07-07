@@ -24,7 +24,7 @@ pFuzzyLogic::pFuzzyLogic(const Config &config)
 	m_approxAccu(config.approxAccuracy)
 {
 	memcpy(m_MembershipFuncs[ErrorType::Error], config.errorMembershipFuncs, 7 * 4 * sizeof(float));
-	memcpy(m_MembershipFuncs[ErrorType::Error], config.dErrorMembershipFuncs, 7 * 4 * sizeof(float));
+	memcpy(m_MembershipFuncs[ErrorType::dError], config.dErrorMembershipFuncs, 7 * 4 * sizeof(float));
 	memcpy(m_outputMembershipFuncs, config.outputMembershipFuncs, 7 * 4 * sizeof(float));
 	memcpy(m_rules, config.rules, 7 * 7 * sizeof(uint8_t));
 }
@@ -46,7 +46,7 @@ pFuzzyLogic::FuzzResult pFuzzyLogic::fuzzification(const float &val, const Error
 
 	for (uint8_t i = 0; i < 7; i++)
 	{
-		if (val > m_MembershipFuncs[type][i][0] && val < m_MembershipFuncs[type][i][3])
+		if (val >= m_MembershipFuncs[type][i][0] && val <= m_MembershipFuncs[type][i][3])
 		{
 			if (val >= m_MembershipFuncs[type][i][1] && val <= m_MembershipFuncs[type][i][2])
 				tempDegreeOfMembship = 1.0f;
@@ -78,14 +78,20 @@ pFuzzyLogic::InferenceResult pFuzzyLogic::fuzzyInference(const FuzzResult &error
 
 	for (uint8_t i = 0, index = 0; i < 2; i++)
 	{
-		for (uint8_t j = 0; j < 2; j++)
+		if (dErrorResult.relatedIndex[i] < 7)
 		{
-			index = m_rules[dErrorResult.relatedIndex[i]][errorResult.relatedIndex[j]];
-			if (ret.outputIndice[index])
-				ret.outputDom[index] = MAX(ret.outputDom[index], MIN(errorResult.degreeOfMembship[j], dErrorResult.degreeOfMembship[i]));
-			else
-				ret.outputDom[index] = MIN(errorResult.degreeOfMembship[j], dErrorResult.degreeOfMembship[i]);
-			ret.outputIndice[index] = true;
+			for (uint8_t j = 0; j < 2; j++)
+			{
+				if (errorResult.relatedIndex[j] < 7)
+				{
+					index = m_rules[dErrorResult.relatedIndex[i]][errorResult.relatedIndex[j]];
+					if (ret.outputIndice[index])
+						ret.outputDom[index] = MAX(ret.outputDom[index], MIN(errorResult.degreeOfMembship[j], dErrorResult.degreeOfMembship[i]));
+					else
+						ret.outputDom[index] = MIN(errorResult.degreeOfMembship[j], dErrorResult.degreeOfMembship[i]);
+					ret.outputIndice[index] = true;
+				}
+			}
 		}
 	}
 
@@ -111,14 +117,18 @@ float pFuzzyLogic::defuzzification(const InferenceResult &inferResult)
 		if (x > m_outputMembershipFuncs[cur][3])
 			cur++;
 
-		if (x < m_outputMembershipFuncs[cur][1])
+		if (m_outputMembershipFuncs[cur][1] - m_outputMembershipFuncs[cur][0] == 0.0f)
+			tempMass = 1;
+		else if (x < m_outputMembershipFuncs[cur][1])
 			tempMass = MIN(inferResult.outputDom[cur], (x - m_outputMembershipFuncs[cur][0]) / (m_outputMembershipFuncs[cur][1] - m_outputMembershipFuncs[cur][0]));
 		else if (x < m_outputMembershipFuncs[cur][2])
 			tempMass = inferResult.outputDom[cur];
+		else if (m_outputMembershipFuncs[cur][3] - m_outputMembershipFuncs[cur][2] == 0.0f)
+			tempMass = 1;
 		else if (cur + 1 >= 7 || x <= m_outputMembershipFuncs[cur + 1][0])
-				tempMass = MIN(inferResult.outputDom[cur], (m_outputMembershipFuncs[cur][3] - x) / (m_outputMembershipFuncs[cur][3] - m_outputMembershipFuncs[cur][2]));
+			tempMass = MIN(inferResult.outputDom[cur], (m_outputMembershipFuncs[cur][3] - x) / (m_outputMembershipFuncs[cur][3] - m_outputMembershipFuncs[cur][2]));
 		else if (x > m_outputMembershipFuncs[cur + 1][0])
-			tempMass = MAX(MIN(inferResult.outputDom[cur], (m_outputMembershipFuncs[cur][3] - x) / (m_outputMembershipFuncs[cur][3] - m_outputMembershipFuncs[cur][2])), MIN(inferResult.outputDom[cur], (x - m_outputMembershipFuncs[cur][0]) / (m_outputMembershipFuncs[cur][1] - m_outputMembershipFuncs[cur][0])));
+			tempMass = MAX(MIN(inferResult.outputDom[cur], (m_outputMembershipFuncs[cur][3] - x) / (m_outputMembershipFuncs[cur][3] - m_outputMembershipFuncs[cur][2])), MIN(inferResult.outputDom[cur + 1], (x - m_outputMembershipFuncs[cur + 1][0]) / (m_outputMembershipFuncs[cur + 1][1] - m_outputMembershipFuncs[cur + 1][0])));
 
 		moment += tempMass * x;
 		mass += tempMass;

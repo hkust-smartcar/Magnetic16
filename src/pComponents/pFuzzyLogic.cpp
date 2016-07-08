@@ -12,6 +12,7 @@
 #define MIN(a, b) ((a < b)? a : b)
 
 using namespace std;
+using namespace libsc;
 
 size_t pFuzzyLogic::FuzzySetLen = 7;
 size_t pFuzzyLogic::MembShipFuncInputLen = 4;
@@ -21,12 +22,41 @@ pFuzzyLogic::pFuzzyLogic(const Config &config)
 	m_MembershipFuncs{ 0 },
 	m_outputMembershipFuncs{ 0 },
 	m_rules{ 0 },
-	m_approxAccu(config.approxAccuracy)
+	m_approxAccu(config.approxAccuracy),
+	m_lastOutput(0.0f),
+	m_lastError(0.0f),
+	m_lastDError(0.0f),
+	m_lastTime(0)
 {
 	memcpy(m_MembershipFuncs[ErrorType::Error], config.errorMembershipFuncs, 7 * 4 * sizeof(float));
 	memcpy(m_MembershipFuncs[ErrorType::dError], config.dErrorMembershipFuncs, 7 * 4 * sizeof(float));
 	memcpy(m_outputMembershipFuncs, config.outputMembershipFuncs, 7 * 4 * sizeof(float));
 	memcpy(m_rules, config.rules, 7 * 7 * sizeof(uint8_t));
+}
+
+void pFuzzyLogic::resetPdController(void)
+{
+	m_lastTime = 0;
+	m_lastError = 0.0f;
+	m_lastOutput = 0.0f;
+}
+
+float pFuzzyLogic::updatePdController(float error)
+{
+	if (m_lastTime)
+	{
+		FuzzResult errorRet = fuzzification(error, ErrorType::Error);
+		FuzzResult dErrorRet = fuzzification((m_lastDError = (error - m_lastError) * 1000.0f / (float)(m_dt = System::Time() - m_lastTime)), ErrorType::dError);
+
+		InferenceResult inferResult = fuzzyInference(errorRet, dErrorRet);
+
+		m_lastError = error;
+
+		m_lastOutput = defuzzification(inferResult);
+	}
+
+	m_lastTime = System::Time();
+	return m_lastOutput;
 }
 
 float pFuzzyLogic::update(float error, float dError)
@@ -39,6 +69,16 @@ float pFuzzyLogic::update(float error, float dError)
 	return defuzzification(inferResult);
 }
 
+float &pFuzzyLogic::getOutput(void)
+{
+	return m_lastOutput;
+}
+
+float &pFuzzyLogic::getDError(void)
+{
+	return m_lastDError;
+}
+
 pFuzzyLogic::FuzzResult pFuzzyLogic::fuzzification(const float &val, const ErrorType &type)
 {
 	float tempDegreeOfMembship = 0.0f;
@@ -46,7 +86,9 @@ pFuzzyLogic::FuzzResult pFuzzyLogic::fuzzification(const float &val, const Error
 
 	for (uint8_t i = 0; i < 7; i++)
 	{
-		if (val >= m_MembershipFuncs[type][i][0] && val <= m_MembershipFuncs[type][i][3])
+		if ((val > m_MembershipFuncs[type][i][0] && val < m_MembershipFuncs[type][i][3]) ||
+			(val == m_MembershipFuncs[type][i][0] && m_MembershipFuncs[type][i][0] == m_MembershipFuncs[type][i][1]) ||
+			(val == m_MembershipFuncs[type][i][2] && m_MembershipFuncs[type][i][2] == m_MembershipFuncs[type][i][3]))
 		{
 			if (val >= m_MembershipFuncs[type][i][1] && val <= m_MembershipFuncs[type][i][2])
 				tempDegreeOfMembship = 1.0f;

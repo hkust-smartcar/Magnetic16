@@ -62,6 +62,7 @@ void pAngle::update(void)
 		m_gyroOffset = ((m_accelAngle = asin(inRange(-1.0f, -m_lastAccel[2], 1.0f)) * RadToDeg) - m_lastAngle) / *m_param.accelTrustValue;
 		m_gyroAngle += m_lastOmega[1] * dt;
 		m_lastAngle += (m_lastOmega[1] + m_gyroOffset) * dt;
+		m_lastAngle = inRange(0.0f, m_lastAngle, 90.0f);
 		m_lastYawOmega = m_lastOmega[2] * sin(m_lastAngle * DegToRad);
 	}
 	else

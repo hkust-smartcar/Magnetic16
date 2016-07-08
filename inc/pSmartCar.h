@@ -7,6 +7,7 @@
  *	
  */
 
+#include <cassert>
 #include <array>
 #include <cmath>
 #include <functional>
@@ -33,6 +34,7 @@
 #define ABS(v) ((v > 0)? v : -v)
 #define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
 #define inRange2(v, m, r) ((v < m - r)? m - r : ((v > m + r)? m + r : v))
+#define inRange3(v, a, b) ((a >= b)? inRange(b, v, a) : inRange(a, v, b))
 #define isInRange(n, v, x) (v >= n && v <= x)
 #define isInRange2(v, m, r) ((v < m + r) && (v > m - r))
 #define sgn(v) ((v > 0)? 1 : -1)
@@ -139,10 +141,9 @@ protected:
 	static void selfDirectionControl(void);
 	static void directionControl(void);
 	static void speedControl(void);
-	static void smoothedIdealSpeed(void);
 	static void print(void);
-//	static void safetyCheck(void);
 
+	void smoothedIdealSpeed(void);
 	void updateSensors(void);
 	void updateState(void);
 	void updateSpeed(void);
@@ -151,8 +152,8 @@ protected:
 	State					m_state[2];
 
 	float					m_direction;
-	float					m_ideal_speed;
-	float					m_cur_speed;
+	float					m_idealSpeed;
+	float					m_curSpeed;
 	float					m_idealAngleOffset;
 	float					m_directionOffset;
 	float					m_idealAngle;

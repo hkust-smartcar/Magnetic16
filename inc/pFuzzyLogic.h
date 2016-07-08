@@ -10,10 +10,12 @@
 
 #include <array>
 #include <cstring>
+#include <libsc/system.h>
 
 typedef unsigned char uint8_t;
 
 using namespace std;
+using namespace libsc;
 
 class pFuzzyLogic
 {
@@ -54,7 +56,7 @@ public:
 
 		Rules				rules;
 
-		float				approxAccuracy = 0.5f;
+		float				approxAccuracy = 1.0f;
 	};
 
 	struct FuzzResult
@@ -89,7 +91,13 @@ public:
 
 	explicit pFuzzyLogic(const Config &config);
 
+	void resetPdController(void);
+
+	float updatePdController(float error);
 	float update(float error, float dError);
+
+	float &getOutput(void);
+	float &getDError(void);
 
 	static size_t FuzzySetLen;
 	static size_t MembShipFuncInputLen;
@@ -106,6 +114,13 @@ private:
 	Rules						m_rules;
 
 	float						m_approxAccu;
+
+	Timer::TimerInt				m_dt;
+	float						m_lastOutput;
+	float						m_lastError;
+	float						m_lastDError;
+
+	Timer::TimerInt				m_lastTime;
 
 };
 

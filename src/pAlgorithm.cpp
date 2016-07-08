@@ -32,7 +32,7 @@ void pSmartCar::addVariablesToGrapher(void)
 	m_grapher.addSharedVar(&pResource::configTable.kDirectionKp, "DirectionKp");
 	m_grapher.addSharedVar(&pResource::configTable.kDirectionKd, "DirectionKd");
 //	m_grapher.addSharedVar(&pResource::configTable.kDirectionKi, "DirectionKi");
-	m_grapher.addSharedVar(&m_ideal_speed, "SpeedSetPoint");
+	m_grapher.addSharedVar(&m_idealSpeed, "SpeedSetPoint");
 	m_grapher.addSharedVar(&pResource::configTable.kSpeedKp, "SpeedKp");
 //	m_grapher.addSharedVar(&pResource::configTable.kSpeedKd, "SpeedKd");
 	m_grapher.addSharedVar(&pResource::configTable.kSpeedKi, "SpeedKi");
@@ -63,7 +63,7 @@ void pSmartCar::update(void)
 
 void pSmartCar::angleControl(void)
 {
-	pResource::m_instance->updatePid(pResource::m_instance->m_state[StatePos::cur].angle + pResource::m_instance->getSmoothAngleOutput(), Type::Angle);
+	pResource::m_instance->updatePid(inRange(0,pResource::m_instance->m_state[StatePos::cur].angle + pResource::m_instance->getSmoothAngleOutput(),90), Type::Angle);
 
 	if (pResource::m_instance->m_motorEnabled && !isInRange2(pResource::m_instance->m_angle.getAngle(), pResource::configTable.kIdealAngle, pResource::configTable.kAngleRange))
 	{
@@ -81,10 +81,14 @@ void pSmartCar::angleControl(void)
 
 void pSmartCar::directionControl(void)
 {
-	float tempResult = pResource::m_instance->m_magSen[0].updatePair();
-	// Fuzzy Logic
-	pResource::m_instance->updatePid(tempResult, Type::Direction);
-	pResource::m_instance->updateSmoothDirectionOutput(pResource::m_instance->m_pidOutputVal[Type::Direction]);
+	float tempResult = -pResource::m_instance->m_magSen[0].updatePair();
+
+//	PD controller
+//	pResource::m_instance->updatePid(tempResult, Type::Direction);
+//	pResource::m_instance->updateSmoothDirectionOutput(pResource::m_instance->m_pidOutputVal[Type::Direction]);
+
+//	Fuzzy PD controller
+	pResource::m_instance->updateSmoothDirectionOutput(pResource::m_instance->m_fuzzyLogic.updatePdController(tempResult));
 }
 
 void pSmartCar::selfDirectionControl(void)
@@ -95,15 +99,9 @@ void pSmartCar::selfDirectionControl(void)
 
 void pSmartCar::speedControl(void)
 {
-	smoothedIdealSpeed();
+	pResource::m_instance->smoothedIdealSpeed();
 	pResource::m_instance->updatePid(pResource::m_instance->m_state[StatePos::cur].dX, Type::Speed);
 	pResource::m_instance->updateSmoothAngleOutput(pResource::m_instance->m_pidOutputVal[Type::Speed]);
-}
-
-void pSmartCar::smoothedIdealSpeed(void)
-{
-	float speed_error = pResource::m_instance->m_ideal_speed - pResource::m_instance->m_state[cur].dX;
-	pResource::m_instance->addSpeed(speed_error * pResource::configTable.kAccelSpeed);
 }
 
 void pSmartCar::print(void)
@@ -117,6 +115,11 @@ void pSmartCar::print(void)
 //========================= | | | | | | | | | | | | | | | | ==============================
 //========================= v v v v v v v v v v v v v v v v ==============================
 
+
+void pSmartCar::smoothedIdealSpeed(void)
+{
+	m_curSpeed = inRange3(m_curSpeed + (m_idealSpeed - m_state[cur].dX) * pResource::configTable.kAccelSpeed, 0, m_idealSpeed);
+}
 
 void pSmartCar::updateSensors(void)
 {

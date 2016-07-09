@@ -18,7 +18,7 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	150
+#define UNIQUE_VAL	15
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -85,7 +85,7 @@ void pResource::setInitialConfigTable(void)
 
 	configTable.kBatteryVoltageRatio = 0.3886279f;
 
-	configTable.kAccelTruthVal = 2.0f;
+	configTable.kAccelTruthVal = 1.5f;
 
 	configTable.kIdealAngle = 75.0f;
 	configTable.kAngleRange = 30.0f;

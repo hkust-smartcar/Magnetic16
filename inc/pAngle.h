@@ -16,6 +16,7 @@
 #include <libsc/timer.h>
 #include <libsc/system.h>
 
+
 using namespace libsc;
 using namespace std;
 
@@ -23,7 +24,7 @@ using namespace std;
 #define DegToRad 0.017453293f
 #define inRange(n, v, x) ((v > x)? x : ((v < n)? n : v))
 
-class pAngle : private Mpu6050
+class pAngle : private Mpu6050, private Mma8451q
 {
 
 public:

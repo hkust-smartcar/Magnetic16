@@ -34,7 +34,7 @@
 #define ABS(v) ((v > 0)? v : -v)
 #define inRange(n, v, x) ((v < n)? n : ((v > x)? x : v))
 #define inRange2(v, m, r) ((v < m - r)? m - r : ((v > m + r)? m + r : v))
-#define inRange3(v, a, b) ((a >= b)? inRange(b, v, a) : inRange(a, v, b))
+#define inRange3(v, a, b,limit) ((a >= b)? inRange(b, v, a) : inRange(a, v, b))
 #define isInRange(n, v, x) (v >= n && v <= x)
 #define isInRange2(v, m, r) ((v < m + r) && (v > m - r))
 #define sgn(v) ((v > 0)? 1 : -1)
@@ -143,7 +143,7 @@ protected:
 	static void speedControl(void);
 	static void print(void);
 
-	void smoothedIdealSpeed(void);
+	void smoothedIdealSpeed(float low_bound,float up_bound,float max_accel,float accel_limit);
 	void updateSensors(void);
 	void updateState(void);
 	void updateSpeed(void);

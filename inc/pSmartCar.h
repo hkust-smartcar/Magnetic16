@@ -80,9 +80,7 @@ public:
 	enum Type
 	{
 		Angle = 0,
-		Direction,
-		Speed,
-		SelfDirection
+		Speed
 	};
 
 	enum IncrementType
@@ -143,7 +141,7 @@ protected:
 	static void speedControl(void);
 	static void print(void);
 
-	void smoothedIdealSpeed(void);
+	void smoothedIdealSpeed(const float &accelLimit);
 	void updateSensors(void);
 	void updateState(void);
 	void updateSpeed(void);
@@ -177,10 +175,10 @@ protected:
 	bool					m_motorEnabled;
 	bool					m_isReadyToRun;
 
-	array<pPid, 4>			m_pidControllers;
-	array<float, 4>			m_pidOutputVal;
+	array<pPid, 2>			m_pidControllers;
+	array<float, 2>			m_pidOutputVal;
 
-	array<pKalmanFilter, 3>	m_filter;
+	pKalmanFilter			m_encoderFilter;
 	uint8_t					m_smoothCounter;
 	array<float, 2>			m_smoothIncrement;
 

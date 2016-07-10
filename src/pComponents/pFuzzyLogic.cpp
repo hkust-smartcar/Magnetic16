@@ -7,9 +7,14 @@
  */
 
 #include <pFuzzyLogic.h>
+#include <pBuzzer.h>
 
 #define MAX(a, b) ((a > b)? a : b)
 #define MIN(a, b) ((a < b)? a : b)
+
+#define DEBUG_ERROR_OR_DERROR 1
+
+#define IS_CONTAIN(arr, v) (arr[0] == v || arr[1] == v)
 
 using namespace std;
 using namespace libsc;
@@ -34,6 +39,47 @@ pFuzzyLogic::pFuzzyLogic(const Config &config)
 	memcpy(m_rules, config.rules, 7 * 7 * sizeof(uint8_t));
 }
 
+pFuzzyLogic::pFuzzyLogic(const EasyConfig &config)
+:
+	m_MembershipFuncs{ 0 },
+	m_outputMembershipFuncs{ 0 },
+	m_rules{ 0 },
+	m_approxAccu(config.approxAccuracy),
+	m_lastOutput(0.0f),
+	m_lastError(0.0f),
+	m_lastDError(0.0f),
+	m_lastTime(0)
+{
+	MembershipFunc errorMF = {	{ config.errorEasyMF[0], config.errorEasyMF[0], -config.errorEasyMF[1], -config.errorEasyMF[2] },		// NL
+								{ -config.errorEasyMF[1], -config.errorEasyMF[2], -config.errorEasyMF[2], -config.errorEasyMF[3] },		// NM
+								{ -config.errorEasyMF[2], -config.errorEasyMF[3], -config.errorEasyMF[3], -config.errorEasyMF[4] },		// NS
+								{ -config.errorEasyMF[3], -config.errorEasyMF[4], config.errorEasyMF[4], config.errorEasyMF[3] },		// ZR
+								{ config.errorEasyMF[4], config.errorEasyMF[3], config.errorEasyMF[3], config.errorEasyMF[2] },			// PS
+								{ config.errorEasyMF[3], config.errorEasyMF[2], config.errorEasyMF[2], config.errorEasyMF[1] },			// PM
+								{ config.errorEasyMF[2], config.errorEasyMF[1], config.errorEasyMF[5], config.errorEasyMF[5] }	};		// PL
+
+	MembershipFunc dErrorMF = {	{ config.dErrorEasyMF[0], config.dErrorEasyMF[0], -config.dErrorEasyMF[1], -config.dErrorEasyMF[2] },			// NL
+								{ -config.dErrorEasyMF[1], -config.dErrorEasyMF[2], -config.dErrorEasyMF[2], -config.dErrorEasyMF[3] },			// NM
+								{ -config.dErrorEasyMF[2], -config.dErrorEasyMF[3], -config.dErrorEasyMF[3], -config.dErrorEasyMF[4] },			// NS
+								{ -config.dErrorEasyMF[3], -config.dErrorEasyMF[4], config.dErrorEasyMF[4], config.dErrorEasyMF[3] },			// ZR
+								{ config.dErrorEasyMF[4], config.dErrorEasyMF[3], config.dErrorEasyMF[3], config.dErrorEasyMF[2] },				// PS
+								{ config.dErrorEasyMF[3], config.dErrorEasyMF[2], config.dErrorEasyMF[2], config.dErrorEasyMF[1] },				// PM
+								{ config.dErrorEasyMF[2], config.dErrorEasyMF[1], config.dErrorEasyMF[5], config.dErrorEasyMF[5] }	};			// PL
+
+	MembershipFunc outputMF = {	{ config.outputEasyMF[0], config.outputEasyMF[0], -config.outputEasyMF[1], -config.outputEasyMF[2] },		// NL
+								{ -config.outputEasyMF[1], -config.outputEasyMF[2], -config.outputEasyMF[2], -config.outputEasyMF[3] },		// NM
+								{ -config.outputEasyMF[2], -config.outputEasyMF[3], -config.outputEasyMF[3], -config.outputEasyMF[4] },		// NS
+								{ -config.outputEasyMF[3], -config.outputEasyMF[4], config.outputEasyMF[4], config.outputEasyMF[3] },		// ZR
+								{ config.outputEasyMF[4], config.outputEasyMF[3], config.outputEasyMF[3], config.outputEasyMF[2] },			// PS
+								{ config.outputEasyMF[3], config.outputEasyMF[2], config.outputEasyMF[2], config.outputEasyMF[1] },			// PM
+								{ config.outputEasyMF[2], config.outputEasyMF[1], config.outputEasyMF[5], config.outputEasyMF[5] } };		// PL
+
+	memcpy(m_MembershipFuncs[ErrorType::Error], errorMF, sizeof(MembershipFunc));
+	memcpy(m_MembershipFuncs[ErrorType::dError], dErrorMF, sizeof(MembershipFunc));
+	memcpy(m_outputMembershipFuncs, outputMF, sizeof(MembershipFunc));
+	memcpy(m_rules, config.rules, 7 * 7 * sizeof(uint8_t));
+}
+
 void pFuzzyLogic::resetPdController(void)
 {
 	m_lastTime = 0;
@@ -46,7 +92,23 @@ float pFuzzyLogic::updatePdController(float error)
 	if (m_lastTime)
 	{
 		FuzzResult errorRet = fuzzification(error, ErrorType::Error);
-		FuzzResult dErrorRet = fuzzification((m_lastDError = (error - m_lastError) * 1000.0f / (float)(m_dt = System::Time() - m_lastTime)), ErrorType::dError);
+		FuzzResult dErrorRet = fuzzification((m_lastDError = (error - m_lastError) * 1000.0f / (float)(System::Time() - m_lastTime)), ErrorType::dError);
+
+#if DEBUG_ERROR_OR_DERROR == 0
+		if (IS_CONTAIN(errorRet.relatedIndex, 0) || IS_CONTAIN(errorRet.relatedIndex, 6))
+			pBuzzer::setBeep(65, 333);
+		else if (IS_CONTAIN(errorRet.relatedIndex, 1) || IS_CONTAIN(errorRet.relatedIndex, 5))
+			pBuzzer::setBeep(47, 200);
+		else
+			pBuzzer::setBeep(0, 0);
+#else
+		if (IS_CONTAIN(dErrorRet.relatedIndex, 0) || IS_CONTAIN(dErrorRet.relatedIndex, 6))
+			pBuzzer::setBeep(65, 333);
+		else if (IS_CONTAIN(dErrorRet.relatedIndex, 1) || IS_CONTAIN(dErrorRet.relatedIndex, 5))
+			pBuzzer::setBeep(47, 200);
+		else
+			pBuzzer::setBeep(0, 0);
+#endif
 
 		InferenceResult inferResult = fuzzyInference(errorRet, dErrorRet);
 

@@ -32,6 +32,7 @@ Mpu6050::Config getGyroConfig(void)
 pAngle::pAngle(pAngle::Config config)
 :
 	Mpu6050(getGyroConfig()),
+	Mma8451q(getAccelConfig()),
 	m_param(config),
 	m_lastAngle(0),
 	m_lastYawOmega(0),
@@ -47,9 +48,10 @@ void pAngle::update(void)
 {
 	if (m_lastTime)
 	{
-		UpdateF();
+		Mpu6050::UpdateF();
+		Mma8451q::UpdateF();
 
-		m_lastAccel = GetAccelF();
+		m_lastAccel = Mma8451q::GetAccelF();
 		m_lastOmega = GetOmegaF();
 
 		float dt = (System::Time() - m_lastTime) / 1000.0f;
@@ -67,8 +69,8 @@ void pAngle::update(void)
 	}
 	else
 	{
-		UpdateF();
-		m_lastAccel = GetAccelF();
+		Mma8451q::UpdateF();
+		m_lastAccel = Mma8451q::GetAccelF();
 		m_lastAngle = m_gyroAngle = asin(inRange(-1.0f, -m_lastAccel[2], 1.0f)) * RadToDeg;
 	}
 

@@ -33,17 +33,22 @@ public:
 
 	pBuzzer(void);
 
+	static void setEnabled(const bool enabled);
+	static bool getEnabled(void);
+
 	static void setBeep(const bool isBeep);
 	static void setBeep(const uint8_t noteIndex = 48, const uint16_t loudness = 333);
 	static void noteDown(const uint8_t noteIndex = 48, const uint16_t loudness = 333, const uint16_t delayMs = 100, const uint16_t delayMsAfter = 0);
 
 	static void startSong(void);
 	static void endSong(void);
+	static void terminated(void);
 
 	static pBuzzer		*m_instance;
 
 private:
 
+	bool				m_enabled;
 	PassiveBuzzer		m_buzzer;
 
 };

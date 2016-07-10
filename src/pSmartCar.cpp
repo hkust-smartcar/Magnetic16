@@ -8,22 +8,11 @@
  */
 
 #include "pSmartCar.h"
-#include <libbase/k60/watchdog.h>
 #include <pResource.h>
 
 using namespace std;
 using namespace libsc;
 using namespace libutil;
-
-//Button::Config getButtonConfig(const uint8_t id)
-//{
-//	Button::Config config;
-//	config.id = id;
-//	config.is_active_low = true;
-//	config.listener = pSmartCar::onClickListener;
-//	config.listener_trigger = Button::Config::Trigger::kDown;
-//	return config;
-//}
 
 pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 {
@@ -46,7 +35,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 						(
 							[&](float error, float additionalInfo, float constant)
 							{
-								return constant /* ABS(m_state[StatePos::cur].dAngle)*/ * m_state[StatePos::cur].dAngle;
+								return constant * m_state[StatePos::cur].dAngle;
 							}
 						);
 		param.setPoint = &pResource::configTable.kIdealAngle;
@@ -56,30 +45,6 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		break;
 
 	case 1:
-		//		param.kPFunc =	function<float (float, float, float)>
-		//						(
-		//							[](float error, float additionalInfo, float constant)
-		//							{
-		//								return pResource::configTable.kDirectionKp * ABS(error) * error;
-		//							}
-		//						);
-		//		param.kDFunc =	function<float (float, float, float)>
-		//						(
-		//							[&](float error, float additionalInfo, float constant)
-		//							{
-		//								return constant * -m_state[StatePos::cur].dYaw;
-		//							}
-		//						);
-		param.kP = &pResource::configTable.kDirectionKp;
-		param.kI = &pResource::configTable.kDirectionKi;
-		param.kD = &pResource::configTable.kDirectionKd;
-		param.setPoint = &m_direction;
-		param.ignoreRange = 0.0f;
-		param.outputMax = 4000;
-		param.outputMin = -4000;
-		break;
-
-	case 2:
 		param.kP = &pResource::configTable.kSpeedKp;
 		param.kI = &pResource::configTable.kSpeedKi;
 		param.kD = &pResource::configTable.kSpeedKd;
@@ -90,16 +55,6 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.sumMax = 10;
 		param.sumMin = -10;
 		break;
-
-	case 3:
-		param.kP = &pResource::configTable.kDirectionKp;
-		param.kI = &pResource::configTable.kDirectionKi;
-		param.kD = &pResource::configTable.kDirectionKd;
-		param.setPoint = &m_direction;
-		param.ignoreRange = 0.0f;
-		param.outputMax = 4000;
-		param.outputMin = -4000;
-		break;
 	}
 
 	return param;
@@ -108,13 +63,13 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 pFuzzyLogic::Config getFuzzyLogicConfig(void)
 {
 	pFuzzyLogic::Config config;
-	pFuzzyLogic::MembershipFunc errorMF = {	{ -1.0f, -1.0f, -0.82f, -0.5f },			// NL
-											{ -0.82f, -0.5f, -0.5f, -0.2f },			// NM
-											{ -0.5f, -0.33f, -0.33f, 0.0f },			// NS
-											{ -0.33f, 0.0f, 0.0f, 0.33f },				// ZR
-											{ 0.0f, 0.33f, 0.33f, 0.5f },				// PS
-											{ 0.2f, 0.5f, 0.5f, 0.82f },				// PM
-											{ 0.5f, 0.82f, 1.0f, 1.0f } };				// PL
+	pFuzzyLogic::MembershipFunc errorMF = {	{ -1.0f, -1.0f, -0.82f, -0.66f },			// NL
+											{ -0.82f, -0.66f, -0.66f, -0.4f },			// NM
+											{ -0.66f, -0.4f, -0.4f, 0.0f },				// NS
+											{ -0.4f, 0.0f, 0.0f, 0.4f },				// ZR
+											{ 0.0f, 0.4f, 0.4f, 0.66f },				// PS
+											{ 0.4f, 0.66f, 0.66f, 0.82f },				// PM
+											{ 0.66f, 0.82f, 1.0f, 1.0f } };				// PL
 
 	pFuzzyLogic::MembershipFunc dErrorMF = {{ -200.0f, -200.0f, -175.0f, -130.0f },		// NL
 											{ -175.0f, -130.0f, -130.0f, -50.0f },		// NM
@@ -125,11 +80,11 @@ pFuzzyLogic::Config getFuzzyLogicConfig(void)
 											{ 130.0f, 175.0f, 200.0f, 200.0f } };		// PL
 
 	pFuzzyLogic::MembershipFunc outputMF = {{ -4000.0f, -4000.0f, -3500.0f, -2700.0f },	// NL
-											{ -3500.0f, -2700.0f, -2700.0f, -1450.0f },	// NM
-											{ -2700.0f, -1450.0f, -1450.0f, -200.0f },	// NS
-											{ -1450.0f, -200.0f, 200.0f, 1450.0f },		// ZR
-											{ 200.0f, 1450.0f, 1450.0f, 2700.0f },		// PS
-											{ 1450.0f, 2700.0f, 2700.0f, 3500.0f },		// PM
+											{ -3500.0f, -2700.0f, -2700.0f, -1700.0f },	// NM
+											{ -2700.0f, -1700.0f, -1700.0f, -200.0f },	// NS
+											{ -1700.0f, -200.0f, 200.0f, 1700.0f },		// ZR
+											{ 200.0f, 1700.0f, 1700.0f, 2700.0f },		// PS
+											{ 1700.0f, 2700.0f, 2700.0f, 3500.0f },		// PM
 											{ 2700.0f, 3500.0f, 4000.0f, 4000.0f } };	// PL
 
 	pFuzzyLogic::Rules rules = {	{ 0, 0, 0, 0, 1, 2, 3 },
@@ -148,19 +103,46 @@ pFuzzyLogic::Config getFuzzyLogicConfig(void)
 	return config;
 }
 
+// Use this one
+pFuzzyLogic::EasyConfig getFuzzyLogicEasyConfig(void)
+{
+	pFuzzyLogic::EasyConfig config;
+
+	pFuzzyLogic::EasyMembershipFunc errorMF = { -1.0f, 0.9f, 0.71f, 0.52f, 0.0f, 1.0f };
+
+	pFuzzyLogic::EasyMembershipFunc dErrorMF = { -200.0f, 8.0f, 6.1f, 4.5f, 0.0f, 200.0f };
+
+	pFuzzyLogic::EasyMembershipFunc outputMF = { -4000.0f, 3500.0f, 2500.0f, 1700.0f, 350.0f, 4000.0f };
+
+	pFuzzyLogic::Rules rules = {	{ 0, 0, 0, 0, 1, 2, 3 },
+									{ 0, 0, 0, 1, 2, 3, 4 },
+									{ 0, 0, 1, 2, 3, 4, 5 },
+									{ 0, 1, 2, 3, 4, 5, 6 },
+									{ 1, 2, 3, 4, 5, 6, 6 },
+									{ 2, 3, 4, 5, 6, 6, 6 },
+									{ 3, 4, 5, 6, 6, 6, 6 } };
+
+	memcpy(config.errorEasyMF, errorMF, sizeof(pFuzzyLogic::EasyMembershipFunc));
+	memcpy(config.dErrorEasyMF, dErrorMF, sizeof(pFuzzyLogic::EasyMembershipFunc));
+	memcpy(config.outputEasyMF, outputMF, sizeof(pFuzzyLogic::EasyMembershipFunc));
+	memcpy(config.rules, rules, sizeof(pFuzzyLogic::Rules));
+	config.approxAccuracy = 50.0f;
+	return config;
+}
+
 Joystick::Config getJoystickConfig(void)
 {
 	Joystick::Config config;
 	config.id = 0;
 	config.is_active_low = true;
 	config.dispatcher = [] (const uint8_t id, const Joystick::State which)
-										{
-		if (!pResource::m_instance->isMotorsEnabled() || pResource::m_instance->isReadyAndSet())
-		{
-			pBuzzer::noteDown(58);
-			pResource::m_instance->setMotorsEnabled(!pResource::m_instance->isMotorsEnabled());
-		}
-										};
+						{
+							if (!pResource::m_instance->isMotorsEnabled() || pResource::m_instance->isReadyAndSet())
+							{
+								pBuzzer::noteDown(58);
+								pResource::m_instance->setMotorsEnabled(!pResource::m_instance->isMotorsEnabled());
+							}
+						};
 	for (uint8_t i = 0; i < 5; i++)
 		config.listener_triggers[i] = Joystick::Config::Trigger::kDown;
 	return config;
@@ -182,9 +164,6 @@ pSmartCar::pSmartCar(void)
 	pMotor(pMotor::Config(0, 0, false, false, rightMotorMapping)) },
 //	m_lcd(MiniLcd::Config(0, -1, 30)),
 //	m_joystick(getJoystickConfig()),
-//	m_buttons{	Button(getButtonConfig(0)),
-//				Button(getButtonConfig(1)),
-//				Button(getButtonConfig(2)) },
 	m_leds{ Led({ 3, true }),
 	Led({ 2, true }),
 	Led({ 1, true }),
@@ -194,16 +173,12 @@ pSmartCar::pSmartCar(void)
 	m_batmeter({ pResource::configTable.kBatteryVoltageRatio }),
 	m_grapher(),
 	m_lpf(0.17f),
-	m_fuzzyLogic(getFuzzyLogicConfig()),
+	m_fuzzyLogic(getFuzzyLogicEasyConfig()),
 	m_motorEnabled(false),
 	m_pidControllers{	pPid(getPidConfig(Type::Angle)),
-						pPid(getPidConfig(Type::Direction)),
-						pPid(getPidConfig(Type::Speed)),
-						pPid(getPidConfig(Type::SelfDirection)) },
+						pPid(getPidConfig(Type::Speed)) },
 	m_pidOutputVal{ 0 },
-	m_filter{	pKalmanFilter(pResource::configTable.kAngleKq, pResource::configTable.kAngleKr, 0, 0.5f),
-				pKalmanFilter(pResource::configTable.kDirectionKq, pResource::configTable.kDirectionKr, 0, 0.5f),
-				pKalmanFilter(pResource::configTable.kSpeedKq, pResource::configTable.kSpeedKr, 0, 0.5f) },
+	m_encoderFilter(pResource::configTable.kSpeedKq, pResource::configTable.kSpeedKr, 0, 0.5f),
 	m_smoothCounter(0),
 	m_smoothIncrement{ 0.0f, 0.0f }
 {
@@ -220,9 +195,6 @@ pSmartCar::pSmartCar(void)
 	m_grapher.setOnReceiveListener(onReceive);
 
 	pBuzzer::startSong();
-	//	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-	//	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-	//	pBuzzer::noteDown(48, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
 
 	m_isReadyToRun = true;
 }
@@ -239,13 +211,6 @@ void pSmartCar::reset(void)
 
 void pSmartCar::run(void)
 {
-	if (m_batteryVoltage <= 7.55f)
-	{
-		pBuzzer::noteDown(40, pBuzzer::defaultValue, 500, 200);
-		pBuzzer::noteDown(40, pBuzzer::defaultValue, 500, 200);
-		pBuzzer::noteDown(40, pBuzzer::defaultValue, 500, 200);
-		assert(false);
-	}
 	m_loop.start();
 }
 
@@ -262,15 +227,6 @@ pSmartCar::State &pSmartCar::State::operator=(const pSmartCar::State &other)
 	this->dYaw = other.dYaw;
 
 	return *this;
-}
-
-void pSmartCar::watchDogTimeout(void)
-{
-	pResource::m_instance->setMotorsEnabled(false);
-	for (uint8_t i = 0; i < 4; i++)
-		pResource::m_instance->setLed(i, true);
-	pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 100);
-	assert(false);
 }
 
 void pSmartCar::onClickListener(const uint8_t id)
@@ -376,7 +332,15 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_angle.getAccel(0), "Accel[0]");
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_angle.getAccel(1), "Accel[1]");
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_angle.getAccel(2), "Accel[2]");
+		break;
 
+	case '8':
+		pBuzzer::setEnabled(!pBuzzer::getEnabled());
+		break;
+
+	case '9':
+		pResource::m_instance->m_idealSpeed = pResource::configTable.kTargetSpeed;
+		break;
 	}
 }
 

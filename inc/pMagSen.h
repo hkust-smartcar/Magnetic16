@@ -11,6 +11,7 @@
 #include <array>
 #include <cassert>
 #include <libbase/k60/adc.h>
+#include <pLowPassFilter.h>
 
 using namespace std;
 using namespace libbase::k60;
@@ -20,7 +21,7 @@ class pMagSen
 
 public:
 
-	pMagSen(const uint8_t startIndex, const bool isPair = true);
+	pMagSen(const uint8_t startIndex, const bool isPair = true, const float factor = 0.1f, const Timer::TimerInt dt = 10);
 
 	float updatePair(void);
 	float update(void);
@@ -32,6 +33,8 @@ private:
 
 	array<Adc, 2>				m_magSenPair;
 	array<float, 2>				m_lastResultPair;
+
+	pLowPassFilter				m_lpf;
 
 	Adc							m_magSen;
 	float						m_lastResult;

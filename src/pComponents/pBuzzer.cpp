@@ -28,32 +28,49 @@ PassiveBuzzer::Config getBuzzerConfig(void)
 
 pBuzzer::pBuzzer(void)
 :
-	m_buzzer(getBuzzerConfig())
+	m_buzzer(getBuzzerConfig()),
+	m_enabled(false)
 {
 	assert(!m_instance);
 	m_instance = this;
 }
 
+void pBuzzer::setEnabled(const bool enabled)
+{
+	m_instance->m_enabled = enabled;
+}
+
+bool pBuzzer::getEnabled(void)
+{
+	return m_instance->m_enabled;
+}
+
 void pBuzzer::setBeep(const bool isBeep)
 {
-	m_instance->m_buzzer.SetBeep(isBeep);
+	if (m_instance->m_enabled)
+		m_instance->m_buzzer.SetBeep(isBeep);
 }
 
 void pBuzzer::setBeep(const uint8_t noteIndex, const uint16_t loudness)
 {
-	m_instance->m_buzzer.Set((uint32_t)m_instance->notes[inRange(0, noteIndex, 87)].freq, inRange(0, loudness, 1000));
+	if (m_instance->m_enabled)
+		m_instance->m_buzzer.Set((uint32_t)m_instance->notes[inRange(0, noteIndex, 87)].freq, inRange(0, loudness, 1000));
 }
 
 void pBuzzer::noteDown(const uint8_t noteIndex, const uint16_t loudness, const uint16_t delayMs, const uint16_t delayMsAfter)
 {
-	m_instance->setBeep(noteIndex, isDefault(loudness)? 333 : loudness);
-	DelayMsByTicks(isDefault(delayMs)? 100 : delayMs);
-	m_instance->setBeep(0, 0);
-	DelayMsByTicks(isDefault(delayMsAfter)? 0 : delayMsAfter);
+	if (m_instance->m_enabled)
+	{
+		m_instance->setBeep(noteIndex, isDefault(loudness)? 333 : loudness);
+		DelayMsByTicks(isDefault(delayMs)? 100 : delayMs);
+		m_instance->setBeep(0, 0);
+		DelayMsByTicks(isDefault(delayMsAfter)? 0 : delayMsAfter);
+	}
 }
 
 void pBuzzer::startSong(void)
 {
+	m_instance->m_enabled = true;
 	m_instance->noteDown(55, m_instance->defaultValue, m_instance->defaultValue, 50);
 	m_instance->noteDown(55, m_instance->defaultValue, m_instance->defaultValue, 50);
 	m_instance->noteDown(55, m_instance->defaultValue, m_instance->defaultValue, 200);
@@ -61,10 +78,12 @@ void pBuzzer::startSong(void)
 	m_instance->noteDown(55, m_instance->defaultValue, m_instance->defaultValue, 200);
 	m_instance->noteDown(58, m_instance->defaultValue, m_instance->defaultValue, 350);
 	m_instance->noteDown(46, m_instance->defaultValue, 200);
+	m_instance->m_enabled = false;
 }
 
 void pBuzzer::endSong(void)
 {
+	m_instance->m_enabled = true;
 	m_instance->noteDown(51);
 	m_instance->noteDown(58, m_instance->defaultValue, m_instance->defaultValue, 200);
 	m_instance->noteDown(58, m_instance->defaultValue, m_instance->defaultValue, 50);
@@ -75,6 +94,14 @@ void pBuzzer::endSong(void)
 	m_instance->noteDown(44, m_instance->defaultValue, m_instance->defaultValue, 200);
 	m_instance->noteDown(44);
 	m_instance->noteDown(41, m_instance->defaultValue, 200);
+	m_instance->m_enabled = false;
+}
+
+void pBuzzer::terminated(void)
+{
+	m_instance->m_enabled = true;
+	pBuzzer::noteDown(51);
+	m_instance->m_enabled = false;
 }
 
 const pBuzzer::note pBuzzer::notes[88] =

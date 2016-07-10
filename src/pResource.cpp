@@ -18,7 +18,7 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	150
+#define UNIQUE_VAL	10
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -37,8 +37,10 @@ pResource::pResource(void)
 
 	if (UNIQUE_VAL != ((ConfigTable *)getConfigTablePtr())->kUniqueVal)
 	{
+		pBuzzer::setEnabled(true);
 		pBuzzer::noteDown(32, pBuzzer::defaultValue, pBuzzer::defaultValue, 100);
 		pBuzzer::noteDown(48, pBuzzer::defaultValue, 50, 100);
+		pBuzzer::setEnabled(false);
 		reset();
 	}
 
@@ -55,7 +57,6 @@ pResource::pResource(void)
 	else if (configTable.kTableSize != sizeof(ConfigTable))
 	{
 		setInitialConfigTable();
-//		addConfigToConfigTable();
 		saveConfig();
 	}
 }
@@ -85,7 +86,7 @@ void pResource::setInitialConfigTable(void)
 
 	configTable.kBatteryVoltageRatio = 0.3886279f;
 
-	configTable.kAccelTruthVal = 2.0f;
+	configTable.kAccelTruthVal = 0.6f;
 
 	configTable.kIdealAngle = 75.0f;
 	configTable.kAngleRange = 30.0f;
@@ -96,28 +97,13 @@ void pResource::setInitialConfigTable(void)
 	configTable.kAngleKq = 0.001f;
 	configTable.kAngleKr = 0.999f;
 
-	configTable.kDirectionKp = 5000.0f;
-	configTable.kDirectionKi = 0.0f;
-	configTable.kDirectionKd = 400.0f;
-	configTable.kDirectionKq = 0.001f;
-	configTable.kDirectionKr = 0.999f;
-
-	configTable.kSpeedKp = 8.0f; //3.3f
-	configTable.kSpeedKi = 0.0f; //1.3f
+	configTable.kSpeedKp = 3.0f; //3.3f
+	configTable.kSpeedKi = 0.08; //1.3f
 	configTable.kSpeedKd = 0.0f;
 	configTable.kSpeedKq = 0.001f;
 	configTable.kSpeedKr = 0.999f;
-	configTable.kAccelSpeed = 0.0f;
+	configTable.kAccelSpeed = 3.7f;
+	configTable.kTargetSpeed = 12.0f;
 
 	configTable.kCountPerRevo = 9557.725f;
-}
-
-void pResource::addConfigToConfigTable(void)
-{
-	ConfigTable tempTable;
-	memcpy(&tempTable, &configTable, configTable.kTableSize);
-	size_t oldTableSize = tempTable.kTableSize;;
-	setInitialConfigTable();
-	tempTable.kTableSize = sizeof(ConfigTable);
-	memcpy(&configTable, &tempTable, oldTableSize);
 }

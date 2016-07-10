@@ -60,10 +60,11 @@ libbase::k60::Pin::Name getAdcPinNameByIndex(const uint8_t index)
 	}
 }
 
-pMagSen::pMagSen(const uint8_t startIndex, const bool isPair)
+pMagSen::pMagSen(const uint8_t startIndex, const bool isPair, const float factor, const Timer::TimerInt dt)
 :
 	m_magSenPair{ Adc(nullptr), Adc(nullptr) },
 	m_lastResultPair{ 0.0f, 0.0f },
+	m_lpf(dt, factor),
 	m_magSen(nullptr),
 	m_lastResult(0.0f),
 	m_isPair(isPair)
@@ -80,7 +81,7 @@ float pMagSen::updatePair(void)
 	{
 		m_lastResultPair[0] = m_magSenPair[0].GetResultF();
 		m_lastResultPair[1] =  m_magSenPair[1].GetResultF();
-		return (m_lastResult = (m_lastResultPair[0] - m_lastResultPair[1]) / (m_lastResultPair[0] + m_lastResultPair[1]));
+		return m_lpf.filter((m_lastResult = (m_lastResultPair[0] - m_lastResultPair[1]) / (m_lastResultPair[0] + m_lastResultPair[1])));
 	}
 	else
 		return 0.0f;
@@ -89,7 +90,7 @@ float pMagSen::updatePair(void)
 float pMagSen::update(void)
 {
 	if (!m_isPair)
-		return (m_lastResult = m_magSen.GetResultF());
+		return m_lpf.filter((m_lastResult = m_magSen.GetResultF()));
 	else
 		return 0.0f;
 }

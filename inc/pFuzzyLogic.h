@@ -27,10 +27,16 @@ public:
 	 * CenterOfArea defuzzification,
 	 * NL NM NS ZR PS PM PL
 	 */
-
 	typedef float MembShipFuncInput[4];
-	// Len: membershipFuncLen
 	typedef MembShipFuncInput MembershipFunc[7];
+
+	/**
+	 * Using miniMax FuzzySet Operation,
+	 * CenterOfArea defuzzification,
+	 * MIN L M S ZR MAX
+	 */
+	typedef float EasyMembershipFunc[6];
+
 	// index of element in output fuzzy set
 	typedef uint8_t RuleResult;
 	// Rules[dError][error]
@@ -47,6 +53,17 @@ public:
 	 *
 	 */
 	typedef RuleResult Rules[7][7];
+
+	struct EasyConfig
+	{
+		EasyMembershipFunc	errorEasyMF;
+		EasyMembershipFunc	dErrorEasyMF;
+		EasyMembershipFunc	outputEasyMF;
+
+		Rules				rules;
+
+		float				approxAccuracy = 1.0f;
+	};
 
 	struct Config
 	{
@@ -90,6 +107,7 @@ public:
 	};
 
 	explicit pFuzzyLogic(const Config &config);
+	explicit pFuzzyLogic(const EasyConfig &config);
 
 	void resetPdController(void);
 
@@ -115,7 +133,6 @@ private:
 
 	float						m_approxAccu;
 
-	Timer::TimerInt				m_dt;
 	float						m_lastOutput;
 	float						m_lastError;
 	float						m_lastDError;

@@ -44,18 +44,13 @@ public:
 		float			kAngleKq;
 		float			kAngleKr;
 
-		float			kDirectionKp;
-		float			kDirectionKi;
-		float			kDirectionKd;
-		float			kDirectionKq;
-		float			kDirectionKr;
-
 		float			kSpeedKp;
 		float			kSpeedKi;
 		float			kSpeedKd;
 		float			kSpeedKq;
 		float			kSpeedKr;
 		float 			kAccelSpeed;
+		float			kTargetSpeed;
 
 		float			kCountPerRevo;
 	};
@@ -74,6 +69,5 @@ public:
 private:
 
 	void setInitialConfigTable(void);
-	void addConfigToConfigTable(void);
 
 };

@@ -33,9 +33,9 @@ public:
 	/**
 	 * Using miniMax FuzzySet Operation,
 	 * CenterOfArea defuzzification,
-	 * MIN L M S ZR MAX
+	 * Limit L M S ZR
 	 */
-	typedef float EasyMembershipFunc[6];
+	typedef float EasyMembershipFunc[5];
 
 	// index of element in output fuzzy set
 	typedef uint8_t RuleResult;

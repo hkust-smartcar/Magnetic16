@@ -52,6 +52,18 @@ public:
 		float 			kAccelSpeed;
 		float			kTargetSpeed;
 
+		float			kErrorMfLimit;
+		float			kErrorMfL;
+		float			kErrorMfM;
+		float			kErrorMfS;
+		float			kErrorMfZ;
+
+		float			kDerrorMfLimit;
+		float			kDerrorMfL;
+		float			kDerrorMfM;
+		float			kDerrorMfS;
+		float			kDerrorMfZ;
+
 		float			kCountPerRevo;
 	};
 

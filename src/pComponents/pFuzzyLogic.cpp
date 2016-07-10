@@ -50,29 +50,29 @@ pFuzzyLogic::pFuzzyLogic(const EasyConfig &config)
 	m_lastDError(0.0f),
 	m_lastTime(0)
 {
-	MembershipFunc errorMF = {	{ config.errorEasyMF[0], config.errorEasyMF[0], -config.errorEasyMF[1], -config.errorEasyMF[2] },		// NL
+	MembershipFunc errorMF = {	{ -config.errorEasyMF[0], -config.errorEasyMF[0], -config.errorEasyMF[1], -config.errorEasyMF[2] },		// NL
 								{ -config.errorEasyMF[1], -config.errorEasyMF[2], -config.errorEasyMF[2], -config.errorEasyMF[3] },		// NM
 								{ -config.errorEasyMF[2], -config.errorEasyMF[3], -config.errorEasyMF[3], -config.errorEasyMF[4] },		// NS
 								{ -config.errorEasyMF[3], -config.errorEasyMF[4], config.errorEasyMF[4], config.errorEasyMF[3] },		// ZR
 								{ config.errorEasyMF[4], config.errorEasyMF[3], config.errorEasyMF[3], config.errorEasyMF[2] },			// PS
 								{ config.errorEasyMF[3], config.errorEasyMF[2], config.errorEasyMF[2], config.errorEasyMF[1] },			// PM
-								{ config.errorEasyMF[2], config.errorEasyMF[1], config.errorEasyMF[5], config.errorEasyMF[5] }	};		// PL
+								{ config.errorEasyMF[2], config.errorEasyMF[1], config.errorEasyMF[0], config.errorEasyMF[0] }	};		// PL
 
-	MembershipFunc dErrorMF = {	{ config.dErrorEasyMF[0], config.dErrorEasyMF[0], -config.dErrorEasyMF[1], -config.dErrorEasyMF[2] },			// NL
+	MembershipFunc dErrorMF = {	{ -config.dErrorEasyMF[0], -config.dErrorEasyMF[0], -config.dErrorEasyMF[1], -config.dErrorEasyMF[2] },			// NL
 								{ -config.dErrorEasyMF[1], -config.dErrorEasyMF[2], -config.dErrorEasyMF[2], -config.dErrorEasyMF[3] },			// NM
 								{ -config.dErrorEasyMF[2], -config.dErrorEasyMF[3], -config.dErrorEasyMF[3], -config.dErrorEasyMF[4] },			// NS
 								{ -config.dErrorEasyMF[3], -config.dErrorEasyMF[4], config.dErrorEasyMF[4], config.dErrorEasyMF[3] },			// ZR
 								{ config.dErrorEasyMF[4], config.dErrorEasyMF[3], config.dErrorEasyMF[3], config.dErrorEasyMF[2] },				// PS
 								{ config.dErrorEasyMF[3], config.dErrorEasyMF[2], config.dErrorEasyMF[2], config.dErrorEasyMF[1] },				// PM
-								{ config.dErrorEasyMF[2], config.dErrorEasyMF[1], config.dErrorEasyMF[5], config.dErrorEasyMF[5] }	};			// PL
+								{ config.dErrorEasyMF[2], config.dErrorEasyMF[1], config.dErrorEasyMF[0], config.dErrorEasyMF[0] }	};			// PL
 
-	MembershipFunc outputMF = {	{ config.outputEasyMF[0], config.outputEasyMF[0], -config.outputEasyMF[1], -config.outputEasyMF[2] },		// NL
+	MembershipFunc outputMF = {	{ -config.outputEasyMF[0], -config.outputEasyMF[0], -config.outputEasyMF[1], -config.outputEasyMF[2] },		// NL
 								{ -config.outputEasyMF[1], -config.outputEasyMF[2], -config.outputEasyMF[2], -config.outputEasyMF[3] },		// NM
 								{ -config.outputEasyMF[2], -config.outputEasyMF[3], -config.outputEasyMF[3], -config.outputEasyMF[4] },		// NS
 								{ -config.outputEasyMF[3], -config.outputEasyMF[4], config.outputEasyMF[4], config.outputEasyMF[3] },		// ZR
 								{ config.outputEasyMF[4], config.outputEasyMF[3], config.outputEasyMF[3], config.outputEasyMF[2] },			// PS
 								{ config.outputEasyMF[3], config.outputEasyMF[2], config.outputEasyMF[2], config.outputEasyMF[1] },			// PM
-								{ config.outputEasyMF[2], config.outputEasyMF[1], config.outputEasyMF[5], config.outputEasyMF[5] } };		// PL
+								{ config.outputEasyMF[2], config.outputEasyMF[1], config.outputEasyMF[0], config.outputEasyMF[0] } };		// PL
 
 	memcpy(m_MembershipFuncs[ErrorType::Error], errorMF, sizeof(MembershipFunc));
 	memcpy(m_MembershipFuncs[ErrorType::dError], dErrorMF, sizeof(MembershipFunc));

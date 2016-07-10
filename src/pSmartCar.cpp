@@ -108,11 +108,11 @@ pFuzzyLogic::EasyConfig getFuzzyLogicEasyConfig(void)
 {
 	pFuzzyLogic::EasyConfig config;
 
-	pFuzzyLogic::EasyMembershipFunc errorMF = { -1.0f, 0.9f, 0.71f, 0.52f, 0.0f, 1.0f };
+	pFuzzyLogic::EasyMembershipFunc errorMF = { pResource::configTable.kErrorMfLimit, pResource::configTable.kErrorMfL, pResource::configTable.kErrorMfM, pResource::configTable.kErrorMfS, pResource::configTable.kErrorMfZ };
 
-	pFuzzyLogic::EasyMembershipFunc dErrorMF = { -200.0f, 8.0f, 6.1f, 4.5f, 0.0f, 200.0f };
+	pFuzzyLogic::EasyMembershipFunc dErrorMF = { pResource::configTable.kDerrorMfLimit, pResource::configTable.kDerrorMfL, pResource::configTable.kDerrorMfM, pResource::configTable.kDerrorMfS, pResource::configTable.kDerrorMfZ };
 
-	pFuzzyLogic::EasyMembershipFunc outputMF = { -4000.0f, 3500.0f, 2500.0f, 1700.0f, 350.0f, 4000.0f };
+	pFuzzyLogic::EasyMembershipFunc outputMF = { 4000.0f, 3800.0f, 2700.0f, 1900.0f, 500.0f };
 
 	pFuzzyLogic::Rules rules = {	{ 0, 0, 0, 0, 1, 2, 3 },
 									{ 0, 0, 0, 1, 2, 3, 4 },

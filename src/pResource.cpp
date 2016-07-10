@@ -18,7 +18,7 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	10
+#define UNIQUE_VAL	74
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -88,7 +88,7 @@ void pResource::setInitialConfigTable(void)
 
 	configTable.kAccelTruthVal = 0.6f;
 
-	configTable.kIdealAngle = 75.0f;
+	configTable.kIdealAngle = 74.0f;
 	configTable.kAngleRange = 30.0f;
 
 	configTable.kAngleKp = 95000.0f;//39150.0f;
@@ -97,13 +97,25 @@ void pResource::setInitialConfigTable(void)
 	configTable.kAngleKq = 0.001f;
 	configTable.kAngleKr = 0.999f;
 
-	configTable.kSpeedKp = 3.0f; //3.3f
-	configTable.kSpeedKi = 0.08; //1.3f
+	configTable.kSpeedKp = 3.3f; //3.3f
+	configTable.kSpeedKi = 0.06; //1.3f
 	configTable.kSpeedKd = 0.0f;
 	configTable.kSpeedKq = 0.001f;
 	configTable.kSpeedKr = 0.999f;
-	configTable.kAccelSpeed = 3.7f;
-	configTable.kTargetSpeed = 12.0f;
+	configTable.kAccelSpeed = 0.05f;
+	configTable.kTargetSpeed = 13.0f;
+
+	configTable.kErrorMfLimit = 1.0f;
+	configTable.kErrorMfL = 0.83f;
+	configTable.kErrorMfM = 0.75f;
+	configTable.kErrorMfS = 0.665f;
+	configTable.kErrorMfZ = 0.0f;
+
+	configTable.kDerrorMfLimit = 200.0f;
+	configTable.kDerrorMfL = 8.2f;
+	configTable.kDerrorMfM = 6.2f;
+	configTable.kDerrorMfS = 3.8f;
+	configTable.kDerrorMfZ = 0.0f;
 
 	configTable.kCountPerRevo = 9557.725f;
 }

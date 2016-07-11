@@ -12,7 +12,7 @@
 #define MAX(a, b) ((a > b)? a : b)
 #define MIN(a, b) ((a < b)? a : b)
 
-#define DEBUG_ERROR_OR_DERROR 1
+#define DEBUG_ERROR_OR_DERROR 0
 
 #define IS_CONTAIN(arr, v) (arr[0] == v || arr[1] == v)
 

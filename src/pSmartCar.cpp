@@ -52,8 +52,8 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.ignoreRange = 0.0f;
 		param.outputMax = 20;
 		param.outputMin = -20;
-		param.sumMax = 10;
-		param.sumMin = -10;
+		param.sumMax = 20;
+		param.sumMin = -20;
 		break;
 	}
 

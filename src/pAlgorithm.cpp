@@ -28,17 +28,17 @@ void pSmartCar::addVariablesToGrapher(void)
 {
 //	m_grapher.addSharedVar(&pResource::configTable.kAngleKp, "AngleKp");
 //	m_grapher.addSharedVar(&pResource::configTable.kAngleKd, "AngleKd");
-//	m_grapher.addSharedVar(&pResource::configTable.kTargetSpeed, "TargetSpeed");
+	m_grapher.addSharedVar(&pResource::configTable.kTargetSpeed, "TargetSpeed");
 	m_grapher.addSharedVar(&pResource::configTable.kSpeedKp, "SpeedKp");
-//	m_grapher.addSharedVar(&pResource::configTable.kSpeedKi, "SpeedKi");
+	m_grapher.addSharedVar(&pResource::configTable.kSpeedKi, "SpeedKi");
 	m_grapher.addSharedVar(&pResource::configTable.kAccelSpeed, "AccelSpeed");
 //	m_grapher.addSharedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
 	m_grapher.addSharedVar(&pResource::configTable.kErrorMfL, "E Mf L");
 	m_grapher.addSharedVar(&pResource::configTable.kErrorMfM, "E Mf M");
 	m_grapher.addSharedVar(&pResource::configTable.kErrorMfS, "E Mf S");
-	m_grapher.addSharedVar(&pResource::configTable.kDerrorMfL, "dE Mf L");
-	m_grapher.addSharedVar(&pResource::configTable.kDerrorMfM, "dE Mf M");
-	m_grapher.addSharedVar(&pResource::configTable.kDerrorMfS, "dE Mf S");
+//	m_grapher.addSharedVar(&pResource::configTable.kDerrorMfL, "dE Mf L");
+//	m_grapher.addSharedVar(&pResource::configTable.kDerrorMfM, "dE Mf M");
+//	m_grapher.addSharedVar(&pResource::configTable.kDerrorMfS, "dE Mf S");
 //	m_grapher.addSharedVar(&pResource::configTable.kAccelTruthVal, "TrustVal");
 //	m_grapher.addSharedVar(&pResource::configTable.kLeftMotorDeadMarginPos, "LPDZ");
 //	m_grapher.addSharedVar(&pResource::configTable.kLeftMotorDeadMarginNag, "LNDZ");

@@ -262,7 +262,9 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 
 	case 'd':
 		pResource::m_instance->setMotorsEnabled(false);
+		pResource::m_instance->m_idealSpeed = 0.0f;
 		pResource::m_instance->m_curSpeed = 0;
+		pResource::m_instance->m_pidControllers[Type::Speed].reset();
 		break;
 
 	case '+':
@@ -271,12 +273,6 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 
 	case '-':
 		pResource::m_instance->m_idealSpeed -= 1.0f;
-		break;
-
-	case '*':
-		pResource::m_instance->m_idealSpeed = 0.0f;
-		pResource::m_instance->m_curSpeed = 0;
-		pResource::m_instance->m_pidControllers[2].reset();
 		break;
 
 	case '0':

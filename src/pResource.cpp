@@ -18,7 +18,7 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	80
+#define UNIQUE_VAL	50
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -108,7 +108,7 @@ void pResource::setInitialConfigTable(void)
 	configTable.kErrorMfLimit = 1.0f;
 	configTable.kErrorMfL = 0.83f;
 	configTable.kErrorMfM = 0.73f;
-	configTable.kErrorMfS = 0.64f;
+	configTable.kErrorMfS = 0.6f;
 	configTable.kErrorMfZ = 0.0f;
 
 	configTable.kDerrorMfLimit = 200.0f;

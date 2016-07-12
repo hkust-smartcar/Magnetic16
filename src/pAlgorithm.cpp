@@ -82,7 +82,7 @@ void pSmartCar::directionControl(void)
 
 void pSmartCar::speedControl(void)
 {
-	pResource::m_instance->smoothedIdealSpeed();
+	pResource::m_instance->smoothedIdealSpeed(2.0f);
 	pResource::m_instance->updatePid(pResource::m_instance->m_state[StatePos::cur].dX, Type::Speed);
 	pResource::m_instance->updateSmoothAngleOutput(pResource::m_instance->m_pidOutputVal[Type::Speed]);
 }
@@ -99,9 +99,11 @@ void pSmartCar::print(void)
 //========================= v v v v v v v v v v v v v v v v ==============================
 
 
-void pSmartCar::smoothedIdealSpeed(void)
+void pSmartCar::smoothedIdealSpeed(const float &accelLimit)
 {
-	m_curSpeed = inRange(0.0f, m_curSpeed + pResource::configTable.kAccelSpeed, m_idealSpeed);
+	m_curSpeed = inRange(0, m_state[cur].dX + inRange(-m_curSpeed, (m_idealSpeed - m_state[cur].dX) * pResource::configTable.kAccelSpeed, accelLimit), m_idealSpeed);
+
+//	m_curSpeed = inRange(0, m_curSpeed + pResource::configTable.kAccelSpeed * (m_idealSpeed - m_state[cur].dX), m_idealSpeed);
 }
 
 void pSmartCar::updateSensors(void)

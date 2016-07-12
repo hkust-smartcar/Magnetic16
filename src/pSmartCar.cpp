@@ -50,10 +50,10 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_curSpeed;
 		param.ignoreRange = 0.0f;
-		param.outputMax = 20;
-		param.outputMin = -20;
-		param.sumMax = 20;
-		param.sumMin = -20;
+		param.outputMax = 18;
+		param.outputMin = -23;
+		param.sumMax = 15;
+		param.sumMin = -15;
 		break;
 	}
 
@@ -112,7 +112,7 @@ pFuzzyLogic::EasyConfig getFuzzyLogicEasyConfig(void)
 
 	pFuzzyLogic::EasyMembershipFunc dErrorMF = { pResource::configTable.kDerrorMfLimit, pResource::configTable.kDerrorMfL, pResource::configTable.kDerrorMfM, pResource::configTable.kDerrorMfS, pResource::configTable.kDerrorMfZ };
 
-	pFuzzyLogic::EasyMembershipFunc outputMF = { 4000.0f, 3800.0f, 2700.0f, 1900.0f, 500.0f };
+	pFuzzyLogic::EasyMembershipFunc outputMF = { 4000.0f, 3500.0f, 2650.0f, 1900.0f, 500.0f };
 
 	pFuzzyLogic::Rules rules = {	{ 0, 0, 0, 0, 1, 2, 3 },
 									{ 0, 0, 0, 1, 2, 3, 4 },
@@ -172,13 +172,12 @@ pSmartCar::pSmartCar(void)
 	m_magSen{ pMagSen(0, true), pMagSen(2, false) },
 	m_batmeter({ pResource::configTable.kBatteryVoltageRatio }),
 	m_grapher(),
-	m_lpf(0.17f),
+	m_encoderLpf(5, 60.0f),
 	m_fuzzyLogic(getFuzzyLogicEasyConfig()),
 	m_motorEnabled(false),
 	m_pidControllers{	pPid(getPidConfig(Type::Angle)),
 						pPid(getPidConfig(Type::Speed)) },
 	m_pidOutputVal{ 0 },
-	m_encoderFilter(pResource::configTable.kSpeedKq, pResource::configTable.kSpeedKr, 0, 0.5f),
 	m_smoothCounter(0),
 	m_smoothIncrement{ 0.0f, 0.0f }
 {
@@ -313,7 +312,7 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_pidControllers[Type::Speed].getSum(), "SpeedSum");
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_curSpeed, "cur_ideal_speed");
 		//		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].dYaw, "Yaw");
-		//		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_idealAngleOffset, "angleOffset");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_idealAngleOffset, "angleOffset");
 		break;
 
 	case '6':

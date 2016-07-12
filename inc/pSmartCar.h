@@ -169,7 +169,7 @@ protected:
 	array<pMagSen, 2>		m_magSen;
 	BatteryMeter			m_batmeter;
 	pGrapher				m_grapher;
-	pLowPassFilter			m_lpf;
+	pLowPassFilter			m_encoderLpf;
 	pFuzzyLogic				m_fuzzyLogic;
 
 	bool					m_motorEnabled;
@@ -178,7 +178,6 @@ protected:
 	array<pPid, 2>			m_pidControllers;
 	array<float, 2>			m_pidOutputVal;
 
-	pKalmanFilter			m_encoderFilter;
 	uint8_t					m_smoothCounter;
 	array<float, 2>			m_smoothIncrement;
 

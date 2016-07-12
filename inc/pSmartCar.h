@@ -141,14 +141,13 @@ protected:
 	static void speedControl(void);
 	static void print(void);
 
-	void smoothedIdealSpeed(void);
+	void smoothedIdealSpeed(const float &accelLimit);
 	void updateSensors(void);
 	void updateState(void);
 	void updateSpeed(void);
 	void onDraw(void);
 
 	State					m_state[2];
-
 	float					m_direction;
 	float					m_idealSpeed;
 	float					m_curSpeed;

@@ -18,7 +18,7 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	7
+#define UNIQUE_VAL	9
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -98,23 +98,23 @@ void pResource::setInitialConfigTable(void)
 	configTable.kAngleKr = 0.999f;
 
 	configTable.kSpeedKp = 3.7f;
-	configTable.kSpeedKi = 0.55f;
-	configTable.kSpeedKd = 0.0f;
+	configTable.kSpeedKi = 0.572f;
+	configTable.kSpeedKd = 0.09f;
 	configTable.kSpeedKq = 0.001f;
 	configTable.kSpeedKr = 0.999f;
 	configTable.kAccelSpeed = 0.4f;
-	configTable.kTargetSpeed = 9.0f;
+	configTable.kTargetSpeed = 10.0f;
 
 	configTable.kErrorMfLimit = 1.0f;
-	configTable.kErrorMfL = 0.83f;
-	configTable.kErrorMfM = 0.73f;
-	configTable.kErrorMfS = 0.64f;
+	configTable.kErrorMfL = 0.81f;
+	configTable.kErrorMfM = 0.477f;
+	configTable.kErrorMfS = 0.58f;
 	configTable.kErrorMfZ = 0.0f;
 
 	configTable.kDerrorMfLimit = 200.0f;
-	configTable.kDerrorMfL = 7.3f;
-	configTable.kDerrorMfM = 4.55f;
-	configTable.kDerrorMfS = 3.2f;
+	configTable.kDerrorMfL = 5.8f;
+	configTable.kDerrorMfM = 4.2f;
+	configTable.kDerrorMfS = 2.63f;
 	configTable.kDerrorMfZ = 0.0f;
 
 	configTable.kCountPerRevo = 9557.725f;

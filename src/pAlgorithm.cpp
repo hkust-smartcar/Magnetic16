@@ -28,15 +28,16 @@ void pSmartCar::addVariablesToGrapher(void)
 {
 //	m_grapher.addSharedVar(&pResource::configTable.kAngleKp, "AngleKp");
 //	m_grapher.addSharedVar(&pResource::configTable.kAngleKd, "AngleKd");
-	m_grapher.addSharedVar(&pResource::configTable.kTargetSpeed, "TargetSpeed");
-	m_grapher.addSharedVar(&pResource::configTable.kSpeedKp, "SpeedKp");
+//	m_grapher.addSharedVar(&pResource::configTable.kTargetSpeed, "TargetSpeed");
+//	m_grapher.addSharedVar(&pResource::configTable.kSpeedKp, "SpeedKp");
 	m_grapher.addSharedVar(&pResource::configTable.kSpeedKi, "SpeedKi");
-	m_grapher.addSharedVar(&pResource::configTable.kAccelSpeed, "AccelSpeed");
+	m_grapher.addSharedVar(&pResource::configTable.kSpeedKd, "SpeedKd");
+//	m_grapher.addSharedVar(&pResource::configTable.kAccelSpeed, "AccelSpeed");
 //	m_grapher.addSharedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
-//	m_grapher.addSharedVar(&pResource::configTable.kErrorMfL, "E Mf L");
+	m_grapher.addSharedVar(&pResource::configTable.kErrorMfL, "E Mf L");
 	m_grapher.addSharedVar(&pResource::configTable.kErrorMfM, "E Mf M");
 	m_grapher.addSharedVar(&pResource::configTable.kErrorMfS, "E Mf S");
-//	m_grapher.addSharedVar(&pResource::configTable.kDerrorMfL, "dE Mf L");
+	m_grapher.addSharedVar(&pResource::configTable.kDerrorMfL, "dE Mf L");
 	m_grapher.addSharedVar(&pResource::configTable.kDerrorMfM, "dE Mf M");
 	m_grapher.addSharedVar(&pResource::configTable.kDerrorMfS, "dE Mf S");
 //	m_grapher.addSharedVar(&pResource::configTable.kAccelTruthVal, "TrustVal");
@@ -44,7 +45,7 @@ void pSmartCar::addVariablesToGrapher(void)
 //	m_grapher.addSharedVar(&pResource::configTable.kLeftMotorDeadMarginNag, "LNDZ");
 //	m_grapher.addSharedVar(&pResource::configTable.kRightMotorDeadMarginPos, "RPDZ");
 //	m_grapher.addSharedVar(&pResource::configTable.kRightMotorDeadMarginNag, "RNDZ");
-
+//	m_grapher.addSharedVar(&pResource::m_instance->speed_pid_enable, "speed_pid_enable");
 	m_grapher.setOnChangedListener(pResource::grapherOnChangedListener);
 }
 
@@ -62,7 +63,8 @@ void pSmartCar::update(void)
 
 void pSmartCar::angleControl(void)
 {
-	pResource::m_instance->updatePid(pResource::m_instance->m_state[StatePos::cur].angle + pResource::m_instance->getSmoothAngleOutput(), Type::Angle);
+
+		pResource::m_instance->updatePid(pResource::m_instance->m_state[StatePos::cur].angle + pResource::m_instance->getSmoothAngleOutput(), Type::Angle);
 
 	if (pResource::m_instance->m_motorEnabled && !isInRange2(pResource::m_instance->m_angle.getAngle(), pResource::configTable.kIdealAngle, pResource::configTable.kAngleRange))
 	{

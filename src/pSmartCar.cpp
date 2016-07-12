@@ -112,7 +112,7 @@ pFuzzyLogic::EasyConfig getFuzzyLogicEasyConfig(void)
 
 	pFuzzyLogic::EasyMembershipFunc dErrorMF = { pResource::configTable.kDerrorMfLimit, pResource::configTable.kDerrorMfL, pResource::configTable.kDerrorMfM, pResource::configTable.kDerrorMfS, pResource::configTable.kDerrorMfZ };
 
-	pFuzzyLogic::EasyMembershipFunc outputMF = { 4000.0f, 3500.0f, 2650.0f, 1900.0f, 500.0f };
+	pFuzzyLogic::EasyMembershipFunc outputMF = { 4000.0f, 3300.0f, 2650.0f, 1900.0f, 500.0f };
 
 	pFuzzyLogic::Rules rules = {	{ 0, 0, 0, 0, 1, 2, 3 },
 									{ 0, 0, 0, 1, 2, 3, 4 },
@@ -151,6 +151,7 @@ Joystick::Config getJoystickConfig(void)
 pSmartCar::pSmartCar(void)
 :
 	m_state(),
+//	speed_pid_enable(1),
 	m_direction(0.0f),
 	m_idealSpeed(0.0f),
 	m_curSpeed(0.0f),

@@ -141,7 +141,7 @@ protected:
 	static void speedControl(void);
 	static void print(void);
 
-	void smoothedIdealSpeed(bool flag);
+	void smoothedIdealSpeed(void);
 	void updateSensors(void);
 	void updateState(void);
 	void updateSpeed(void);

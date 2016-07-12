@@ -50,10 +50,10 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_curSpeed;
 		param.ignoreRange = 0.0f;
-		param.outputMax = 20;
-		param.outputMin = -20;
-		param.sumMax = 20;
-		param.sumMin = -20;
+		param.outputMax = 15;
+		param.outputMin = -15;
+		param.sumMax = 15;
+		param.sumMin = -15;
 		break;
 	}
 
@@ -150,6 +150,7 @@ Joystick::Config getJoystickConfig(void)
 
 pSmartCar::pSmartCar(void)
 :
+	m_accel_enable(0),
 	m_state(),
 	m_direction(0.0f),
 	m_idealSpeed(0.0f),
@@ -259,11 +260,15 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 	{
 	case 's':
 		pResource::m_instance->setMotorsEnabled(true);
+		pResource::m_instance->m_accel_enable = 1;
 		break;
 
 	case 'd':
 		pResource::m_instance->setMotorsEnabled(false);
+		pResource::m_instance->m_accel_enable = 0;
+		pResource::m_instance->m_idealSpeed = 0.0f;
 		pResource::m_instance->m_curSpeed = 0;
+		pResource::m_instance->m_pidControllers[2].reset();
 		break;
 
 	case '+':

@@ -174,6 +174,8 @@ protected:
 	bool					m_motorEnabled;
 	bool					m_isReadyToRun;
 
+	uint8_t 				m_ignoreSpeedCounter;
+
 	array<pPid, 2>			m_pidControllers;
 	array<float, 2>			m_pidOutputVal;
 

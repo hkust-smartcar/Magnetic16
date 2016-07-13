@@ -50,8 +50,8 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_curSpeed;
 		param.ignoreRange = 0.0f;
-		param.outputMax = 18;
-		param.outputMin = -23;
+		param.outputMax = 15;
+		param.outputMin = -20;
 		param.sumMax = 15;
 		param.sumMin = -15;
 		break;
@@ -173,9 +173,11 @@ pSmartCar::pSmartCar(void)
 	m_magSen{ pMagSen(0, true), pMagSen(2, false) },
 	m_batmeter({ pResource::configTable.kBatteryVoltageRatio }),
 	m_grapher(),
-	m_encoderLpf(5, 60.0f),
+	m_encoderLpf(5, 70.0f),
 	m_fuzzyLogic(getFuzzyLogicEasyConfig()),
 	m_motorEnabled(false),
+	m_isReadyToRun(false),
+	m_ignoreSpeedCounter(0),
 	m_pidControllers{	pPid(getPidConfig(Type::Angle)),
 						pPid(getPidConfig(Type::Speed)) },
 	m_pidOutputVal{ 0 },
@@ -310,6 +312,8 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_curSpeed, "cur_ideal_speed");
 		//		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].dYaw, "Yaw");
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_idealAngleOffset, "angleOffset");
+//		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_motors[0].getPower(), "Power0");
+//		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_motors[1].getPower(), "Power1");
 		break;
 
 	case '6':

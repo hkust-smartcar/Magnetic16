@@ -15,15 +15,18 @@ pPid::pPid(pPid::PidParam param)
 :
 	m_param(param),
 	m_lastTime(0),
-	m_lastError(0),
-	m_sum(0),
-	m_epsilon(m_param.outputMax * 0.05f)
+	m_lastSetPoint(0.0f),
+	m_lastError(0.0f),
+	m_lastSumError(0.0f),
+	m_sum(0.0f)
 {
 	System::Init();
 }
 
 void pPid::reset(void)
 {
+	m_lastSetPoint = 0.0f;
+	m_lastSumError = 0.0f;
 	m_sum = 0;
 	m_lastTime = 0;
 }
@@ -45,15 +48,15 @@ float pPid::getOutput(const float val)
 
 		tempOutput +=  ((m_param.kDFunc)? m_param.kDFunc(error, (error - m_lastError) / dt, *m_param.kD) : (error - m_lastError) / dt * *m_param.kD);
 
-//		if (error > m_epsilon)
-//		{
-			m_sum = inRange(m_param.sumMin, (m_sum += ((error + m_lastError) * dt) * 0.5f), m_param.sumMax);
-			tempOutput += (m_param.kIFunc)? m_param.kIFunc(error, m_sum, *m_param.kI) : m_sum * *m_param.kI;
-//		}
+		m_sum = inRange(m_param.sumMin, m_sum + (m_lastSetPoint - val - m_lastSumError) * dt * 0.5f, m_param.sumMax);
+
+		tempOutput += (m_param.kIFunc)? m_param.kIFunc(error, m_sum, *m_param.kI) : m_sum * *m_param.kI;
 
 		m_lastError = error;
 	}
 
+	m_lastSetPoint = *m_param.setPoint;
+	m_lastSumError = m_lastSetPoint - val;
 	m_lastTime = System::Time();
 
 	return inRange(m_param.outputMin, tempOutput, m_param.outputMax);

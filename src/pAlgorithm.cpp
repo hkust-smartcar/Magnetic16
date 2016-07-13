@@ -29,12 +29,12 @@ void pSmartCar::addVariablesToGrapher(void)
 //	m_grapher.addSharedVar(&pResource::configTable.kAngleKp, "AngleKp");
 //	m_grapher.addSharedVar(&pResource::configTable.kAngleKd, "AngleKd");
 //	m_grapher.addSharedVar(&pResource::configTable.kTargetSpeed, "TargetSpeed");
-//	m_grapher.addSharedVar(&pResource::configTable.kSpeedKp, "SpeedKp");
+	m_grapher.addSharedVar(&pResource::configTable.kSpeedKp, "SpeedKp");
 	m_grapher.addSharedVar(&pResource::configTable.kSpeedKi, "SpeedKi");
-	m_grapher.addSharedVar(&pResource::configTable.kSpeedKd, "SpeedKd");
-//	m_grapher.addSharedVar(&pResource::configTable.kAccelSpeed, "AccelSpeed");
+//	m_grapher.addSharedVar(&pResource::configTable.kSpeedKd, "SpeedKd");
+	m_grapher.addSharedVar(&pResource::configTable.kAccelSpeed, "AccelSpeed");
 //	m_grapher.addSharedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
-	m_grapher.addSharedVar(&pResource::configTable.kErrorMfL, "E Mf L");
+//	m_grapher.addSharedVar(&pResource::configTable.kErrorMfL, "E Mf L");
 	m_grapher.addSharedVar(&pResource::configTable.kErrorMfM, "E Mf M");
 	m_grapher.addSharedVar(&pResource::configTable.kErrorMfS, "E Mf S");
 	m_grapher.addSharedVar(&pResource::configTable.kDerrorMfL, "dE Mf L");
@@ -122,7 +122,14 @@ void pSmartCar::updateState(void)
 		m_state[StatePos::prev] = m_state[StatePos::cur];
 		m_state[StatePos::cur].angle = pResource::m_instance->m_angle.getAngle();
 		m_state[StatePos::cur].dAngle = -pResource::m_instance->m_angle.getOmega(1);
-		m_state[StatePos::cur].dX = m_encoderLpf.filter((m_motors[0].getEncoderCount() + m_motors[1].getEncoderCount()) * 0.0523137f) / (System::Time() - m_state[StatePos::prev].timeStamp);//m_filter.Filter((m_motors[0].getEncoderCount() + m_motors[1].getEncoderCount()) * 0.5f - pResource::configTable.kCountPerDeg * (m_angle.getAngle() - m_state[StatePos::prev].angle));
+
+		float tempDx = m_encoderLpf.filter((m_motors[0].getEncoderCount() + m_motors[1].getEncoderCount()) * 0.0523137f) / (System::Time() - m_state[StatePos::prev].timeStamp) - m_state[StatePos::cur].dX;
+		if (++m_ignoreSpeedCounter >= 20 || tempDx < m_state[StatePos::cur].dX * 1.5f)
+		{
+			m_state[StatePos::cur].dX = tempDx;
+			m_ignoreSpeedCounter = 0;
+		}
+
 		m_state[StatePos::cur].dYaw = m_angle.getYawOmega();
 	}
 

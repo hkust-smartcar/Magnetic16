@@ -103,6 +103,9 @@ public:
 	void setMotorPower(const uint8_t id, const int16_t power);
 	void updateMotors(void);
 
+	void setDirectionEnabled(const bool enabled);
+	bool isDirectionEnabled(void);
+
 	bool isReadyAndSet(void);
 
 	void setLed(const uint8_t index, const bool enabled);
@@ -172,6 +175,7 @@ protected:
 	pFuzzyLogic				m_fuzzyLogic;
 
 	bool					m_motorEnabled;
+	bool					m_directionEnabled;
 	bool					m_isReadyToRun;
 
 	uint8_t 				m_ignoreSpeedCounter;

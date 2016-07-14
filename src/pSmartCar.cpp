@@ -112,7 +112,7 @@ pFuzzyLogic::EasyConfig getFuzzyLogicEasyConfig(void)
 
 	pFuzzyLogic::EasyMembershipFunc dErrorMF = { pResource::configTable.kDerrorMfLimit, pResource::configTable.kDerrorMfL, pResource::configTable.kDerrorMfM, pResource::configTable.kDerrorMfS, pResource::configTable.kDerrorMfZ };
 
-	pFuzzyLogic::EasyMembershipFunc outputMF = { 4000.0f, 3300.0f, 2650.0f, 1900.0f, 500.0f };
+	pFuzzyLogic::EasyMembershipFunc outputMF = { 4000.0f, 3500.0f, 2650.0f, 1900.0f, 500.0f };
 
 	pFuzzyLogic::Rules rules = {	{ 0, 0, 0, 0, 1, 2, 3 },
 									{ 0, 0, 0, 1, 2, 3, 4 },
@@ -176,6 +176,7 @@ pSmartCar::pSmartCar(void)
 	m_encoderLpf(5, 70.0f),
 	m_fuzzyLogic(getFuzzyLogicEasyConfig()),
 	m_motorEnabled(false),
+	m_directionEnabled(false),
 	m_isReadyToRun(false),
 	m_ignoreSpeedCounter(0),
 	m_pidControllers{	pPid(getPidConfig(Type::Angle)),
@@ -259,6 +260,37 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 {
 	switch (bytes[0])
 	{
+	case 'q':
+		pResource::m_instance->m_grapher.removeAllSharedVar();
+		break;
+
+	case 'w':
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kTargetSpeed, "TargetSpeed");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kSpeedKp, "SpeedKp");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kSpeedKi, "SpeedKi");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kSpeedKd, "SpeedKd");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kAccelSpeed, "AccelSpeed");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
+		break;
+
+	case 'e':
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kAngleKp, "AngleKp");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kAngleKd, "AngleKd");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kAccelTruthVal, "TrustVal");
+		break;
+
+	case 'r':
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kErrorMfL, "E Mf L");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kErrorMfM, "E Mf M");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kErrorMfS, "E Mf S");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kErrorMfZ, "E Mf Z");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kDerrorMfL, "dE Mf L");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kDerrorMfM, "dE Mf M");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kDerrorMfS, "dE Mf S");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kDerrorMfZ, "dE Mf Z");
+		break;
+
 	case 's':
 		pResource::m_instance->setMotorsEnabled(true);
 		break;
@@ -268,6 +300,10 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 		pResource::m_instance->m_idealSpeed = 0.0f;
 		pResource::m_instance->m_curSpeed = 0;
 		pResource::m_instance->m_pidControllers[Type::Speed].reset();
+		break;
+
+	case '*':
+		pResource::m_instance->setDirectionEnabled(!pResource::m_instance->isDirectionEnabled());
 		break;
 
 	case '+':
@@ -367,6 +403,16 @@ bool pSmartCar::isMotorsEnabled(void)
 void pSmartCar::setMotorPower(const uint8_t index, const int16_t power)
 {
 	m_motors[index].setPower(power);
+}
+
+void pSmartCar::setDirectionEnabled(const bool enabled)
+{
+	m_directionEnabled = enabled;
+}
+
+bool pSmartCar::isDirectionEnabled(void)
+{
+	return m_directionEnabled;
 }
 
 void pSmartCar::setLed(const uint8_t index, const bool enabled)

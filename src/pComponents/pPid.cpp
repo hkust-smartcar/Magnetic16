@@ -48,7 +48,7 @@ float pPid::getOutput(const float val)
 
 		tempOutput +=  ((m_param.kDFunc)? m_param.kDFunc(error, (error - m_lastError) / dt, *m_param.kD) : (error - m_lastError) / dt * *m_param.kD);
 
-		m_sum = inRange(m_param.sumMin, m_sum + (m_lastSetPoint - val - m_lastSumError) * dt * 0.5f, m_param.sumMax);
+		m_sum = inRange(m_param.sumMin, m_sum + (m_lastSetPoint - val + m_lastSumError) * dt * 0.5f, m_param.sumMax);
 
 		tempOutput += (m_param.kIFunc)? m_param.kIFunc(error, m_sum, *m_param.kI) : m_sum * *m_param.kI;
 

@@ -39,6 +39,8 @@ pAngle::pAngle(pAngle::Config config)
 	m_accelAngle(0),
 	m_gyroAngle(0),
 	m_gyroOffset(0),
+	m_accelFilter(5, 40),
+	m_dYawFilter(5, 40),
 	m_lastTime(0)
 {
 	System::Init();
@@ -54,6 +56,8 @@ void pAngle::update(void)
 		m_lastAccel = Mma8451q::GetAccelF();
 		m_lastOmega = GetOmegaF();
 
+		m_lastAccel[2] = m_accelFilter.filter(m_lastAccel[2]);
+
 		float dt = (System::Time() - m_lastTime) / 1000.0f;
 
 //		float tempAngleDiff = m_lastOmega[0] * dt;
@@ -65,7 +69,7 @@ void pAngle::update(void)
 		m_gyroAngle += m_lastOmega[1] * dt;
 		m_lastAngle += (m_lastOmega[1] + m_gyroOffset) * dt;
 		m_lastAngle = inRange(0.0f, m_lastAngle, 90.0f);
-		m_lastYawOmega = m_lastOmega[2] * sin(m_lastAngle * DegToRad);
+		m_lastYawOmega = m_dYawFilter.filter(m_lastOmega[2] * sin(m_lastAngle * DegToRad));
 	}
 	else
 	{

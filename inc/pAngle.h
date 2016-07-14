@@ -15,6 +15,7 @@
 #include <libsc/mpu6050.h>
 #include <libsc/timer.h>
 #include <libsc/system.h>
+#include <pLowPassFilter.h>
 
 using namespace libsc;
 using namespace std;
@@ -72,6 +73,9 @@ private:
 	float			m_gyroAngle;
 
 	float			m_gyroOffset;
+
+	pLowPassFilter	m_accelFilter;
+	pLowPassFilter	m_dYawFilter;
 
 	array<float, 3>	m_lastAccel;
 	array<float, 3>	m_lastOmega;

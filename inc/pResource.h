@@ -36,19 +36,17 @@ public:
 		float			kAccelTruthVal;
 
 		float			kIdealAngle;
+		float			kRunAngle;
 		float			kAngleRange;
 
 		float			kAngleKp;
 		float			kAngleKi;
 		float			kAngleKd;
-		float			kAngleKq;
-		float			kAngleKr;
 
 		float			kSpeedKp;
 		float			kSpeedKi;
 		float			kSpeedKd;
-		float			kSpeedKq;
-		float			kSpeedKr;
+		float			kSpinConstant;
 		float 			kAccelSpeed;
 		float			kTargetSpeed;
 

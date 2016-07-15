@@ -50,7 +50,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_curSpeed;
 		param.ignoreRange = 0.0f;
-		param.outputMax = 15;
+		param.outputMax = 22;
 		param.outputMin = -20;
 		param.sumMax = 15;
 		param.sumMin = -15;
@@ -269,6 +269,7 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kSpeedKp, "SpeedKp");
 		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kSpeedKi, "SpeedKi");
 		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kSpeedKd, "SpeedKd");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kSpinConstant, "SpinConst");
 		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kAccelSpeed, "AccelSpeed");
 		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
 		break;
@@ -375,7 +376,8 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 		break;
 
 	case '9':
-		pResource::m_instance->m_idealSpeed = pResource::configTable.kTargetSpeed;
+		pResource::m_instance->m_curSpeed = pResource::configTable.kTargetSpeed;
+		pResource::m_instance->m_idealAngle = pResource::configTable.kRunAngle;
 		break;
 	}
 }

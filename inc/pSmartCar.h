@@ -13,6 +13,7 @@
 #include <functional>
 #include <vector>
 #include <libsc/system.h>
+#include <libbase/k60/gpio.h>
 #include <libsc/mini_lcd.h>
 #include <libsc/led.h>
 #include <libutil/pGrapher.h>
@@ -111,9 +112,13 @@ public:
 	void setLed(const uint8_t index, const bool enabled);
 	void setBeep(const bool isBeep, const uint8_t noteIndex = 40);
 
+	void updateFuzzyLogic(const pFuzzyLogic::EasyMembershipFunc &errorNewMf, const pFuzzyLogic::EasyMembershipFunc &dErrorNewMf);
+
 	void sendDataToGrapher(void);
 
 	static void onClickListener(const uint8_t id);
+
+	static void stop(Gpi *gpi);
 
 protected:
 
@@ -164,8 +169,7 @@ protected:
 	pAngle					m_angle;
 	array<pMotor, 2>		m_motors;
 //	MiniLcd					m_lcd;
-//	Joystick				m_joystick;
-//	array<Button, 3>		m_buttons;
+	Joystick				m_joystick;
 	array<Led, 4>			m_leds;
 	pBuzzer					m_buzzer;
 	array<pMagSen, 2>		m_magSen;
@@ -173,6 +177,7 @@ protected:
 	pGrapher				m_grapher;
 	pLowPassFilter			m_encoderLpf;
 	pFuzzyLogic				m_fuzzyLogic;
+	Gpi						m_hallSensor;
 
 	bool					m_motorEnabled;
 	bool					m_directionEnabled;

@@ -41,6 +41,8 @@ public:
 	static void noteDown(const uint8_t noteIndex = 48, const uint16_t loudness = 333, const uint16_t delayMs = 100, const uint16_t delayMsAfter = 0);
 
 	static void startSong(void);
+	static void quickStartSong(void);
+	static void runSong(void);
 	static void endSong(void);
 	static void terminated(void);
 

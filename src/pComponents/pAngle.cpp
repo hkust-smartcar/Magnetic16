@@ -39,7 +39,7 @@ pAngle::pAngle(pAngle::Config config)
 	m_accelAngle(0),
 	m_gyroAngle(0),
 	m_gyroOffset(0),
-	m_accelFilter(5, 40),
+	m_accelFilter(5, 30),
 	m_dYawFilter(5, 40),
 	m_lastTime(0)
 {

@@ -60,6 +60,15 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 	return param;
 }
 
+Gpi::Config getGpiConfig(const Pin::Name pin, const Gpi::OnGpiEventListener &listener)
+{
+	Gpi::Config config;
+	config.pin = pin;
+	config.interrupt = Pin::Config::Interrupt::kFalling;
+	config.isr = listener;
+	return config;
+}
+
 pFuzzyLogic::Config getFuzzyLogicConfig(void)
 {
 	pFuzzyLogic::Config config;
@@ -99,7 +108,7 @@ pFuzzyLogic::Config getFuzzyLogicConfig(void)
 	memcpy(config.dErrorMembershipFuncs, dErrorMF, sizeof(pFuzzyLogic::MembershipFunc));
 	memcpy(config.outputMembershipFuncs, outputMF, sizeof(pFuzzyLogic::MembershipFunc));
 	memcpy(config.rules, rules, sizeof(pFuzzyLogic::Rules));
-	config.approxAccuracy = 50.0f;
+	config.approxAccuracy = 10.0f;
 	return config;
 }
 
@@ -126,7 +135,29 @@ pFuzzyLogic::EasyConfig getFuzzyLogicEasyConfig(void)
 	memcpy(config.dErrorEasyMF, dErrorMF, sizeof(pFuzzyLogic::EasyMembershipFunc));
 	memcpy(config.outputEasyMF, outputMF, sizeof(pFuzzyLogic::EasyMembershipFunc));
 	memcpy(config.rules, rules, sizeof(pFuzzyLogic::Rules));
-	config.approxAccuracy = 50.0f;
+	config.approxAccuracy = 10.0f;
+	return config;
+}
+
+pFuzzyLogic::EasyConfig getFuzzyLogicEasyConfig(const pFuzzyLogic::EasyMembershipFunc &errorNewMf, const pFuzzyLogic::EasyMembershipFunc &dErrorNewMf)
+{
+	pFuzzyLogic::EasyConfig config;
+
+	pFuzzyLogic::EasyMembershipFunc outputMF = { 4000.0f, 3500.0f, 2650.0f, 1900.0f, 500.0f };
+
+	pFuzzyLogic::Rules rules = {	{ 0, 0, 0, 0, 1, 2, 3 },
+									{ 0, 0, 0, 1, 2, 3, 4 },
+									{ 0, 0, 1, 2, 3, 4, 5 },
+									{ 0, 1, 2, 3, 4, 5, 6 },
+									{ 1, 2, 3, 4, 5, 6, 6 },
+									{ 2, 3, 4, 5, 6, 6, 6 },
+									{ 3, 4, 5, 6, 6, 6, 6 } };
+
+	memcpy(config.errorEasyMF, errorNewMf, sizeof(pFuzzyLogic::EasyMembershipFunc));
+	memcpy(config.dErrorEasyMF, errorNewMf, sizeof(pFuzzyLogic::EasyMembershipFunc));
+	memcpy(config.outputEasyMF, outputMF, sizeof(pFuzzyLogic::EasyMembershipFunc));
+	memcpy(config.rules, rules, sizeof(pFuzzyLogic::Rules));
+	config.approxAccuracy = 10.0f;
 	return config;
 }
 
@@ -137,14 +168,67 @@ Joystick::Config getJoystickConfig(void)
 	config.is_active_low = true;
 	config.dispatcher = [] (const uint8_t id, const Joystick::State which)
 						{
-							if (!pResource::m_instance->isMotorsEnabled() || pResource::m_instance->isReadyAndSet())
+							switch (which)
 							{
-								pBuzzer::noteDown(58);
-								pResource::m_instance->setMotorsEnabled(!pResource::m_instance->isMotorsEnabled());
+							case Joystick::State::kSelect:
+								if (!pResource::m_instance->isMotorsEnabled() || pResource::m_instance->isReadyAndSet())
+								{
+									pBuzzer::runSong();
+									pResource::m_instance->setMotorsEnabled(!pResource::m_instance->isMotorsEnabled());
+								}
+								break;
+
+							case Joystick::State::kLeft:
+								if (!pResource::m_instance->isMotorsEnabled())
+								{
+									pResource::m_instance->updateFuzzyLogic(getFuzzyLogicEasyConfig({ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }));
+									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+								}
+								else
+									pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+								break;
+
+							case Joystick::State::kUp:
+								if (!pResource::m_instance->isMotorsEnabled())
+								{
+									pResource::m_instance->updateFuzzyLogic(getFuzzyLogicEasyConfig({ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }));
+									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+								}
+								else
+									pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+								break;
+
+							case Joystick::State::kRight:
+								if (!pResource::m_instance->isMotorsEnabled())
+								{
+									pResource::m_instance->updateFuzzyLogic(getFuzzyLogicEasyConfig({ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }));
+									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+								}
+								else
+									pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+								break;
+
+							case Joystick::State::kDown:
+								if (!pResource::m_instance->isMotorsEnabled())
+								{
+									pResource::m_instance->updateFuzzyLogic(getFuzzyLogicEasyConfig({ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }));
+									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+								}
+								else
+									pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+								break;
 							}
 						};
+
 	for (uint8_t i = 0; i < 5; i++)
 		config.listener_triggers[i] = Joystick::Config::Trigger::kDown;
+
 	return config;
 }
 
@@ -164,7 +248,7 @@ pSmartCar::pSmartCar(void)
 	m_motors{ pMotor(pMotor::Config(1, 1, true, true, leftMotorMapping)),
 	pMotor(pMotor::Config(0, 0, false, false, rightMotorMapping)) },
 //	m_lcd(MiniLcd::Config(0, -1, 30)),
-//	m_joystick(getJoystickConfig()),
+	m_joystick(getJoystickConfig()),
 	m_leds{ Led({ 3, true }),
 	Led({ 2, true }),
 	Led({ 1, true }),
@@ -175,6 +259,7 @@ pSmartCar::pSmartCar(void)
 	m_grapher(),
 	m_encoderLpf(5, 70.0f),
 	m_fuzzyLogic(getFuzzyLogicEasyConfig()),
+	m_hallSensor(getGpiConfig(Pin::Name::kPta6, &stop)),
 	m_motorEnabled(false),
 	m_directionEnabled(false),
 	m_isReadyToRun(false),
@@ -193,11 +278,11 @@ pSmartCar::pSmartCar(void)
 
 	m_batteryVoltage = m_batmeter.GetVoltage();
 
-	m_leds[1].SetEnable(true);
+	m_leds[2].SetEnable(true);
 
 	m_grapher.setOnReceiveListener(onReceive);
 
-	pBuzzer::startSong();
+	pBuzzer::quickStartSong();
 
 	m_isReadyToRun = true;
 }
@@ -244,6 +329,13 @@ void pSmartCar::onClickListener(const uint8_t id)
 		pResource::m_instance->setMotorsEnabled(pResource::m_instance->m_motorEnabled = !pResource::m_instance->m_motorEnabled);
 		break;
 	}
+}
+
+void pSmartCar::stop(Gpi *gpi)
+{
+	pResource::m_instance->setMotorsEnabled(false);
+	pBuzzer::terminated();
+	assert(false);
 }
 
 float pSmartCar::leftMotorMapping(const float val)
@@ -347,7 +439,7 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].dX, "Speed");
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_pidControllers[Type::Speed].getSum(), "SpeedSum");
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_curSpeed, "cur_ideal_speed");
-		//		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].dYaw, "Yaw");
+//		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_state[StatePos::cur].dYaw, "Yaw");
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_idealAngleOffset, "angleOffset");
 //		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_motors[0].getPower(), "Power0");
 //		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_motors[1].getPower(), "Power1");
@@ -384,7 +476,10 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 
 bool pSmartCar::isReadyAndSet(void)
 {
-	return !(m_isReadyToRun = !m_isReadyToRun);
+	if (m_isReadyToRun)
+		return !(m_isReadyToRun = false);
+	else
+		return m_isReadyToRun;
 }
 
 void pSmartCar::setMotorsEnabled(const bool enabled)
@@ -425,6 +520,11 @@ void pSmartCar::setLed(const uint8_t index, const bool enabled)
 void pSmartCar::setBeep(const bool isBeep, const uint8_t noteIndex)
 {
 	m_buzzer.setBeep(true);
+}
+
+void pSmartCar::updateFuzzyLogic(const pFuzzyLogic::EasyMembershipFunc &errorNewMf, const pFuzzyLogic::EasyMembershipFunc &dErrorNewMf)
+{
+	m_fuzzyLogic.updateConfig(getFuzzyLogicEasyConfig(errorNewMf, dErrorNewMf));
 }
 
 void pSmartCar::sendDataToGrapher(void)

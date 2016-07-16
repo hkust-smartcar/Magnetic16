@@ -81,6 +81,22 @@ void pBuzzer::startSong(void)
 	m_instance->m_enabled = false;
 }
 
+void pBuzzer::quickStartSong(void)
+{
+	m_instance->m_enabled = true;
+	m_instance->noteDown(55, m_instance->defaultValue, 300, 200);
+	m_instance->m_enabled = false;
+}
+
+void pBuzzer::runSong(void)
+{
+	m_instance->m_enabled = true;
+	m_instance->noteDown(m_instance->defaultValue, m_instance->defaultValue, 400, 100);
+	m_instance->noteDown(m_instance->defaultValue, m_instance->defaultValue, 400, 100);
+	m_instance->noteDown(m_instance->defaultValue, m_instance->defaultValue, 400, 100);
+	m_instance->m_enabled = false;
+}
+
 void pBuzzer::endSong(void)
 {
 	m_instance->m_enabled = true;
@@ -100,7 +116,7 @@ void pBuzzer::endSong(void)
 void pBuzzer::terminated(void)
 {
 	m_instance->m_enabled = true;
-	pBuzzer::noteDown(51);
+	pBuzzer::noteDown(51, m_instance->defaultValue, 2000, m_instance->defaultValue);
 	m_instance->m_enabled = false;
 }
 

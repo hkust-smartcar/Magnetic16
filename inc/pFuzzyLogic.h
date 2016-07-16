@@ -109,8 +109,8 @@ public:
 	explicit pFuzzyLogic(const Config &config);
 	explicit pFuzzyLogic(const EasyConfig &config);
 
-	void updateConfig(const Config &config);
-	void updateConfig(const EasyConfig &config);
+	void updateConfig(const Config config);
+	void updateConfig(const EasyConfig config);
 
 	void resetPdController(void);
 

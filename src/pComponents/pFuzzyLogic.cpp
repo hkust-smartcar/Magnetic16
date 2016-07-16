@@ -80,6 +80,46 @@ pFuzzyLogic::pFuzzyLogic(const EasyConfig &config)
 	memcpy(m_rules, config.rules, 7 * 7 * sizeof(uint8_t));
 }
 
+void pFuzzyLogic::updateConfig(const Config config)
+{
+	memcpy(m_MembershipFuncs[ErrorType::Error], config.errorMembershipFuncs, 7 * 4 * sizeof(float));
+	memcpy(m_MembershipFuncs[ErrorType::dError], config.dErrorMembershipFuncs, 7 * 4 * sizeof(float));
+	memcpy(m_outputMembershipFuncs, config.outputMembershipFuncs, 7 * 4 * sizeof(float));
+	memcpy(m_rules, config.rules, 7 * 7 * sizeof(uint8_t));
+}
+
+void pFuzzyLogic::updateConfig(const EasyConfig config)
+{
+	MembershipFunc errorMF = {	{ -config.errorEasyMF[0], -config.errorEasyMF[0], -config.errorEasyMF[1], -config.errorEasyMF[2] },		// NL
+								{ -config.errorEasyMF[1], -config.errorEasyMF[2], -config.errorEasyMF[2], -config.errorEasyMF[3] },		// NM
+								{ -config.errorEasyMF[2], -config.errorEasyMF[3], -config.errorEasyMF[3], -config.errorEasyMF[4] },		// NS
+								{ -config.errorEasyMF[3], -config.errorEasyMF[4], config.errorEasyMF[4], config.errorEasyMF[3] },		// ZR
+								{ config.errorEasyMF[4], config.errorEasyMF[3], config.errorEasyMF[3], config.errorEasyMF[2] },			// PS
+								{ config.errorEasyMF[3], config.errorEasyMF[2], config.errorEasyMF[2], config.errorEasyMF[1] },			// PM
+								{ config.errorEasyMF[2], config.errorEasyMF[1], config.errorEasyMF[0], config.errorEasyMF[0] }	};		// PL
+
+	MembershipFunc dErrorMF = {	{ -config.dErrorEasyMF[0], -config.dErrorEasyMF[0], -config.dErrorEasyMF[1], -config.dErrorEasyMF[2] },			// NL
+								{ -config.dErrorEasyMF[1], -config.dErrorEasyMF[2], -config.dErrorEasyMF[2], -config.dErrorEasyMF[3] },			// NM
+								{ -config.dErrorEasyMF[2], -config.dErrorEasyMF[3], -config.dErrorEasyMF[3], -config.dErrorEasyMF[4] },			// NS
+								{ -config.dErrorEasyMF[3], -config.dErrorEasyMF[4], config.dErrorEasyMF[4], config.dErrorEasyMF[3] },			// ZR
+								{ config.dErrorEasyMF[4], config.dErrorEasyMF[3], config.dErrorEasyMF[3], config.dErrorEasyMF[2] },				// PS
+								{ config.dErrorEasyMF[3], config.dErrorEasyMF[2], config.dErrorEasyMF[2], config.dErrorEasyMF[1] },				// PM
+								{ config.dErrorEasyMF[2], config.dErrorEasyMF[1], config.dErrorEasyMF[0], config.dErrorEasyMF[0] }	};			// PL
+
+	MembershipFunc outputMF = {	{ -config.outputEasyMF[0], -config.outputEasyMF[0], -config.outputEasyMF[1], -config.outputEasyMF[2] },		// NL
+								{ -config.outputEasyMF[1], -config.outputEasyMF[2], -config.outputEasyMF[2], -config.outputEasyMF[3] },		// NM
+								{ -config.outputEasyMF[2], -config.outputEasyMF[3], -config.outputEasyMF[3], -config.outputEasyMF[4] },		// NS
+								{ -config.outputEasyMF[3], -config.outputEasyMF[4], config.outputEasyMF[4], config.outputEasyMF[3] },		// ZR
+								{ config.outputEasyMF[4], config.outputEasyMF[3], config.outputEasyMF[3], config.outputEasyMF[2] },			// PS
+								{ config.outputEasyMF[3], config.outputEasyMF[2], config.outputEasyMF[2], config.outputEasyMF[1] },			// PM
+								{ config.outputEasyMF[2], config.outputEasyMF[1], config.outputEasyMF[0], config.outputEasyMF[0] } };		// PL
+
+	memcpy(m_MembershipFuncs[ErrorType::Error], errorMF, sizeof(MembershipFunc));
+	memcpy(m_MembershipFuncs[ErrorType::dError], dErrorMF, sizeof(MembershipFunc));
+	memcpy(m_outputMembershipFuncs, outputMF, sizeof(MembershipFunc));
+	memcpy(m_rules, config.rules, 7 * 7 * sizeof(uint8_t));
+}
+
 void pFuzzyLogic::resetPdController(void)
 {
 	m_lastTime = 0;

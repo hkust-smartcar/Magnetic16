@@ -112,11 +112,12 @@ public:
 	void setLed(const uint8_t index, const bool enabled);
 	void setBeep(const bool isBeep, const uint8_t noteIndex = 40);
 
-	void updateFuzzyLogic(const pFuzzyLogic::EasyMembershipFunc &errorNewMf, const pFuzzyLogic::EasyMembershipFunc &dErrorNewMf);
+	void updateFuzzyLogic(const pFuzzyLogic::EasyMembershipFunc errorNewMf, const pFuzzyLogic::EasyMembershipFunc dErrorNewMf);
 
 	void sendDataToGrapher(void);
 
 	static void onClickListener(const uint8_t id);
+	static void onJoystickClick(const Joystick::State which);
 
 	static void stop(Gpi *gpi);
 

@@ -8,6 +8,7 @@
  */
 
 #include "pSmartCar.h"
+#include <pFuzzyLogic.h>
 #include <pResource.h>
 
 using namespace std;
@@ -139,7 +140,7 @@ pFuzzyLogic::EasyConfig getFuzzyLogicEasyConfig(void)
 	return config;
 }
 
-pFuzzyLogic::EasyConfig getFuzzyLogicEasyConfig(const pFuzzyLogic::EasyMembershipFunc &errorNewMf, const pFuzzyLogic::EasyMembershipFunc &dErrorNewMf)
+pFuzzyLogic::EasyConfig getFuzzyLogicEasyConfig(const pFuzzyLogic::EasyMembershipFunc errorNewMf, const pFuzzyLogic::EasyMembershipFunc dErrorNewMf)
 {
 	pFuzzyLogic::EasyConfig config;
 
@@ -168,62 +169,7 @@ Joystick::Config getJoystickConfig(void)
 	config.is_active_low = true;
 	config.dispatcher = [] (const uint8_t id, const Joystick::State which)
 						{
-							switch (which)
-							{
-							case Joystick::State::kSelect:
-								if (!pResource::m_instance->isMotorsEnabled() || pResource::m_instance->isReadyAndSet())
-								{
-									pBuzzer::runSong();
-									pResource::m_instance->setMotorsEnabled(!pResource::m_instance->isMotorsEnabled());
-								}
-								break;
-
-							case Joystick::State::kLeft:
-								if (!pResource::m_instance->isMotorsEnabled())
-								{
-									pResource::m_instance->updateFuzzyLogic(getFuzzyLogicEasyConfig({ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }));
-									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
-								}
-								else
-									pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
-								break;
-
-							case Joystick::State::kUp:
-								if (!pResource::m_instance->isMotorsEnabled())
-								{
-									pResource::m_instance->updateFuzzyLogic(getFuzzyLogicEasyConfig({ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }));
-									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
-									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
-								}
-								else
-									pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
-								break;
-
-							case Joystick::State::kRight:
-								if (!pResource::m_instance->isMotorsEnabled())
-								{
-									pResource::m_instance->updateFuzzyLogic(getFuzzyLogicEasyConfig({ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }));
-									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
-									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
-									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
-								}
-								else
-									pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
-								break;
-
-							case Joystick::State::kDown:
-								if (!pResource::m_instance->isMotorsEnabled())
-								{
-									pResource::m_instance->updateFuzzyLogic(getFuzzyLogicEasyConfig({ 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f }));
-									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
-									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
-									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
-									pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
-								}
-								else
-									pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
-								break;
-							}
+							pSmartCar::onJoystickClick(which);
 						};
 
 	for (uint8_t i = 0; i < 5; i++)
@@ -327,6 +273,76 @@ void pSmartCar::onClickListener(const uint8_t id)
 
 	case 0:
 		pResource::m_instance->setMotorsEnabled(pResource::m_instance->m_motorEnabled = !pResource::m_instance->m_motorEnabled);
+		break;
+	}
+}
+
+void pSmartCar::onJoystickClick(const Joystick::State which)
+{
+	switch (which)
+	{
+	case Joystick::State::kSelect:
+		if (!pResource::m_instance->isMotorsEnabled() || pResource::m_instance->isReadyAndSet())
+		{
+			pResource::m_instance->setMotorsEnabled(!pResource::m_instance->isMotorsEnabled());
+			pBuzzer::runSong();
+			pResource::m_instance->m_curSpeed = pResource::configTable.kTargetSpeed;
+			pResource::m_instance->m_idealAngle = pResource::configTable.kRunAngle;
+		}
+		break;
+
+	case Joystick::State::kLeft:
+		if (!pResource::m_instance->isMotorsEnabled())
+		{
+			pFuzzyLogic::EasyMembershipFunc mfError = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+			pFuzzyLogic::EasyMembershipFunc mfDerror = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+			pResource::m_instance->updateFuzzyLogic(mfError, mfDerror);
+			pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+		}
+		else
+			pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+		break;
+
+	case Joystick::State::kUp:
+		if (!pResource::m_instance->isMotorsEnabled())
+		{
+			pFuzzyLogic::EasyMembershipFunc mfError = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+			pFuzzyLogic::EasyMembershipFunc mfDerror = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+			pResource::m_instance->updateFuzzyLogic(mfError, mfDerror);
+			pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+			pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+		}
+		else
+			pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+		break;
+
+	case Joystick::State::kRight:
+		if (!pResource::m_instance->isMotorsEnabled())
+		{
+			pFuzzyLogic::EasyMembershipFunc mfError = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+			pFuzzyLogic::EasyMembershipFunc mfDerror = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+			pResource::m_instance->updateFuzzyLogic(mfError, mfDerror);
+			pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+			pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+			pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+		}
+		else
+			pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+		break;
+
+	case Joystick::State::kDown:
+		if (!pResource::m_instance->isMotorsEnabled())
+		{
+			pFuzzyLogic::EasyMembershipFunc mfError = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+			pFuzzyLogic::EasyMembershipFunc mfDerror = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+			pResource::m_instance->updateFuzzyLogic(mfError, mfDerror);
+			pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+			pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+			pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+			pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, 1000, 50);
+		}
+		else
+			pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
 		break;
 	}
 }
@@ -522,7 +538,7 @@ void pSmartCar::setBeep(const bool isBeep, const uint8_t noteIndex)
 	m_buzzer.setBeep(true);
 }
 
-void pSmartCar::updateFuzzyLogic(const pFuzzyLogic::EasyMembershipFunc &errorNewMf, const pFuzzyLogic::EasyMembershipFunc &dErrorNewMf)
+void pSmartCar::updateFuzzyLogic(const pFuzzyLogic::EasyMembershipFunc errorNewMf, const pFuzzyLogic::EasyMembershipFunc dErrorNewMf)
 {
 	m_fuzzyLogic.updateConfig(getFuzzyLogicEasyConfig(errorNewMf, dErrorNewMf));
 }

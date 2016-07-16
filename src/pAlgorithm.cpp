@@ -18,7 +18,7 @@ void pSmartCar::addAllRoutineToLoop(void)
 {
 	m_loop.addFunctionToLoop(update, 5);
 	m_loop.addFunctionToLoop(directionControl, 10);
-	m_loop.addFunctionToLoop(speedControl, 100);
+	m_loop.addFunctionToLoop(speedControl, 20);
 	m_loop.addFunctionToLoop(angleControl, 5);
 	m_loop.addFunctionToLoop(print, 20);
 //	m_loop.addFunctionToLoop(safetyCheck, 200);
@@ -115,7 +115,7 @@ void pSmartCar::updateState(void)
 
 void pSmartCar::updateSmoothAngleOutput(const float newAngle)
 {
-	m_smoothIncrement[IncrementType::SpeedIncrement] = (newAngle - m_idealAngleOffset) * 0.05f;
+	m_smoothIncrement[IncrementType::SpeedIncrement] = (newAngle - m_idealAngleOffset) * 0.25f;
 }
 
 float pSmartCar::getSmoothAngleOutput(void)

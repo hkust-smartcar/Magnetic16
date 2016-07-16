@@ -184,6 +184,10 @@ protected:
 	bool					m_directionEnabled;
 	bool					m_isReadyToRun;
 
+	bool					m_isSetSpeed;
+	bool					m_isIgnoreMagnet;
+	Timer::TimerInt			m_startTime;
+
 	uint8_t 				m_ignoreSpeedCounter;
 
 	array<pPid, 2>			m_pidControllers;

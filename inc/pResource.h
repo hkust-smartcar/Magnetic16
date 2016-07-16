@@ -47,7 +47,6 @@ public:
 		float			kSpeedKi;
 		float			kSpeedKd;
 		float			kSpinConstant;
-		float 			kAccelSpeed;
 		float			kTargetSpeed;
 
 		float			kErrorMfLimit;

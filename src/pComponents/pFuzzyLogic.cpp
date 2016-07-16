@@ -12,6 +12,7 @@
 #define MAX(a, b) ((a > b)? a : b)
 #define MIN(a, b) ((a < b)? a : b)
 
+#define DEBUG_FUZZY 0
 #define DEBUG_ERROR_OR_DERROR 0
 
 #define IS_CONTAIN(arr, v) (arr[0] == v || arr[1] == v)
@@ -134,6 +135,7 @@ float pFuzzyLogic::updatePdController(float error)
 		FuzzResult errorRet = fuzzification(error, ErrorType::Error);
 		FuzzResult dErrorRet = fuzzification((m_lastDError = (error - m_lastError) * 1000.0f / (float)(System::Time() - m_lastTime)), ErrorType::dError);
 
+#if DEBUG_FUZZY == 1
 #if DEBUG_ERROR_OR_DERROR == 0
 		if (IS_CONTAIN(errorRet.relatedIndex, 0) || IS_CONTAIN(errorRet.relatedIndex, 6))
 			pBuzzer::setBeep(65, 333);
@@ -148,6 +150,7 @@ float pFuzzyLogic::updatePdController(float error)
 			pBuzzer::setBeep(47, 200);
 		else
 			pBuzzer::setBeep(0, 0);
+#endif
 #endif
 
 		InferenceResult inferResult = fuzzyInference(errorRet, dErrorRet);

@@ -18,7 +18,7 @@ void pSmartCar::addAllRoutineToLoop(void)
 {
 	m_loop.addFunctionToLoop(update, 5);
 	m_loop.addFunctionToLoop(directionControl, 10);
-	m_loop.addFunctionToLoop(speedControl, 20);
+	m_loop.addFunctionToLoop(speedControl, 40);
 	m_loop.addFunctionToLoop(angleControl, 5);
 	m_loop.addFunctionToLoop(print, 20);
 //	m_loop.addFunctionToLoop(safetyCheck, 200);
@@ -80,11 +80,6 @@ void pSmartCar::print(void)
 //========================= v v v v v v v v v v v v v v v v ==============================
 
 
-void pSmartCar::smoothedIdealSpeed(const float &accelLimit)
-{
-	m_curSpeed = inRange(0, m_state[cur].dX + inRange(-m_curSpeed, (m_idealSpeed - m_state[cur].dX) * pResource::configTable.kAccelSpeed, accelLimit), m_idealSpeed);
-}
-
 void pSmartCar::updateSensors(void)
 {
 	m_angle.update();
@@ -108,6 +103,17 @@ void pSmartCar::updateState(void)
 		}
 
 		m_state[StatePos::cur].dYaw = m_angle.getYawOmega();
+		if (!m_isReadyToRun && !m_isSetSpeed && System::Time() - m_startTime >= 2300)
+		{
+			pResource::m_instance->m_curSpeed = pResource::configTable.kTargetSpeed;
+			pResource::m_instance->m_idealAngle = pResource::configTable.kRunAngle;
+			m_isSetSpeed = true;
+		}
+		else if (!m_isReadyToRun && m_isIgnoreMagnet && System::Time() - m_startTime >= 10000)
+		{
+			setLed(3, true);
+			m_isIgnoreMagnet = false;
+		}
 	}
 
 	m_state[StatePos::prev].timeStamp = System::Time();
@@ -115,7 +121,7 @@ void pSmartCar::updateState(void)
 
 void pSmartCar::updateSmoothAngleOutput(const float newAngle)
 {
-	m_smoothIncrement[IncrementType::SpeedIncrement] = (newAngle - m_idealAngleOffset) * 0.25f;
+	m_smoothIncrement[IncrementType::SpeedIncrement] = (newAngle - m_idealAngleOffset) * 0.125f;
 }
 
 float pSmartCar::getSmoothAngleOutput(void)

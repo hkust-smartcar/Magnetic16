@@ -29,7 +29,7 @@ PassiveBuzzer::Config getBuzzerConfig(void)
 pBuzzer::pBuzzer(void)
 :
 	m_buzzer(getBuzzerConfig()),
-	m_enabled(false)
+	m_enabled(true)
 {
 	assert(!m_instance);
 	m_instance = this;
@@ -70,7 +70,6 @@ void pBuzzer::noteDown(const uint8_t noteIndex, const uint16_t loudness, const u
 
 void pBuzzer::startSong(void)
 {
-	m_instance->m_enabled = true;
 	m_instance->noteDown(55, m_instance->defaultValue, m_instance->defaultValue, 50);
 	m_instance->noteDown(55, m_instance->defaultValue, m_instance->defaultValue, 50);
 	m_instance->noteDown(55, m_instance->defaultValue, m_instance->defaultValue, 200);
@@ -78,28 +77,20 @@ void pBuzzer::startSong(void)
 	m_instance->noteDown(55, m_instance->defaultValue, m_instance->defaultValue, 200);
 	m_instance->noteDown(58, m_instance->defaultValue, m_instance->defaultValue, 350);
 	m_instance->noteDown(46, m_instance->defaultValue, 200);
-	m_instance->m_enabled = false;
 }
 
 void pBuzzer::quickStartSong(void)
 {
-	m_instance->m_enabled = true;
 	m_instance->noteDown(55, m_instance->defaultValue, 300, 200);
-	m_instance->m_enabled = false;
 }
 
 void pBuzzer::runSong(void)
 {
-	m_instance->m_enabled = true;
-	m_instance->noteDown(m_instance->defaultValue, m_instance->defaultValue, 400, 100);
-	m_instance->noteDown(m_instance->defaultValue, m_instance->defaultValue, 400, 100);
-	m_instance->noteDown(m_instance->defaultValue, m_instance->defaultValue, 400, 100);
-	m_instance->m_enabled = false;
+	m_instance->noteDown(50, m_instance->defaultValue, 400, 100);
 }
 
 void pBuzzer::endSong(void)
 {
-	m_instance->m_enabled = true;
 	m_instance->noteDown(51);
 	m_instance->noteDown(58, m_instance->defaultValue, m_instance->defaultValue, 200);
 	m_instance->noteDown(58, m_instance->defaultValue, m_instance->defaultValue, 50);
@@ -110,14 +101,11 @@ void pBuzzer::endSong(void)
 	m_instance->noteDown(44, m_instance->defaultValue, m_instance->defaultValue, 200);
 	m_instance->noteDown(44);
 	m_instance->noteDown(41, m_instance->defaultValue, 200);
-	m_instance->m_enabled = false;
 }
 
 void pBuzzer::terminated(void)
 {
-	m_instance->m_enabled = true;
-	pBuzzer::noteDown(51, m_instance->defaultValue, 2000, m_instance->defaultValue);
-	m_instance->m_enabled = false;
+	pBuzzer::noteDown(51, m_instance->defaultValue, 2000, 5000);
 }
 
 const pBuzzer::note pBuzzer::notes[88] =

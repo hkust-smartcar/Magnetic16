@@ -18,7 +18,7 @@ using namespace std;
 // Change it if u changed the config table
 // otherwise the config table in flash memory
 // won't update
-#define UNIQUE_VAL	95
+#define UNIQUE_VAL	5
 
 pResource::ConfigTable	pResource::configTable;
 pResource				*pResource::m_instance = nullptr;
@@ -37,10 +37,8 @@ pResource::pResource(void)
 
 	if (UNIQUE_VAL != ((ConfigTable *)getConfigTablePtr())->kUniqueVal)
 	{
-		pBuzzer::setEnabled(true);
 		pBuzzer::noteDown(32, pBuzzer::defaultValue, pBuzzer::defaultValue, 100);
 		pBuzzer::noteDown(48, pBuzzer::defaultValue, 50, 100);
-		pBuzzer::setEnabled(false);
 		reset();
 	}
 
@@ -96,11 +94,10 @@ void pResource::setInitialConfigTable(void)
 	configTable.kAngleKi = 0.0f;
 	configTable.kAngleKd = 21.0f;
 
-	configTable.kSpeedKp = 1.45f;
+	configTable.kSpeedKp = 2.2f;
 	configTable.kSpeedKi = 0.0f;
 	configTable.kSpeedKd = 0.0f;
-	configTable.kSpinConstant = 0.0062f;
-	configTable.kAccelSpeed = 0.37f;
+	configTable.kSpinConstant = 0.01f;
 	configTable.kTargetSpeed = 6.0f;
 
 	configTable.kErrorMfLimit = 1.0f;

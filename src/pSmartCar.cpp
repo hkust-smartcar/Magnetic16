@@ -39,7 +39,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 								return constant * m_state[StatePos::cur].dAngle;
 							}
 						);
-		param.setPoint = &pResource::configTable.kIdealAngle;
+		param.setPoint = &m_idealAngle;
 		param.ignoreRange = 0.0f;
 		param.outputMax = 4000;
 		param.outputMin = -4000;
@@ -51,7 +51,7 @@ pPid::PidParam pSmartCar::getPidConfig(pSmartCar::Type type)
 		param.kD = &pResource::configTable.kSpeedKd;
 		param.setPoint = &m_curSpeed;
 		param.ignoreRange = 0.0f;
-		param.outputMax = 22;
+		param.outputMax = 18;
 		param.outputMin = -20;
 		param.sumMax = 15;
 		param.sumMin = -15;
@@ -178,10 +178,18 @@ Joystick::Config getJoystickConfig(void)
 	return config;
 }
 
+Adc::Config getHallSensorConfig(void)
+{
+	Adc::Config config;
+	config.pin = Pin::Name::kPta6;
+	config.avg_pass = Adc::Config::AveragePass::k16;
+	config.speed = Adc::Config::SpeedMode::kExFast;
+	return config;
+}
+
 pSmartCar::pSmartCar(void)
 :
 	m_state(),
-//	speed_pid_enable(1),
 	m_direction(0.0f),
 	m_idealSpeed(0.0f),
 	m_curSpeed(0.0f),
@@ -205,10 +213,12 @@ pSmartCar::pSmartCar(void)
 	m_grapher(),
 	m_encoderLpf(5, 70.0f),
 	m_fuzzyLogic(getFuzzyLogicEasyConfig()),
-	m_hallSensor(getGpiConfig(Pin::Name::kPta6, &stop)),
+//	m_hallSensor(getGpiConfig(Pin::Name::kPta6, &stop)),
+//	m_hallSensor2(getHallSensorConfig()),
 	m_motorEnabled(false),
 	m_directionEnabled(true),
 	m_isReadyToRun(true),
+	m_timeLimit(23000),
 	m_isSetSpeed(false),
 	m_isIgnoreMagnet(true),
 	m_ignoreSpeedCounter(0),
@@ -293,57 +303,41 @@ void pSmartCar::onJoystickClick(const Joystick::State which)
 			break;
 
 		case Joystick::State::kLeft:
-			if (!pResource::m_instance->isMotorsEnabled())
-			{
-				pFuzzyLogic::EasyMembershipFunc mfError = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-				pFuzzyLogic::EasyMembershipFunc mfDerror = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-				pResource::m_instance->updateFuzzyLogic(mfError, mfDerror);
-				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-			}
-			else
-				pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+//			if (!pResource::m_instance->isMotorsEnabled())
+//			{
+//				pResource::configTable.kDerrorMfS -= 0.15f;
+//				pFuzzyLogic::EasyMembershipFunc mfError = { pResource::configTable.kErrorMfLimit, pResource::configTable.kErrorMfL, pResource::configTable.kErrorMfM, pResource::configTable.kErrorMfS, pResource::configTable.kErrorMfZ };
+//				pFuzzyLogic::EasyMembershipFunc mfDerror = { pResource::configTable.kDerrorMfLimit, pResource::configTable.kDerrorMfL, pResource::configTable.kDerrorMfM, pResource::configTable.kDerrorMfS, pResource::configTable.kDerrorMfZ };
+//				pResource::m_instance->updateFuzzyLogic(mfError, mfDerror);
+//				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
+//			}
+//			else
+//				pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+			pResource::m_instance->m_timeLimit -= 1000;
 			break;
 
 		case Joystick::State::kUp:
-			if (!pResource::m_instance->isMotorsEnabled())
-			{
-				pFuzzyLogic::EasyMembershipFunc mfError = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-				pFuzzyLogic::EasyMembershipFunc mfDerror = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-				pResource::m_instance->updateFuzzyLogic(mfError, mfDerror);
-				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-			}
-			else
-				pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+			pResource::configTable.kTargetSpeed = inRange(7.0f, pResource::configTable.kTargetSpeed + 1.0f, 9.0f);
+			pBuzzer::noteDown(60, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
 			break;
 
 		case Joystick::State::kRight:
-			if (!pResource::m_instance->isMotorsEnabled())
-			{
-				pFuzzyLogic::EasyMembershipFunc mfError = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-				pFuzzyLogic::EasyMembershipFunc mfDerror = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-				pResource::m_instance->updateFuzzyLogic(mfError, mfDerror);
-				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-			}
-			else
-				pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+//			if (!pResource::m_instance->isMotorsEnabled())
+//			{
+//				pResource::configTable.kDerrorMfM -= 0.1f;
+//				pFuzzyLogic::EasyMembershipFunc mfError = { pResource::configTable.kErrorMfLimit, pResource::configTable.kErrorMfL, pResource::configTable.kErrorMfM, pResource::configTable.kErrorMfS, pResource::configTable.kErrorMfZ };
+//				pFuzzyLogic::EasyMembershipFunc mfDerror = { pResource::configTable.kDerrorMfLimit, pResource::configTable.kDerrorMfL, pResource::configTable.kDerrorMfM, pResource::configTable.kDerrorMfS, pResource::configTable.kDerrorMfZ };
+//				pResource::m_instance->updateFuzzyLogic(mfError, mfDerror);
+//				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
+//			}
+//			else
+//				pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+			pResource::m_instance->m_timeLimit += 1000;
 			break;
 
 		case Joystick::State::kDown:
-			if (!pResource::m_instance->isMotorsEnabled())
-			{
-				pFuzzyLogic::EasyMembershipFunc mfError = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-				pFuzzyLogic::EasyMembershipFunc mfDerror = { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
-				pResource::m_instance->updateFuzzyLogic(mfError, mfDerror);
-				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-				pBuzzer::noteDown(pBuzzer::defaultValue, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
-			}
-			else
-				pBuzzer::noteDown(60, pBuzzer::defaultValue, 1000, 50);
+			pResource::configTable.kTargetSpeed = inRange(7.0f, pResource::configTable.kTargetSpeed - 1.0f, 9.0f);
+			pBuzzer::noteDown(60, pBuzzer::defaultValue, pBuzzer::defaultValue, 50);
 			break;
 		}
 	}
@@ -353,6 +347,7 @@ void pSmartCar::stop(Gpi *gpi)
 {
 	if (!pResource::m_instance->m_isIgnoreMagnet)
 	{
+		pResource::m_instance->setLed(2, false);
 		pResource::m_instance->setMotorsEnabled(false);
 		pBuzzer::terminated();
 		while (true);
@@ -384,6 +379,7 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kSpeedKd, "SpeedKd");
 		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kSpinConstant, "SpinConst");
 		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kIdealAngle, "IdealAngle");
+		pResource::m_instance->m_grapher.addSharedVar(&pResource::configTable.kLeftMotorRatio, "LMR");
 		break;
 
 	case 'e':
@@ -434,6 +430,7 @@ void pSmartCar::onReceive(const std::vector<Byte>& bytes)
 	case '1':
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_magSen[0].getVoltage(), "LeftVol");
 		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->m_magSen[0].getVoltage(1), "RightVol");
+		pResource::m_instance->m_grapher.addWatchedVar(&pResource::m_instance->hallSensorReading, "HallSensor");
 		break;
 
 	case '2':

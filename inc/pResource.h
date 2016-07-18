@@ -34,6 +34,7 @@ public:
 		float			kBatteryVoltageRatio;
 
 		float			kAccelTruthVal;
+		float			kLeftMotorRatio;
 
 		float			kIdealAngle;
 		float			kRunAngle;

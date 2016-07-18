@@ -21,7 +21,7 @@ class pMagSen
 
 public:
 
-	pMagSen(const uint8_t startIndex, const bool isPair = true, const float factor = 60.0f, const Timer::TimerInt dt = 10);
+	pMagSen(const uint8_t startIndex, const bool isPair = true, const float factor = 40.0f, const Timer::TimerInt dt = 10);
 
 	float updatePair(void);
 	float update(void);

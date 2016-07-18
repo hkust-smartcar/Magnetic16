@@ -58,7 +58,7 @@ public:
 	{
 		EasyMembershipFunc	errorEasyMF;
 		EasyMembershipFunc	dErrorEasyMF;
-		EasyMembershipFunc	outputEasyMF;
+		EasyMembershipFunc outputEasyMF;
 
 		Rules				rules;
 
@@ -114,6 +114,7 @@ public:
 
 	void resetPdController(void);
 
+	float updatePController(float error);
 	float updatePdController(float error);
 	float update(float error, float dError);
 
@@ -127,6 +128,7 @@ private:
 
 	FuzzResult fuzzification(const float &val, const ErrorType &type);
 	InferenceResult fuzzyInference(const FuzzResult &errorResult, const FuzzResult &dErrorResult);
+	InferenceResult fuzzyInference(const FuzzResult &errorResult);
 	float defuzzification(const InferenceResult &inferResult);
 
 	array<MembershipFunc, 2> 	m_MembershipFuncs;

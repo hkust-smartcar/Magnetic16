@@ -14,11 +14,13 @@ using namespace std;
 using namespace libsc;
 using namespace libbase::k60;
 
+#define TUNING_P_FLC 0
+
 void pSmartCar::addAllRoutineToLoop(void)
 {
 	m_loop.addFunctionToLoop(update, 5);
 	m_loop.addFunctionToLoop(directionControl, 10);
-	m_loop.addFunctionToLoop(speedControl, 40);
+	m_loop.addFunctionToLoop(speedControl, 100);
 	m_loop.addFunctionToLoop(angleControl, 5);
 	m_loop.addFunctionToLoop(print, 20);
 //	m_loop.addFunctionToLoop(safetyCheck, 200);
@@ -33,6 +35,7 @@ void pSmartCar::addVariablesToGrapher(void)
 //========================================================================================
 //=========================				Routine				==============================
 //========================================================================================
+
 void pSmartCar::update(void)
 {
 	pResource::m_instance->updateSensors();
@@ -58,7 +61,11 @@ void pSmartCar::angleControl(void)
 void pSmartCar::directionControl(void)
 {
 	float tempResult = -pResource::m_instance->m_magSen[0].updatePair();
+#if TUNING_P_FLC == 0
 	pResource::m_instance->updateSmoothDirectionOutput(pResource::m_instance->m_fuzzyLogic.updatePdController(tempResult));
+#else
+	pResource::m_instance->updateSmoothDirectionOutput(pResource::m_instance->m_fuzzyLogic.updatePController(tempResult));
+#endif
 }
 
 void pSmartCar::speedControl(void)
@@ -109,10 +116,11 @@ void pSmartCar::updateState(void)
 			pResource::m_instance->m_idealAngle = pResource::configTable.kRunAngle;
 			m_isSetSpeed = true;
 		}
-		else if (!m_isReadyToRun && m_isIgnoreMagnet && System::Time() - m_startTime >= 10000)
+		else if (!m_isReadyToRun && m_isIgnoreMagnet && System::Time() - m_startTime >= 24300)
 		{
 			setLed(3, true);
 			m_isIgnoreMagnet = false;
+			pSmartCar::stop(nullptr);
 		}
 	}
 
@@ -121,7 +129,7 @@ void pSmartCar::updateState(void)
 
 void pSmartCar::updateSmoothAngleOutput(const float newAngle)
 {
-	m_smoothIncrement[IncrementType::SpeedIncrement] = (newAngle - m_idealAngleOffset) * 0.125f;
+	m_smoothIncrement[IncrementType::SpeedIncrement] = (newAngle - m_idealAngleOffset) * 0.05f;
 }
 
 float pSmartCar::getSmoothAngleOutput(void)
@@ -153,7 +161,7 @@ void pSmartCar::updateMotors(void)
 void pSmartCar::updateSpeed(void)
 {
 	float tempDirectionOutput = (m_directionEnabled)? getSmoothDirectionOutput() : 0.0f;
-	m_motors[0].setMappedPower(inRange(-9000, m_pidOutputVal[Type::Angle] + tempDirectionOutput, 9000));
+	m_motors[0].setMappedPower(inRange(-9000, (m_pidOutputVal[Type::Angle] + tempDirectionOutput) * pResource::configTable.kLeftMotorRatio, 9000));
 	m_motors[1].setMappedPower(inRange(-9000, m_pidOutputVal[Type::Angle] - tempDirectionOutput, 9000));
 }
 

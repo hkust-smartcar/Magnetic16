@@ -12,9 +12,6 @@
 #define MAX(a, b) ((a > b)? a : b)
 #define MIN(a, b) ((a < b)? a : b)
 
-#define DEBUG_FUZZY 0
-#define DEBUG_ERROR_OR_DERROR 0
-
 #define IS_CONTAIN(arr, v) (arr[0] == v || arr[1] == v)
 
 using namespace std;
@@ -125,7 +122,25 @@ void pFuzzyLogic::resetPdController(void)
 {
 	m_lastTime = 0;
 	m_lastError = 0.0f;
+	m_lastDError = 0.0f;
 	m_lastOutput = 0.0f;
+}
+
+float pFuzzyLogic::updatePController(float error)
+{
+	if (m_lastTime)
+	{
+		FuzzResult errorRet = fuzzification(error, ErrorType::Error);
+
+		InferenceResult inferResult = fuzzyInference(errorRet);
+
+		m_lastError = error;
+
+		m_lastOutput = defuzzification(inferResult);
+	}
+
+	m_lastTime = System::Time();
+	return m_lastOutput;
 }
 
 float pFuzzyLogic::updatePdController(float error)
@@ -134,24 +149,6 @@ float pFuzzyLogic::updatePdController(float error)
 	{
 		FuzzResult errorRet = fuzzification(error, ErrorType::Error);
 		FuzzResult dErrorRet = fuzzification((m_lastDError = (error - m_lastError) * 1000.0f / (float)(System::Time() - m_lastTime)), ErrorType::dError);
-
-#if DEBUG_FUZZY == 1
-#if DEBUG_ERROR_OR_DERROR == 0
-		if (IS_CONTAIN(errorRet.relatedIndex, 0) || IS_CONTAIN(errorRet.relatedIndex, 6))
-			pBuzzer::setBeep(65, 333);
-		else if (IS_CONTAIN(errorRet.relatedIndex, 1) || IS_CONTAIN(errorRet.relatedIndex, 5))
-			pBuzzer::setBeep(47, 200);
-		else
-			pBuzzer::setBeep(0, 0);
-#else
-		if (IS_CONTAIN(dErrorRet.relatedIndex, 0) || IS_CONTAIN(dErrorRet.relatedIndex, 6))
-			pBuzzer::setBeep(65, 333);
-		else if (IS_CONTAIN(dErrorRet.relatedIndex, 1) || IS_CONTAIN(dErrorRet.relatedIndex, 5))
-			pBuzzer::setBeep(47, 200);
-		else
-			pBuzzer::setBeep(0, 0);
-#endif
-#endif
 
 		InferenceResult inferResult = fuzzyInference(errorRet, dErrorRet);
 
@@ -239,6 +236,24 @@ pFuzzyLogic::InferenceResult pFuzzyLogic::fuzzyInference(const FuzzResult &error
 					ret.outputIndice[index] = true;
 				}
 			}
+		}
+	}
+
+	return ret;
+}
+
+pFuzzyLogic::InferenceResult pFuzzyLogic::fuzzyInference(const pFuzzyLogic::FuzzResult &errorResult)
+{
+	InferenceResult ret;
+
+	for (uint8_t i = 0, index = 0; i < 2; i++)
+	{
+		if (errorResult.relatedIndex[i] < 7)
+		{
+			index = m_rules[3][errorResult.relatedIndex[i]];
+			if (ret.outputIndice[index])
+				ret.outputDom[index] = MAX(ret.outputDom[index], errorResult.degreeOfMembship[i]);
+			ret.outputIndice[index] = true;
 		}
 	}
 

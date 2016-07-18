@@ -178,11 +178,15 @@ protected:
 	pGrapher				m_grapher;
 	pLowPassFilter			m_encoderLpf;
 	pFuzzyLogic				m_fuzzyLogic;
-	Gpi						m_hallSensor;
+//	Gpi						m_hallSensor;
+//	Adc						m_hallSensor2;
+	float					hallSensorReading;
 
 	bool					m_motorEnabled;
 	bool					m_directionEnabled;
 	bool					m_isReadyToRun;
+
+	Timer::TimerInt			m_timeLimit;
 
 	bool					m_isSetSpeed;
 	bool					m_isIgnoreMagnet;
